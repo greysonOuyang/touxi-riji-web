@@ -76,12 +76,14 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     const centerX = width / 2;
     const centerY = height / 2;
     const radius = Math.min(width, height) / 2 - 10;
+    const lineWidth = 10;
 
     // 绘制外圈（灰色）
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.strokeStyle = '#e0e0e0';
-    ctx.lineWidth = 10;
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
     // 计算填充比例
@@ -91,15 +93,16 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     // 绘制填充的外圈（蓝色或橙色）
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + fillAngle);
-    ctx.strokeStyle = currentValue >= 0 ? '#3498db' : '#f39c12';
-    ctx.lineWidth = 10;
+    ctx.strokeStyle = currentValue >= 0 ? '#3A7EF6' : '#f39c12';
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
     ctx.stroke();
 
     // 绘制水波
-    drawWaves(ctx, centerX, centerY, radius, fillRatio, currentValue >= 0 ? '#3498db' : '#f39c12', timestamp);
+    drawWaves(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, currentValue >= 0 ? '#3A7EF6' : '#f39c12', timestamp);
 
     // 绘制气泡
-    drawBubbles(ctx, centerX, centerY, radius, fillRatio, timestamp);
+    drawBubbles(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, timestamp);
   };
 
   const drawWaves = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
@@ -131,8 +134,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
       ctx.fill();
     };
 
-    drawWave(80, 5, 0.03, 0.5);
-    drawWave(50, 3, 0.05, 0.3);
+    drawWave(80, 4, 0.03, 0.5);
+    drawWave(50, 2, 0.05, 0.3);
 
     ctx.restore();
   };
