@@ -1,0 +1,81 @@
+.health-card {
+    background-color: #f4f4f8;  // 设置卡片背景为浅灰蓝色
+    border-radius: 12px;
+    border: none;  // 移除边框，因为背景色已经提供了足够的区分
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  
+    &:hover {
+      background-color: #eaeaf0;  // 悬停时稍微加深背景色
+    }
+  
+    &.full-width {
+      width: 100%;
+      padding: 20px;
+    }
+  
+    &.half-width {
+      padding: 15px;
+    }
+  
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+  
+      .card-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 10px;
+      }
+  
+      .card-title {
+        font-size: 16px;
+        font-weight: bold;
+      }
+  
+      .card-right-icon {
+        width: 16px;
+        height: 16px;
+        margin-left: auto;
+      }
+    }
+  
+    .card-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        width: 100%; // 添加这一行
+    
+        .card-value {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 5px;
+          word-break: break-word; // 添加这一行，允许长文本换行
+        }
+    
+        .card-subtext {
+          font-size: 12px;
+          color: #666;
+          word-break: break-word; // 添加这一行
+        }
+    
+        .card-note {
+          font-size: 14px;
+          word-break: break-word; // 添加这一行
+        }
+    
+        .card-image {
+          width: 100%;
+          height: 100px;
+          object-fit: cover;
+          margin-top: 10px;
+          border-radius: 5px;
+        }
+      }
+  }

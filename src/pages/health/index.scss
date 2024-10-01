@@ -1,0 +1,39 @@
+.health-page {
+  min-height: 100vh;              // 确保内容区域至少占满整个视口高度
+  padding: 15px;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.date-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #2c3e50;  // 深色文字，增加对比度
+}
+
+.cards-container {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+
+.health-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;  // 稍微减小间距
+}
+
+.half-width {
+  width: calc(50% - 8px);  // 调整宽度以适应新的间距
+  margin-bottom: 15px;
+}
