@@ -1,9 +1,25 @@
+
+// src/app.scss
+
+// 引入 NutUI 的样式
+// @import '@nutui/nutui-react-taro/dist/styles/variables.scss';
+
+// // 自定义主题变量
+// $primary-color: #3A7EF6;
+// $primary-color-end: #3A7EF6;
+
+// 覆盖 NutUI 的默认变量
+// :root,
+
+// 其他全局样式...
 page {
   background-color: #ffffff;
   min-height: 100vh;
   width: 100%;
   box-sizing: border-box;
   overflow-x: hidden;
+  // --nut-primary-color: #{$primary-color};
+  // --nut-primary-color-end: #{$primary-color-end};
 }
 
 .page-container {

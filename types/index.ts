@@ -17,3 +17,11 @@ export interface HealthCardProps {
   data: HealthData & { width: 'full' | 'half' };
   width: 'full' | 'half';
 }
+
+
+export interface UltrafiltrationData {
+  concentration: string;
+  infusionVolume: number;
+  drainageVolume: number;
+  ultrafiltrationVolume: number;
+}
