@@ -1,55 +1,34 @@
-import React, { useState } from "react";
-import { View, Text } from "@tarojs/components";
-import UltrafiltrationBall from "../UltrafiltrationBall";
-import { UltrafiltrationData } from "types";
-import UltrafiltrationForm from '../UltrafiltrationForm';
-import "./index.scss";
+import React from 'react';
+import { View, Text } from '@tarojs/components';
+import UltrafiltrationBall from '../UltrafiltrationBall';
+import './index.scss'
 
 interface UltrafiltrationViewProps {
+  date: string;
   value: number;
   target: number;
   concentration: string;
   specification: string;
-  currentSession: number;
-  totalSessions: number;
-  onUpdate: (data: UltrafiltrationData) => void;
+  frequency: number;
 }
 
 const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
+  date,
   value,
   target,
   concentration,
   specification,
-  currentSession,
-  totalSessions,
-  onUpdate,
+  frequency,
 }) => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-
-  const handleAddClick = () => {
-    setIsFormOpen(true);
-  };
-
-  const handleFormClose = () => {
-    setIsFormOpen(false);
-  };
-
-  const handleFormSubmit = (data: UltrafiltrationData) => {
-    onUpdate(data);
-    setIsFormOpen(false);
-  };
-
   return (
     <View className="ultrafiltration-view">
+      <Text className="date">{date}</Text>
       <View className="ultrafiltration-header">
-        <Text className="date">2024/10/3</Text>
+        <Text className="label">超滤量</Text>
         <Text className="value">{Math.round(value)}ml</Text>
       </View>
       <View className="ultrafiltration-main">
         <UltrafiltrationBall value={value} maxValue={target} />
-        <View className="add-button" onClick={handleAddClick}>
-          <View className="plus-icon" />
-        </View>
       </View>
       <View className="ultrafiltration-details">
         <View className="detail-item">
@@ -62,15 +41,9 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
         </View>
         <View className="detail-item">
           <Text className="detail-label">次数</Text>
-          <Text className="detail-value">{currentSession}/{totalSessions}</Text>
+          <Text className="detail-value">{frequency}</Text>
         </View>
       </View>
-      <UltrafiltrationForm
-        isOpen={isFormOpen}
-        onClose={handleFormClose}
-        onSubmit={handleFormSubmit}
-        initialConcentration={concentration}
-      />
     </View>
   );
 };

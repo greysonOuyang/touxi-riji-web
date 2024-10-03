@@ -16,25 +16,23 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
   const currentValueRef = useRef(0);
   const targetValueRef = useRef(value);
 
+  const ensurePositive = useCallback((value: number) => Math.max(0.1, value), []);
+
   const drawBall = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
     ctx.clearRect(0, 0, width, height);
     const centerX = width / 2;
     const centerY = height / 2;
-    const radius = Math.min(width, height) / 2 - 10;
-    const lineWidth = 10;
+    const minDimension = Math.min(width, height);
+    const radius = ensurePositive(minDimension / 2 - 10);
+    const lineWidth = ensurePositive(Math.min(10, radius / 5));
   
-    // 绘制阴影
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius + 2, 0, Math.PI * 2);
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetX = 2;
-    ctx.shadowOffsetY = 2;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
-    ctx.fill();
-    ctx.restore();
-  
+    // 添加调试信息
+    console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
+
+    // 绘制背景（用于调试）
+    // ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+    // ctx.fillRect(0, 0, width, height);
+
     // 绘制外圈（灰色）
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
@@ -44,7 +42,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     ctx.stroke();
   
     // 计算填充比例
-    const fillRatio = Math.abs(currentValue) / maxValue;
+    const safeMaxValue = ensurePositive(maxValue);
+    const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
     const fillAngle = Math.PI * 2 * fillRatio;
   
     // 绘制填充的外圈（蓝色或橙色）
@@ -56,14 +55,22 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     ctx.stroke();
   
     // 绘制水波
-    drawWaves(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, currentValue >= 0 ? '#3A7EF6' : '#f39c12', timestamp);
+    drawWaves(ctx, centerX, centerY, ensurePositive(radius - lineWidth / 2), fillRatio, currentValue >= 0 ? '#3A7EF6' : '#f39c12', timestamp);
   
     // 绘制气泡
-    drawBubbles(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, timestamp);
+    drawBubbles(ctx, centerX, centerY, ensurePositive(radius - lineWidth / 2), fillRatio, timestamp);
   
     // 绘制内部光泽效果
-    drawGloss(ctx, centerX, centerY, radius - lineWidth / 2);
-  }, []);
+    drawGloss(ctx, centerX, centerY, ensurePositive(radius - lineWidth / 2));
+
+    // 绘制当前值（用于调试）
+    // ctx.fillStyle = '#000';
+    // ctx.font = '14px Arial';
+    // ctx.textAlign = 'center';
+    // ctx.fillText(`${currentValue.toFixed(2)} / ${maxValue}`, centerX, centerY);
+  }, [ensurePositive]);
+
+  // drawWaves, drawBubbles, drawGloss, hexToRgb 函数保持不变
 
   const drawWaves = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
     const waterLevel = centerY + radius - (2 * radius * fillRatio);
@@ -95,18 +102,18 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     };
   
     // 绘制多层水波
-    drawWave(80, 4, 0.03, 0.5, 0);
-    drawWave(50, 2, 0.05, 0.3, -2);
-    drawWave(100, 3, 0.02, 0.2, 2);
+    drawWave(80, ensurePositive(4), 0.03, 0.5, 0);
+    drawWave(50, ensurePositive(2), 0.05, 0.3, -2);
+    drawWave(100, ensurePositive(3), 0.02, 0.2, 2);
   
     ctx.restore();
-  }, []);
+  }, [ensurePositive]);
 
   const drawBubbles = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, timestamp: number) => {
     const bubbles = [
-      { x: -20, y: 0, radius: 3, speed: 0.05 },
-      { x: 15, y: 0, radius: 2, speed: 0.03 },
-      { x: -5, y: 0, radius: 1.5, speed: 0.02 },
+      { x: -20, y: 0, radius: ensurePositive(3), speed: 0.05 },
+      { x: 15, y: 0, radius: ensurePositive(2), speed: 0.03 },
+      { x: -5, y: 0, radius: ensurePositive(1.5), speed: 0.02 },
     ];
 
     ctx.save();
@@ -126,11 +133,11 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     });
 
     ctx.restore();
-  }, []);
+  }, [ensurePositive]);
 
   const drawGloss = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number) => {
     const gradient = ctx.createRadialGradient(
-      centerX - radius / 3, centerY - radius / 3, radius / 10,
+      centerX - radius / 3, centerY - radius / 3, ensurePositive(radius / 10),
       centerX, centerY, radius
     );
     gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
@@ -140,7 +147,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.fillStyle = gradient;
     ctx.fill();
-  }, []);
+  }, [ensurePositive]);
 
   const hexToRgb = useCallback((hex: string, alpha: number) => {
     const r = parseInt(hex.slice(1, 3), 16);
@@ -163,17 +170,22 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     query.select('#ultrafiltrationBall')
       .fields({ node: true, size: true })
       .exec((res) => {
-        const canvas = res[0].node;
-        const ctx = canvas.getContext('2d');
-        
-        const { pixelRatio } = Taro.getWindowInfo();
-        
-        canvas.width = res[0].width * pixelRatio;
-        canvas.height = res[0].height * pixelRatio;
-        ctx.scale(pixelRatio, pixelRatio);
-        
-        canvasRef.current = { canvas, ctx, width: canvas.width / pixelRatio, height: canvas.height / pixelRatio };
-        setCanvasReady(true);
+        if (res[0] && res[0].node) {
+          const canvas = res[0].node;
+          const ctx = canvas.getContext('2d');
+          
+          const { pixelRatio } = Taro.getWindowInfo();
+          
+          canvas.width = res[0].width * pixelRatio;
+          canvas.height = res[0].height * pixelRatio;
+          ctx.scale(pixelRatio, pixelRatio);
+          
+          canvasRef.current = { canvas, ctx, width: res[0].width, height: res[0].height };
+          setCanvasReady(true);
+          console.log(`Canvas initialized: width=${res[0].width}, height=${res[0].height}, pixelRatio=${pixelRatio}`);
+        } else {
+          console.error('Failed to get canvas node');
+        }
       });
 
     return () => {
@@ -192,19 +204,14 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
       const diff = targetValueRef.current - currentValueRef.current;
       currentValueRef.current += diff * 0.1; // 调整这个系数可以改变过渡速度
 
-      if (Math.abs(diff) > 0.1) {
-        drawBall(ctx, width, height, currentValueRef.current, maxValue, timestamp);
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        currentValueRef.current = targetValueRef.current;
-        drawBall(ctx, width, height, currentValueRef.current, maxValue, timestamp);
-        animationRef.current = requestAnimationFrame(animate);
-      }
+      drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
+      animationRef.current = requestAnimationFrame(animate);
     };
     
     animationRef.current = requestAnimationFrame(animate);
   }, [drawBall, maxValue]);
 
+  // handleTap 函数保持不变
   const handleTap = useCallback((e: any) => {
     if (!canvasRef.current || !onChange) return;
     
@@ -214,11 +221,11 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     const y = e.touches[0].clientY - rect.top;
     
     const centerY = height / 2;
-    const radius = Math.min(width, height) / 2 - 10;
+    const radius = ensurePositive(Math.min(width, height) / 2 - 10);
     
     const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
     onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
-  }, [onChange, maxValue]);
+  }, [onChange, maxValue, ensurePositive]);
 
   return (
     <Canvas 
@@ -227,6 +234,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
       className='ultrafiltration-ball'
       canvasId='ultrafiltrationBall'
       onTap={handleTap}
+      style={{ width: '200px', height: '200px' }}
     />
   );
 };
