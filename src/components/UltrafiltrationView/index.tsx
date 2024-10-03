@@ -4,25 +4,24 @@ import UltrafiltrationBall from '../UltrafiltrationBall';
 import './index.scss'
 
 interface UltrafiltrationViewProps {
-  date: string;
   value: number;
   target: number;
   concentration: string;
   specification: string;
-  frequency: number;
+  currentSession: number;
+  totalSession: number;
 }
 
 const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
-  date,
   value,
   target,
   concentration,
   specification,
-  frequency,
+  currentSession,
+  totalSession,
 }) => {
   return (
     <View className="ultrafiltration-view">
-      <Text className="date">{date}</Text>
       <View className="ultrafiltration-header">
         <Text className="label">超滤量</Text>
         <Text className="value">{Math.round(value)}ml</Text>
@@ -41,7 +40,7 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
         </View>
         <View className="detail-item">
           <Text className="detail-label">次数</Text>
-          <Text className="detail-value">{frequency}</Text>
+          <Text className="detail-value">{currentSession} / {totalSession}</Text>
         </View>
       </View>
     </View>

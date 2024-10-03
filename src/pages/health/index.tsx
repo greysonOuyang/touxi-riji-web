@@ -14,7 +14,7 @@ const HealthPage: React.FC = () => {
     concentration: '1.5%',
     specification: '2000ml',
     currentSession: 1,
-    totalSessions: 4
+    totalSession: 4
   });
 
   const handleUltrafiltrationUpdate = async () => {
@@ -60,8 +60,7 @@ const HealthPage: React.FC = () => {
           concentration={ultrafiltrationData.concentration}
           specification={ultrafiltrationData.specification}
           currentSession={ultrafiltrationData.currentSession}
-          totalSessions={ultrafiltrationData.totalSessions}
-          onUpdate={handleUltrafiltrationUpdate}
+          totalSession={ultrafiltrationData.totalSession}
         />
           </View>
 
