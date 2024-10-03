@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Canvas } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import './index.scss';
@@ -6,14 +6,148 @@ import './index.scss';
 interface UltrafiltrationBallProps {
   value: number;
   maxValue: number;
+  onChange?: (value: number) => void;
 }
 
-const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxValue }) => {
+const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxValue, onChange }) => {
   const canvasRef = useRef<any>(null);
   const animationRef = useRef<number>();
   const [canvasReady, setCanvasReady] = useState(false);
   const currentValueRef = useRef(0);
   const targetValueRef = useRef(value);
+
+  const drawBall = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
+    ctx.clearRect(0, 0, width, height);
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 2 - 10;
+    const lineWidth = 10;
+  
+    // 绘制阴影
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius + 2, 0, Math.PI * 2);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 2;
+    ctx.shadowOffsetY = 2;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fill();
+    ctx.restore();
+  
+    // 绘制外圈（灰色）
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = '#e0e0e0';
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  
+    // 计算填充比例
+    const fillRatio = Math.abs(currentValue) / maxValue;
+    const fillAngle = Math.PI * 2 * fillRatio;
+  
+    // 绘制填充的外圈（蓝色或橙色）
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + fillAngle);
+    ctx.strokeStyle = currentValue >= 0 ? '#3A7EF6' : '#f39c12';
+    ctx.lineWidth = lineWidth;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  
+    // 绘制水波
+    drawWaves(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, currentValue >= 0 ? '#3A7EF6' : '#f39c12', timestamp);
+  
+    // 绘制气泡
+    drawBubbles(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, timestamp);
+  
+    // 绘制内部光泽效果
+    drawGloss(ctx, centerX, centerY, radius - lineWidth / 2);
+  }, []);
+
+  const drawWaves = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
+    const waterLevel = centerY + radius - (2 * radius * fillRatio);
+    
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.clip();
+  
+    const wave = (x: number, wavelength: number, amplitude: number, speed: number) => 
+      Math.sin((x + timestamp * speed) / wavelength) * amplitude;
+  
+    const drawWave = (wavelength: number, amplitude: number, speed: number, alpha: number, yOffset: number) => {
+      ctx.beginPath();
+      ctx.moveTo(centerX - radius, waterLevel + yOffset);
+      for (let x = 0; x <= radius * 2; x++) {
+        const y = wave(x, wavelength, amplitude, speed);
+        ctx.lineTo(centerX - radius + x, waterLevel + y + yOffset);
+      }
+      ctx.lineTo(centerX + radius, centerY + radius);
+      ctx.lineTo(centerX - radius, centerY + radius);
+      ctx.closePath();
+  
+      const gradient = ctx.createLinearGradient(0, waterLevel + yOffset, 0, centerY + radius);
+      gradient.addColorStop(0, hexToRgb(color, alpha * 0.7));
+      gradient.addColorStop(1, hexToRgb(color, alpha));
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    };
+  
+    // 绘制多层水波
+    drawWave(80, 4, 0.03, 0.5, 0);
+    drawWave(50, 2, 0.05, 0.3, -2);
+    drawWave(100, 3, 0.02, 0.2, 2);
+  
+    ctx.restore();
+  }, []);
+
+  const drawBubbles = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, timestamp: number) => {
+    const bubbles = [
+      { x: -20, y: 0, radius: 3, speed: 0.05 },
+      { x: 15, y: 0, radius: 2, speed: 0.03 },
+      { x: -5, y: 0, radius: 1.5, speed: 0.02 },
+    ];
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    bubbles.forEach((bubble, index) => {
+      const x = centerX + bubble.x;
+      const maxY = centerY + radius - (2 * radius * fillRatio);
+      const y = centerY + radius - ((timestamp * bubble.speed + index * 1000) % (2 * radius * fillRatio));
+
+      ctx.beginPath();
+      ctx.arc(x, Math.max(y, maxY), bubble.radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+      ctx.fill();
+    });
+
+    ctx.restore();
+  }, []);
+
+  const drawGloss = useCallback((ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number) => {
+    const gradient = ctx.createRadialGradient(
+      centerX - radius / 3, centerY - radius / 3, radius / 10,
+      centerX, centerY, radius
+    );
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+    gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+  
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  }, []);
+
+  const hexToRgb = useCallback((hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }, []);
 
   useEffect(() => {
     if (!canvasReady) return;
@@ -49,7 +183,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     };
   }, []);
 
-  const animateBall = () => {
+  const animateBall = useCallback(() => {
     const animate = (timestamp: number) => {
       if (!canvasRef.current) return;
       const { ctx, width, height } = canvasRef.current;
@@ -69,109 +203,22 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     };
     
     animationRef.current = requestAnimationFrame(animate);
-  };
+  }, [drawBall, maxValue]);
 
-  const drawBall = (ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
-    ctx.clearRect(0, 0, width, height);
-    const centerX = width / 2;
+  const handleTap = useCallback((e: any) => {
+    if (!canvasRef.current || !onChange) return;
+    
+    const { width, height } = canvasRef.current;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    
     const centerY = height / 2;
     const radius = Math.min(width, height) / 2 - 10;
-    const lineWidth = 10;
-
-    // 绘制外圈（灰色）
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = '#e0e0e0';
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // 计算填充比例
-    const fillRatio = Math.abs(currentValue) / maxValue;
-    const fillAngle = Math.PI * 2 * fillRatio;
-
-    // 绘制填充的外圈（蓝色或橙色）
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + fillAngle);
-    ctx.strokeStyle = currentValue >= 0 ? '#3A7EF6' : '#f39c12';
-    ctx.lineWidth = lineWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // 绘制水波
-    drawWaves(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, currentValue >= 0 ? '#3A7EF6' : '#f39c12', timestamp);
-
-    // 绘制气泡
-    drawBubbles(ctx, centerX, centerY, radius - lineWidth / 2, fillRatio, timestamp);
-  };
-
-  const drawWaves = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
-    const waterLevel = centerY + radius - (2 * radius * fillRatio);
     
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.clip();
-
-    const wave = (x: number, wavelength: number, amplitude: number, speed: number) => 
-      Math.sin((x + timestamp * speed) / wavelength) * amplitude;
-
-    const drawWave = (wavelength: number, amplitude: number, speed: number, alpha: number) => {
-      ctx.beginPath();
-      ctx.moveTo(centerX - radius, waterLevel);
-      for (let x = 0; x <= radius * 2; x++) {
-        const y = wave(x, wavelength, amplitude, speed);
-        ctx.lineTo(centerX - radius + x, waterLevel + y);
-      }
-      ctx.lineTo(centerX + radius, centerY + radius);
-      ctx.lineTo(centerX - radius, centerY + radius);
-      ctx.closePath();
-
-      const gradient = ctx.createLinearGradient(0, waterLevel, 0, centerY + radius);
-      gradient.addColorStop(0, hexToRgb(color, alpha));
-      gradient.addColorStop(1, hexToRgb(color, 1));
-      ctx.fillStyle = gradient;
-      ctx.fill();
-    };
-
-    drawWave(80, 4, 0.03, 0.5);
-    drawWave(50, 2, 0.05, 0.3);
-
-    ctx.restore();
-  };
-
-  const drawBubbles = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, timestamp: number) => {
-    const bubbles = [
-      { x: -20, y: 0, radius: 3, speed: 0.05 },
-      { x: 15, y: 0, radius: 2, speed: 0.03 },
-      { x: -5, y: 0, radius: 1.5, speed: 0.02 },
-    ];
-
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.clip();
-
-    bubbles.forEach((bubble, index) => {
-      const x = centerX + bubble.x;
-      const maxY = centerY + radius - (2 * radius * fillRatio);
-      const y = centerY + radius - ((timestamp * bubble.speed + index * 1000) % (2 * radius * fillRatio));
-
-      ctx.beginPath();
-      ctx.arc(x, Math.max(y, maxY), bubble.radius, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-      ctx.fill();
-    });
-
-    ctx.restore();
-  };
-
-  const hexToRgb = (hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
+    const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
+    onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
+  }, [onChange, maxValue]);
 
   return (
     <Canvas 
@@ -179,6 +226,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
       id='ultrafiltrationBall'
       className='ultrafiltration-ball'
       canvasId='ultrafiltrationBall'
+      onTap={handleTap}
     />
   );
 };

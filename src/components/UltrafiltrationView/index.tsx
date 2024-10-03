@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { View } from "@tarojs/components";
+import React, { useState } from "react";
+import { View, Text } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
-import { UltrafiltrationData } from "types"; // 确保路径正确
+import { UltrafiltrationData } from "types";
 import UltrafiltrationForm from '../UltrafiltrationForm';
 import "./index.scss";
 
@@ -24,12 +24,7 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
   totalSessions,
   onUpdate,
 }) => {
-  const [currentValue, setCurrentValue] = useState(0);
   const [isFormOpen, setIsFormOpen] = useState(false);
-
-  useEffect(() => {
-    // 动画效果代码保持不变
-  }, [value]);
 
   const handleAddClick = () => {
     setIsFormOpen(true);
@@ -46,30 +41,28 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
 
   return (
     <View className="ultrafiltration-view">
+      <View className="ultrafiltration-header">
+        <Text className="date">2024/10/3</Text>
+        <Text className="value">{Math.round(value)}ml</Text>
+      </View>
       <View className="ultrafiltration-main">
-        <UltrafiltrationBall value={currentValue} maxValue={target} />
-        <View className="ultrafiltration-info">
-          <View className="info-label">超滤量</View>
-          <View className="info-value">{currentValue}ml</View>
-        </View>
+        <UltrafiltrationBall value={value} maxValue={target} />
         <View className="add-button" onClick={handleAddClick}>
-          <View className="plus-icon"></View>
+          <View className="plus-icon" />
         </View>
       </View>
       <View className="ultrafiltration-details">
         <View className="detail-item">
-          <View className="detail-label">浓度</View>
-          <View className="detail-value">{concentration}</View>
+          <Text className="detail-label">浓度</Text>
+          <Text className="detail-value">{concentration}</Text>
         </View>
         <View className="detail-item">
-          <View className="detail-label">规格</View>
-          <View className="detail-value">{specification}</View>
+          <Text className="detail-label">规格</Text>
+          <Text className="detail-value">{specification}</Text>
         </View>
         <View className="detail-item">
-          <View className="detail-label">次数</View>
-          <View className="detail-value">
-            {currentSession}/{totalSessions}
-          </View>
+          <Text className="detail-label">次数</Text>
+          <Text className="detail-value">{currentSession}/{totalSessions}</Text>
         </View>
       </View>
       <UltrafiltrationForm
