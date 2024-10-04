@@ -1,37 +1,77 @@
 .ultrafiltration-card {
-  padding: 20px;
-
-  .title {
-    font-size: 18px;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .input-row, .result-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-
-    .label {
-      width: 70px;
-      margin-right: 10px;
-    }
-
-    .unit {
-      margin-left: 10px;
-    }
-  }
-
-  .result-row {
-    .value {
-      font-weight: bold;
-      color: #007aff;
-    }
-  }
-
-  .button-container {
-    margin-top: 20px;
-  }
+  padding: 16px;
+  background-color: #fff; /* Background color for the card */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Shadow effect */
+  height: 100%; /* Full height for scrollable content */
 }
+
+.title {
+  font-size: 18px; /* Title font size */
+  font-weight: bold; /* Bold title */
+  margin-bottom: 16px; /* Space below title */
+  text-align: center; /* Center title */
+}
+
+.input-row {
+  display: flex; /* Flexbox for label and input */
+  align-items: center; /* Center vertically */
+  margin-bottom: 16px; /* Space between rows */
+}
+
+.label {
+  width: 80px; /* Fixed width for labels */
+  font-size: 16px; /* Font size for labels */
+}
+
+.input-with-unit {
+  display: flex; /* Flexbox for input and unit */
+  align-items: center; /* Center vertically */
+  flex-grow: 1; /* Allow input to take remaining space */
+}
+
+.unit {
+  margin-left: 8px; /* Space between input and unit */
+  font-size: 16px; /* Font size for units */
+  color: #555; /* Color for units */
+}
+
+.result-row {
+  display: flex; /* Flexbox for result display */
+  align-items: center; /* Center vertically */
+  margin-top: 16px; /* Space above result row */
+}
+
+.value {
+  font-size: 16px; /* Font size for result value */
+  font-weight: bold; /* Bold result value */
+  margin-left: 8px; /* Space between label and value */
+}
+.button-container {
+  display: flex;
+  justify-content: center; /* 居中对齐按钮 */
+  width: 100%; /* 满宽 */
+  margin-top: 16px;
+  padding: 0 16px; /* 增加左右内边距，避免按钮溢出 */
+}
+
+.custom-nutui-button {
+  background-color: #007bff; /* 蓝色按钮 */
+  border-radius: 12px; /* 圆角 */
+  width: 100%; /* 满宽 */
+  text-align: center;
+  color: #fff; /* 白色文字 */
+  padding: 10px 0; /* 内边距调整 */
+  transition: all 0.3s ease; /* 平滑的动效 */
+}
+
+.custom-nutui-button:hover {
+  background-color: #0056b3; /* 悬浮时稍微深色 */
+}
+
+.custom-nutui-button:active {
+  background-color: #004085; /* 点击时的颜色 */
+  transform: scale(0.98); /* 点击时的缩放效果 */
+}
+
 
