@@ -30,8 +30,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
 
     // 绘制背景（用于调试）
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
-    ctx.fillRect(0, 0, width, height);
+    // ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+    // ctx.fillRect(0, 0, width, height);
 
     // 绘制外圈（灰色）
     ctx.beginPath();
@@ -228,13 +228,12 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
   }, [onChange, maxValue, ensurePositive]);
 
   return (
-    <Canvas 
-      type='2d'
-      id='ultrafiltrationBall'
-      className='ultrafiltration-ball'
-      canvasId='ultrafiltrationBall'
-      onTap={handleTap}
-      style={{ width: '200px', height: '200px' }}
+    <Canvas
+      type="2d"
+      id="ultrafiltrationBall"
+      className="ultrafiltration-ball"
+      canvasId="ultrafiltrationBall"
+      ref={canvasRef}
     />
   );
 };

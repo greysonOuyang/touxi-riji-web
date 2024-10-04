@@ -1,46 +1,98 @@
 .ultrafiltration-view {
-  padding: 20px;
-
-  .date {
-    font-size: 16px;
-    color: #333;
-    margin-bottom: 10px;
-    display: block;
-  }
+  position: relative;
+  padding: 16px;
 
   .ultrafiltration-header {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 20px;
+    align-items: center;
+    margin-bottom: 16px;
 
     .label {
       font-size: 18px;
+      font-weight: bold;
       color: #333;
     }
 
     .value {
       font-size: 24px;
       font-weight: bold;
-      color: #007bff;
+      color: #1989fa;
     }
   }
 
   .ultrafiltration-main {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
-    height: 200px;
+    margin-bottom: 16px;
+    position: relative;
+
+    .ball-container {
+      width: 200px;
+      height: 200px;
+      position: relative;
+
+      .add-icon {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 32px; // 稍微调大
+        height: 32px; // 稍微调大
+        background-color: #1989fa;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 10;
+        transition: all 0.3s ease; // 添加过渡效果
+
+        &::before,
+        &::after {
+          content: '';
+          position: absolute;
+          background-color: white;
+        }
+
+        &::before {
+          width: 2px;
+          height: 16px; // 稍微调大
+        }
+
+        &::after {
+          width: 16px; // 稍微调大
+          height: 2px;
+        }
+
+        &:hover {
+          transform: scale(1.1); // 悬停时稍微放大
+        }
+
+        &:active {
+          transform: scale(0.9); // 点击时稍微缩小
+          background-color: darken(#1989fa, 10%); // 点击时颜色变深
+        }
+      }
+    }
   }
 
   .ultrafiltration-details {
     display: flex;
     justify-content: space-between;
+    padding: 0 4px;
 
     .detail-item {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      align-items: flex-start;
+
+      &:last-child {
+        align-items: flex-end;
+      }
+
+      &:nth-child(2) {
+        align-items: center;
+      }
 
       .detail-label {
         font-size: 14px;
@@ -50,6 +102,7 @@
 
       .detail-value {
         font-size: 16px;
+        font-weight: bold;
         color: #333;
       }
     }

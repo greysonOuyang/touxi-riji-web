@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text } from '@tarojs/components';
 import UltrafiltrationBall from '../UltrafiltrationBall';
-import './index.scss'
+import UltrafiltrationCard from '../UltrafiltrationCard';
+import './index.scss';
 
 interface UltrafiltrationViewProps {
   value: number;
@@ -20,6 +21,15 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
   currentSession,
   totalSession,
 }) => {
+  const [isFormVisible, setIsFormVisible] = useState(false);
+
+  const handleOpenForm = () => setIsFormVisible(true);
+  const handleCloseForm = () => setIsFormVisible(false);
+  const handleSaveForm = (newData) => {
+    console.log('New data:', newData);
+    setIsFormVisible(false);
+  };
+
   return (
     <View className="ultrafiltration-view">
       <View className="ultrafiltration-header">
@@ -27,7 +37,10 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
         <Text className="value">{Math.round(value)}ml</Text>
       </View>
       <View className="ultrafiltration-main">
-        <UltrafiltrationBall value={value} maxValue={target} />
+        <View className="ball-container">
+          <View className="add-icon" onClick={handleOpenForm}></View>
+          <UltrafiltrationBall value={value} maxValue={target} />
+        </View>
       </View>
       <View className="ultrafiltration-details">
         <View className="detail-item">
@@ -40,9 +53,19 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
         </View>
         <View className="detail-item">
           <Text className="detail-label">次数</Text>
-          <Text className="detail-value">{currentSession} / {totalSession}</Text>
+          <Text className="detail-value">{currentSession}/{totalSession}</Text>
         </View>
       </View>
+      <UltrafiltrationCard 
+        isVisible={isFormVisible}
+        onClose={handleCloseForm}
+        onSave={handleSaveForm}
+        initialData={{
+          concentration: parseFloat(concentration),
+          infusionVolume: 0,
+          drainageVolume: value
+        }}
+      />
     </View>
   );
 };
