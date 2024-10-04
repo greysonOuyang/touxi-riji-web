@@ -1,0 +1,54 @@
+.ultrafiltration-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+  
+      view:first-child {
+        font-size: 36px;
+        font-weight: bold;
+      }
+    }
+  
+    .input-container {
+      padding: 32px;
+  
+      .input-row, .result-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 32px;
+  
+        view:first-child {
+          width: 160px;
+          margin-right: 16px;
+        }
+  
+        view:last-child {
+          margin-left: 16px;
+        }
+      }
+  
+      .result-row {
+        font-weight: bold;
+      }
+  
+      .nut-button {
+        width: 100%;
+        margin-top: 32px;
+      }
+    }
+  }
+  
+  // 自定义NutUI组件样式
+  :global {
+    .nut-input-number {
+      width: 240px;
+    }
+  }

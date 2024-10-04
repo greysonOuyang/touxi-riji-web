@@ -30,8 +30,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
 
     // 绘制背景（用于调试）
-    // ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
-    // ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
+    ctx.fillRect(0, 0, width, height);
 
     // 绘制外圈（灰色）
     ctx.beginPath();
@@ -64,10 +64,10 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     drawGloss(ctx, centerX, centerY, ensurePositive(radius - lineWidth / 2));
 
     // 绘制当前值（用于调试）
-    // ctx.fillStyle = '#000';
-    // ctx.font = '14px Arial';
-    // ctx.textAlign = 'center';
-    // ctx.fillText(`${currentValue.toFixed(2)} / ${maxValue}`, centerX, centerY);
+    ctx.fillStyle = '#000';
+    ctx.font = '14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(`${currentValue.toFixed(2)} / ${maxValue}`, centerX, centerY);
   }, [ensurePositive]);
 
   // drawWaves, drawBubbles, drawGloss, hexToRgb 函数保持不变

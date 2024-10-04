@@ -37,6 +37,8 @@
   "author": "",
   "dependencies": {
     "@babel/runtime": "^7.21.5",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@nutui/icons-react-taro": "^1.0.5",
     "@nutui/nutui-react-taro": "^2.6.21",
     "@tarojs/components": "^4.0.6",

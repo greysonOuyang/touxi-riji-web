@@ -1,0 +1,71 @@
+$theme-blue: #3A7EF6;
+$button-size: 56px;
+
+.floating-add-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: $button-size;
+  height: $button-size;
+  border-radius: 50%;
+  background: linear-gradient(135deg, lighten($theme-blue, 10%), $theme-blue);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    transform: scale(0);
+    transition: transform 0.3s ease-out;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+
+    &::before {
+      transform: scale(1);
+    }
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  .plus-icon {
+    width: $button-size * 0.5;
+    height: $button-size * 0.5;
+    fill: white;
+    z-index: 1;
+  }
+}
+
+.grid-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.grid-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 4px;
+  fill: $theme-blue;
+}
+
+.grid-text {
+  font-size: 12px;
+  color: #333;
+}
