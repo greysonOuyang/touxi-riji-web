@@ -27,7 +27,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({ value, maxVal
     const lineWidth = ensurePositive(Math.min(10, radius / 5));
   
     // 添加调试信息
-    console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
+    // console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
 
     // 绘制背景（用于调试）
     // ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
