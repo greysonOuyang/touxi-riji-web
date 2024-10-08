@@ -3,6 +3,7 @@ import { View, Text } from '@tarojs/components';
 import UltrafiltrationBall from '../UltrafiltrationBall';
 import UltrafiltrationCard from '../UltrafiltrationCard';
 import './index.scss';
+import TimePicker from '../TimePicker';
 
 interface UltrafiltrationViewProps {
   value: number;
@@ -56,7 +57,8 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
           <Text className="detail-value">{currentSession}/{totalSession}</Text>
         </View>
       </View>
-      <UltrafiltrationCard 
+      <TimePicker onTimeChange={handleOpenForm} />
+      {/* <UltrafiltrationCard 
         isVisible={isFormVisible}
         onClose={handleCloseForm}
         onSave={handleSaveForm}
@@ -65,7 +67,7 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
           infusionVolume: 0,
           drainageVolume: value
         }}
-      />
+      /> */}
     </View>
   );
 };

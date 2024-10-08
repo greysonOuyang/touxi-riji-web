@@ -2,7 +2,8 @@ export default {
   pages: [
     'pages/health/index',
     'pages/record/index',
-    'pages/settings/index'
+    'pages/statistics/index',
+    'pages/profile/index'
   ],
   window: {
     // backgroundTextStyle: 'light',
@@ -25,7 +26,7 @@ export default {
         pagePath: 'pages/health/index',
         text: '首页',
         iconPath: 'assets/icons/home.png',
-        selectedIconPath: 'assets/icons/home_a.png'
+        selectedIconPath: 'assets/icons/home_selected.png'
       },
       {
         pagePath: 'pages/record/index',
@@ -34,7 +35,15 @@ export default {
         selectedIconPath: 'assets/icons/calendar_a.png'
       },
       {
-        pagePath: 'pages/settings/index',
+        pagePath: 'pages/statistics/index',
+        text: '统计',
+        // iconPath: 'assets/icons/statistics.png',
+        // selectedIconPath: 'assets/icons/statistics_selected.png'
+        iconPath: 'assets/icons/home.png',
+        selectedIconPath: 'assets/icons/home_selected.png'
+      },
+      {
+        pagePath: 'pages/profile/index',
         text: '个人',
         iconPath: 'assets/icons/personal.png',
         selectedIconPath: 'assets/icons/personal_a.png'
@@ -43,6 +52,6 @@ export default {
     color: '#999999',
     selectedColor: '3a82f7',
     backgroundColor: '#ffffff',
-    borderStyle: 'white'
+    borderStyle: 'black'
   }
 }

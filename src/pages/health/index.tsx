@@ -1,67 +1,51 @@
-import React, { useState } from 'react';
-import { View, Text } from "@tarojs/components";
+import React, { useState } from "react";
+
+import { View } from "@tarojs/components";
+
 import "./index.scss";
 import UltrafiltrationView from "@/components/UltrafiltrationView";
 import HealthCard from "@/components/HealthCard";
 import { cardLayout } from "@/data/healthData";
-import { UltrafiltrationData } from 'types';
-import { updateUltrafiltrationData } from '@/api/ultrafiltration'; // 假设这是一个API调用函数
+
+interface HealthData {
+  // Define the structure of your health data here
+  ultrafiltration: {
+    value: number;
+    target: number;
+    concentration: string;
+    specification: string;
+    currentSession: number;
+    totalSession: number;
+  };
+  // Add other health data fields as needed
+}
 
 const HealthPage: React.FC = () => {
-  const [ultrafiltrationData, setUltrafiltrationData] = useState({
-    value: 800,
-    target: 1000,
-    concentration: '1.5%',
-    specification: '2000ml',
-    currentSession: 1,
-    totalSession: 4
+  const [healthData, setHealthData] = useState<HealthData>({
+    ultrafiltration: {
+      value: 800,
+      target: 1000,
+      concentration: "1.5%",
+      specification: "2000ml",
+      currentSession: 1,
+      totalSession: 4,
+    },
+    // Initialize other health data fields here
   });
-
-  const handleUltrafiltrationUpdate = async () => {
-    try {
-      await updateUltrafiltrationData(ultrafiltrationData)
-      // 更新成功后的逻辑...
-    } catch (error) {
-      console.error('Failed to update ultrafiltration data:', error)
-      // 错误处理逻辑...
-    }
-  }
-
-  // const handleUltrafiltrationUpdate = async (data: UltrafiltrationData) => {
-  //   try {
-  //     // 调用API保存数据
-  //     await updateUltrafiltrationData(data);
-
-  //     // 更新本地状态
-  //     setUltrafiltrationData(prevData => ({
-  //       ...prevData,
-  //       value: prevData.value + data.ultrafiltrationVolume,
-  //       concentration: data.concentration,
-  //       currentSession: prevData.currentSession + 1
-  //     }));
-
-  //     // 可以在这里添加成功提示
-  //   } catch (error) {
-  //     console.error('Failed to update ultrafiltration data:', error);
-  //     // 可以在这里添加错误提示
-  //   }
-  // };
 
   return (
     <View className="page-container">
       <View className="main-content">
         <View className="health-page">
-          <Text className="date-title">{new Date().toLocaleDateString()}</Text>
-
           <View className="cards-container">
-          <UltrafiltrationView
-          value={ultrafiltrationData.value}
-          target={ultrafiltrationData.target}
-          concentration={ultrafiltrationData.concentration}
-          specification={ultrafiltrationData.specification}
-          currentSession={ultrafiltrationData.currentSession}
-          totalSession={ultrafiltrationData.totalSession}
-        />
+            <UltrafiltrationView
+              value={healthData.ultrafiltration.value}
+              target={healthData.ultrafiltration.target}
+              concentration={healthData.ultrafiltration.concentration}
+              specification={healthData.ultrafiltration.specification}
+              currentSession={healthData.ultrafiltration.currentSession}
+              totalSession={healthData.ultrafiltration.totalSession}
+            />
           </View>
 
           <View className="health-grid">

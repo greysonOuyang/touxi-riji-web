@@ -70,7 +70,8 @@
 
         &:active {
           transform: scale(0.9); // 点击时稍微缩小
-          background-color: darken(#1989fa, 10%); // 点击时颜色变深
+          // background-color: darken(#1989fa, 10%); // 点击时颜色变深
+          
         }
       }
     }
@@ -108,3 +109,5 @@
     }
   }
 }
+
+

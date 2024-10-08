@@ -1,107 +1,51 @@
 .ultrafiltration-card {
-  display: flex;
-  flex-direction: column;
-  background-color: #fff;
-  border-radius: 16px;
-  overflow: hidden; // 隐藏子元素溢出，使圆角生效
+  .open-form-btn {
+    padding: 10px 20px;
+    background-color: #007aff;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    margin: 20px auto;
+    width: 200px;
+  }
 
-  .card-header {
-    background-color: #2196F3; // 设置蓝色背景
+  .form-container {
     padding: 20px;
 
-    .title {
+    .form-title {
       font-size: 18px;
       font-weight: bold;
-      color: #fff;
+      margin-bottom: 20px;
+      text-align: center;
     }
-  }
 
-  .card-content {
-    padding: 20px;
+    .selected-time {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 16px;
+    }
 
-    .input-row {
+    .footer {
       display: flex;
-      align-items: center;
-      margin-bottom: 16px;
+      justify-content: space-between;
+      margin-top: 20px;
 
-      .input-label {
-        width: 80px;
-        font-size: 16px;
-        color: #333;
-      }
+      .btn {
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-align: center;
+        width: 45%;
 
-      .input-container {
-        flex: 1;
-        display: flex;
-        align-items: center;
-
-        .input-wrapper {
-          flex: 1;
-
-          .nut-input-number {
-            // 调整 NutUI 输入框样式
-            height: 40px;
-            border-radius: 4px;
-          }
-        }
-
-        .unit-label {
-          margin-left: 8px;
-          font-size: 16px;
+        &.cancel {
+          background-color: #f2f2f2;
           color: #333;
         }
+
+        &.save {
+          background-color: #007aff;
+          color: white;
+        }
       }
-
-      .error-message {
-        color: #f00;
-        font-size: 14px;
-        margin-top: 4px;
-      }
-    }
-
-    // 浓度滑块样式
-    .nut-slider {
-      flex: 1;
-
-      .nut-slider-bar {
-        background-color: #2196F3; // 设置蓝色滑块
-      }
-    }
-
-    .result-container {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-
-      .result-title {
-        font-size: 16px;
-        color: #333;
-        margin-bottom: 8px;
-      }
-
-      .nut-progress {
-        width: 100%;
-        height: 8px;
-        border-radius: 4px; // 设置圆角进度条
-      }
-
-      .result-value {
-        font-size: 16px;
-        margin-top: 8px;
-      }
-    }
-  }
-
-  .card-footer {
-    padding: 20px;
-    border-top: 1px solid #eee; // 添加顶部边框
-
-    .save-button {
-      width: 100%;
-      height: 48px;
-      font-size: 16px;
-      border-radius: 24px; // 设置圆角按钮
     }
   }
 }
