@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { DatePicker, type PickerOption } from '@nutui/nutui-react-taro';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text, Input, Image } from '@tarojs/components';
 import clockIcon from '@/assets/icons/clock.png';
+// import editIcon from '@/assets/icons/edit.png';
 import './index.scss';
 
 interface TimePickerProps {
@@ -38,6 +39,10 @@ const TimePicker: React.FC<TimePickerProps> = ({ onTimeChange }) => {
     onTimeChange(value);
   };
 
+  const handleInputChange = (e: any) => {
+    setChosenValue(e.detail.value);
+  };
+
   const getDefaultValue = () => {
     const [hours, minutes] = (chosenValue || currentTime).split(':').map(Number);
     const now = new Date();
@@ -46,23 +51,31 @@ const TimePicker: React.FC<TimePickerProps> = ({ onTimeChange }) => {
   };
 
   return (
-    <View className="time-picker" onClick={handleContainerClick}>
-      <Image
-        src={clockIcon}
-        className="clock-icon"
-      />
-      <Text className="time-text">
-        {chosenValue || currentTime}
-      </Text>
+    <View className="time-picker">
+      <View className="time-display" onClick={handleContainerClick}>
+        <Image src={clockIcon} className="clock-icon" />
+        <Text className="time-text">{chosenValue || currentTime}</Text>
+        {/* <Image src={editIcon} className="clock-icon" /> */}
+      </View>
       <DatePicker
         key={pickerKey}
-        title="时间选择"
         type="hour-minutes"
         defaultValue={getDefaultValue()}
         visible={showPicker}
         onClose={() => setShowPicker(false)}
         onConfirm={handlePickerConfirm}
       />
+      {showPicker && (
+        <View className="time-input-overlay">
+          <Input
+            type="text"
+            value={chosenValue}
+            onInput={handleInputChange}
+            className="time-input"
+            placeholder="Enter time (HH:MM)"
+          />
+        </View>
+      )}
     </View>
   );
 };
