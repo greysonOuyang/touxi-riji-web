@@ -21,6 +21,9 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
   totalSession,
 }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
+  
+  // Get current date
+  const currentDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
   const handleOpenForm = () => setIsFormVisible(true);
   const handleCloseForm = () => setIsFormVisible(false);
@@ -33,10 +36,10 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
     <View className="ultrafiltration-view">
       <View className="ultrafiltration-header">
         <Text className="label">超滤量</Text>
+        <Text className="date">{currentDate}</Text>
       </View>
       <View className="ultrafiltration-main">
         <View className="ball-container">
-          {/* <View className="add-icon" onClick={handleOpenForm}></View> */}
           <UltrafiltrationBall value={value} maxValue={target} />
         </View>
       </View>

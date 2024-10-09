@@ -33,11 +33,11 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     const radius = ensurePositive(minDimension / 2 - 20);  // 外环半径
     const outerRadius = radius + 5;  // 进度条略大于外环半径
     const maxLineWidth = ensurePositive(Math.min(8, radius / 5));  // 最大厚度
-    const minLineWidth = maxLineWidth * 0.6;  // 起始厚度
+    const minLineWidth = maxLineWidth * 0.4;  // 起始厚度
     const outerRingWidth = maxLineWidth;  // 外环厚度保持一致
 
     // 定义进度条的分段数量
-    const totalSegments = 1000;
+    const totalSegments = 500;
 
     // 计算填充比例
     const safeMaxValue = ensurePositive(maxValue);
@@ -65,10 +65,11 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
 
         // 线条透明度渐变
         const alpha = Math.min(progress * 2, 1);
+        const baseAlpha = Math.max(0.05, 0.1 - progress * 0.8);  // 调整起始透明度
 
         // 绘制线条
         const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
-        gradientLine.addColorStop(0, `rgba(58, 126, 246, ${alpha * 0.1})`);  // 从内侧浅色透明
+        gradientLine.addColorStop(0, `rgba(58, 126, 246, ${baseAlpha})`);  // 从内侧开始的透明蓝色
         gradientLine.addColorStop(1, `rgba(58, 126, 246, ${alpha})`);  // 到外圈深蓝
 
         ctx.beginPath();
@@ -89,9 +90,9 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.fill();
 
     // 绘制水波、光泽和中心数值
-    drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, '#3A7EF6', timestamp);
+    drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, '#3874f5', timestamp);
     drawGloss(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2));
-    ctx.fillStyle = '#333333';  // 深色字体
+    ctx.fillStyle = '#333';  // 深色字体
     ctx.font = 'bold 16px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -99,86 +100,76 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.fillText(displayValue, centerX, centerY);
 }, [ensurePositive]);
 
+const drawWaves = useCallback(
+  (
+    ctx: CanvasRenderingContext2D,
+    centerX: number,
+    centerY: number,
+    radius: number,
+    fillRatio: number,
+    color: string,
+    timestamp: number
+  ) => {
+    const waterLevel = centerY + radius - 2 * radius * fillRatio;
 
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.clip();
 
+    const wave = (
+      x: number,
+      wavelength: number,
+      amplitude: number,
+      speed: number
+    ) => Math.sin((x + timestamp * speed) / wavelength) * amplitude;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // drawWaves, drawBubbles, drawGloss, hexToRgb 函数保持不变
-
-  const drawWaves = useCallback(
-    (
-      ctx: CanvasRenderingContext2D,
-      centerX: number,
-      centerY: number,
-      radius: number,
-      fillRatio: number,
-      color: string,
-      timestamp: number
+    const drawWave = (
+      wavelength: number,
+      amplitude: number,
+      speed: number,
+      baseAlpha: number,
+      yOffset: number,
+      phaseShift: number
     ) => {
-      const waterLevel = centerY + radius - 2 * radius * fillRatio;
-
-      ctx.save();
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.clip();
+      ctx.moveTo(centerX - radius, waterLevel + yOffset);
 
-      const wave = (
-        x: number,
-        wavelength: number,
-        amplitude: number,
-        speed: number
-      ) => Math.sin((x + timestamp * speed) / wavelength) * amplitude;
+      for (let x = 0; x <= radius * 2; x++) {
+        const y = wave(x, wavelength, amplitude, speed);
+        ctx.lineTo(centerX - radius + x, waterLevel + y + yOffset);
+      }
 
-      const drawWave = (
-        wavelength: number,
-        amplitude: number,
-        speed: number,
-        alpha: number,
-        yOffset: number
-      ) => {
-        ctx.beginPath();
-        ctx.moveTo(centerX - radius, waterLevel + yOffset);
-        for (let x = 0; x <= radius * 2; x++) {
-          const y = wave(x, wavelength, amplitude, speed);
-          ctx.lineTo(centerX - radius + x, waterLevel + y + yOffset);
-        }
-        ctx.lineTo(centerX + radius, centerY + radius);
-        ctx.lineTo(centerX - radius, centerY + radius);
-        ctx.closePath();
+      ctx.lineTo(centerX + radius, centerY + radius);
+      ctx.lineTo(centerX - radius, centerY + radius);
+      ctx.closePath();
 
-        const gradient = ctx.createLinearGradient(
-          0,
-          waterLevel + yOffset,
-          0,
-          centerY + radius
-        );
-        gradient.addColorStop(0, hexToRgb(color, alpha * 0.7));
-        gradient.addColorStop(1, hexToRgb(color, alpha));
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      };
+      // 动态调整颜色透明度，基于时间戳生成变化的 alpha 值
+      const dynamicAlpha = baseAlpha + 0.3 * Math.sin(timestamp * 0.002 + phaseShift);
 
-      // 绘制多层水波
-      drawWave(80, ensurePositive(4), 0.03, 0.5, 0);
-      drawWave(50, ensurePositive(2), 0.05, 0.3, -2);
-      drawWave(100, ensurePositive(3), 0.02, 0.2, 2);
+      const gradient = ctx.createLinearGradient(
+        0,
+        waterLevel + yOffset,
+        0,
+        centerY + radius
+      );
+      gradient.addColorStop(0, hexToRgb(color, dynamicAlpha * 0.7));
+      gradient.addColorStop(1, hexToRgb(color, dynamicAlpha));
 
-      ctx.restore();
-    },
-    [ensurePositive]
-  );
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    };
+
+    // 为每个波浪层绘制时引入不同的相位偏移和动态透明度变化
+    drawWave(80, ensurePositive(8), 0.03, 0.5, 0, 0);       // 第一层波浪
+    drawWave(50, ensurePositive(6), 0.05, 0.3, -3, Math.PI);  // 第二层波浪，相位偏移 Math.PI
+    drawWave(100, ensurePositive(4), 0.02, 0.2, -6, Math.PI / 2); // 第三层波浪，相位偏移 Math.PI / 2
+
+    ctx.restore();
+  },
+  [ensurePositive]
+);
+
 
   const drawBubbles = useCallback(
     (
