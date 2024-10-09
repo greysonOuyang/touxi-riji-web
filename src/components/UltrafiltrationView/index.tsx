@@ -36,7 +36,7 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
       </View>
       <View className="ultrafiltration-main">
         <View className="ball-container">
-          <View className="add-icon" onClick={handleOpenForm}></View>
+          {/* <View className="add-icon" onClick={handleOpenForm}></View> */}
           <UltrafiltrationBall value={value} maxValue={target} />
         </View>
       </View>

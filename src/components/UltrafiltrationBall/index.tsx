@@ -25,90 +25,95 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     []
   );
 
-  const drawBall = useCallback(
-    (
-      ctx: CanvasRenderingContext2D,
-      width: number,
-      height: number,
-      currentValue: number,
-      maxValue: number,
-      timestamp: number
-    ) => {
-      ctx.clearRect(0, 0, width, height);
-      const centerX = width / 2;
-      const centerY = height / 2;
-      const minDimension = Math.min(width, height);
-      const radius = ensurePositive(minDimension / 2 - 10);
-      const lineWidth = ensurePositive(Math.min(10, radius / 5));
+  const drawBall = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
+    ctx.clearRect(0, 0, width, height);
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const minDimension = Math.min(width, height);
+    const radius = ensurePositive(minDimension / 2 - 20);  // 外环半径
+    const outerRadius = radius + 5;  // 进度条略大于外环半径
+    const maxLineWidth = ensurePositive(Math.min(8, radius / 5));  // 最大厚度
+    const minLineWidth = maxLineWidth * 0.6;  // 起始厚度
+    const outerRingWidth = maxLineWidth;  // 外环厚度保持一致
 
-      // 添加调试信息
-      // console.log(`Drawing ball: width=${width}, height=${height}, radius=${radius}, currentValue=${currentValue}, maxValue=${maxValue}`);
+    // 定义进度条的分段数量
+    const totalSegments = 1000;
 
-      // 绘制背景（用于调试）
-      // ctx.fillStyle = 'rgba(200, 200, 200, 0.5)';
-      // ctx.fillRect(0, 0, width, height);
+    // 计算填充比例
+    const safeMaxValue = ensurePositive(maxValue);
+    const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
+    const fillAngle = Math.PI * 2 * fillRatio;
 
-      // 绘制外圈（灰色）
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = "#e0e0e0";
-      ctx.lineWidth = lineWidth;
-      ctx.lineCap = "round";
-      ctx.stroke();
+    const outerRingColor = 'rgba(200, 200, 200, 0.4)';  // 灰色透明环
 
-      // 计算填充比例
-      const safeMaxValue = ensurePositive(maxValue);
-      const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
-      const fillAngle = Math.PI * 2 * fillRatio;
+    // 绘制灰色外环（没有透明渐变）
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.strokeStyle = outerRingColor;
+    ctx.lineWidth = outerRingWidth;  // 外环的宽度保持一致
+    ctx.lineCap = 'round';
+    ctx.stroke();
 
-      // 绘制填充的外圈（蓝色或橙色）
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + fillAngle);
-      ctx.strokeStyle = currentValue >= 0 ? "#3A7EF6" : "#f39c12";
-      ctx.lineWidth = lineWidth;
-      ctx.lineCap = "round";
-      ctx.stroke();
+    // 动态调整线条厚度并使其贴紧外环
+    for (let i = 0; i < totalSegments; i++) {
+        const startAngle = -Math.PI / 2 + (fillAngle / totalSegments) * i;
+        const endAngle = -Math.PI / 2 + (fillAngle / totalSegments) * (i + 1);
 
-      // 绘制水波
-      drawWaves(
-        ctx,
-        centerX,
-        centerY,
-        ensurePositive(radius - lineWidth / 2),
-        fillRatio,
-        currentValue >= 0 ? "#3A7EF6" : "#f39c12",
-        timestamp
-      );
+        // 逐渐增加线条的宽度
+        const progress = i / totalSegments;
+        const currentLineWidth = Math.min(minLineWidth + Math.sqrt(progress) * (maxLineWidth - minLineWidth), maxLineWidth);
 
-      // 绘制气泡
-      drawBubbles(
-        ctx,
-        centerX,
-        centerY,
-        ensurePositive(radius - lineWidth / 2),
-        fillRatio,
-        timestamp
-      );
+        // 线条透明度渐变
+        const alpha = Math.min(progress * 2, 1);
 
-      // 绘制内部光泽效果
-      drawGloss(ctx, centerX, centerY, ensurePositive(radius - lineWidth / 2));
+        // 绘制线条
+        const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
+        gradientLine.addColorStop(0, `rgba(58, 126, 246, ${alpha * 0.1})`);  // 从内侧浅色透明
+        gradientLine.addColorStop(1, `rgba(58, 126, 246, ${alpha})`);  // 到外圈深蓝
 
-      // 绘制当前值（用于调试）
-      // ctx.fillStyle = '#000';
-      // ctx.font = '14px Arial';
-      // ctx.textAlign = 'center';
-      // ctx.fillText(`${currentValue.toFixed(2)} / ${maxValue}`, centerX, centerY);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+        ctx.strokeStyle = gradientLine;
+        ctx.lineWidth = currentLineWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+    }
 
-      // 绘制当前值
-      ctx.fillStyle = "#333333"; // 深灰色
-      ctx.font = "bold 16px Arial";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const displayValue = `${Math.round(currentValue)} ml`;
-      ctx.fillText(displayValue, centerX, centerY);
-    },
-    [ensurePositive]
-  );
+    // 绘制端点圆点（白色）
+    const endX = centerX + outerRadius * Math.cos(-Math.PI / 2 + fillAngle);
+    const endY = centerY + outerRadius * Math.sin(-Math.PI / 2 + fillAngle);
+    const outerDotRadius = 8;  // 外白点半径
+    ctx.beginPath();
+    ctx.arc(endX, endY, outerDotRadius, 0, Math.PI * 2);  // 白色端点
+    ctx.fillStyle = '#FFFFFF';  // 白色
+    ctx.fill();
+
+    // 绘制水波、光泽和中心数值
+    drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, '#3A7EF6', timestamp);
+    drawGloss(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2));
+    ctx.fillStyle = '#333333';  // 深色字体
+    ctx.font = 'bold 16px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const displayValue = `${Math.round(currentValue)} ml`;
+    ctx.fillText(displayValue, centerX, centerY);
+}, [ensurePositive]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // drawWaves, drawBubbles, drawGloss, hexToRgb 函数保持不变
 

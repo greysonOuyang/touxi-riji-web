@@ -23,7 +23,7 @@ interface HealthData {
 const HealthPage: React.FC = () => {
   const [healthData, setHealthData] = useState<HealthData>({
     ultrafiltration: {
-      value: 500,
+      value: 800,
       target: 1000,
       concentration: "1.5%",
       specification: "2000ml",

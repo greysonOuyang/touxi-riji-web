@@ -14,7 +14,7 @@ export default {
     // backgroundColor: '#e6f2ff'
 
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#ffffff',
+    navigationBarBackgroundColor: '#f6f7fb',
     navigationBarTitleText: '健康概览',
     navigationBarTextStyle: 'black'
   },
