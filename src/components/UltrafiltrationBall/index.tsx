@@ -162,8 +162,8 @@ const drawWaves = useCallback(
 
     // 为每个波浪层绘制时引入不同的相位偏移和动态透明度变化
     drawWave(80, ensurePositive(8), 0.03, 0.5, 0, 0);       // 第一层波浪
-    drawWave(50, ensurePositive(6), 0.05, 0.3, -3, Math.PI);  // 第二层波浪，相位偏移 Math.PI
-    drawWave(100, ensurePositive(4), 0.02, 0.2, -6, Math.PI / 2); // 第三层波浪，相位偏移 Math.PI / 2
+    drawWave(50, ensurePositive(6), 0.05, 0.3, -5, Math.PI);  // 第二层波浪，相位偏移 Math.PI
+    drawWave(100, ensurePositive(4), 0.02, 0.2, -3, Math.PI / 2); // 第三层波浪，相位偏移 Math.PI / 2
 
     ctx.restore();
   },
