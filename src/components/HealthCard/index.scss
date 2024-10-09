@@ -1,12 +1,14 @@
 .health-card {
-    background-color: #f5f5f5;  // 设置卡片背景为浅灰蓝色
-    border-radius: 12px;
+  background-color: #f4f4f8;
+  border: 1px solid rgba(0, 0, 0, 0.1);  // 使用非常淡的黑色边框
+    border-radius: 10px;
     border: none;  // 移除边框，因为背景色已经提供了足够的区分
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     overflow: hidden;
     transition: all 0.3s ease;
+    margin: 4px; // 设置统一的上下左右间距
   
     &:hover {
       background-color: #eaeaf0;  // 悬停时稍微加深背景色

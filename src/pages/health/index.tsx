@@ -23,7 +23,7 @@ interface HealthData {
 const HealthPage: React.FC = () => {
   const [healthData, setHealthData] = useState<HealthData>({
     ultrafiltration: {
-      value: 800,
+      value: 500,
       target: 1000,
       concentration: "1.5%",
       specification: "2000ml",
@@ -34,29 +34,28 @@ const HealthPage: React.FC = () => {
   });
 
   return (
-    <View className="page-container">
-      <View className="main-content">
-        <View className="health-page">
-          <View className="cards-container">
-            <UltrafiltrationView
-              value={healthData.ultrafiltration.value}
-              target={healthData.ultrafiltration.target}
-              concentration={healthData.ultrafiltration.concentration}
-              specification={healthData.ultrafiltration.specification}
-              currentSession={healthData.ultrafiltration.currentSession}
-              totalSession={healthData.ultrafiltration.totalSession}
-            />
-          </View>
+    <View className="main-content">
+      <View className="health-page">
+        <View className="cards-container">
+          <UltrafiltrationView
+            value={healthData.ultrafiltration.value}
+            target={healthData.ultrafiltration.target}
+            concentration={healthData.ultrafiltration.concentration}
+            specification={healthData.ultrafiltration.specification}
+            currentSession={healthData.ultrafiltration.currentSession}
+            totalSession={healthData.ultrafiltration.totalSession}
+          />
+        </View>
 
-          <View className="health-grid">
-            {cardLayout.map((data) => (
-              <HealthCard key={data.id} data={data} />
-            ))}
-          </View>
+        <View className="health-grid">
+          {cardLayout.map((data) => (
+            <HealthCard key={data.id} data={data} />
+          ))}
         </View>
       </View>
     </View>
-  );
+);
+
 };
 
 export default HealthPage;

@@ -1,6 +1,7 @@
 .ultrafiltration-view {
   position: relative;
-  padding: 16px;
+  padding: 5px;
+  
 
   .ultrafiltration-header {
     display: flex;
@@ -9,14 +10,14 @@
     margin-bottom: 16px;
 
     .label {
-      font-size: 18px;
-      font-weight: bold;
+      font-size: 16px;
+      // font-weight: bold;
       color: #333;
     }
 
     .value {
-      font-size: 24px;
-      font-weight: bold;
+      font-size: 18px;
+      // font-weight: bold;
       color: #1989fa;
     }
   }
@@ -28,16 +29,16 @@
     position: relative;
 
     .ball-container {
-      width: 200px;
-      height: 200px;
+      width: 160px;
+      height: 160px;
       position: relative;
 
       .add-icon {
         position: absolute;
         top: -5px;
         right: -5px;
-        width: 32px; // 稍微调大
-        height: 32px; // 稍微调大
+        width: 28px; // 稍微调大
+        height: 28px; // 稍微调大
         background-color: #1989fa;
         border-radius: 50%;
         display: flex;
@@ -70,7 +71,6 @@
 
         &:active {
           transform: scale(0.9); // 点击时稍微缩小
-          // background-color: darken(#1989fa, 10%); // 点击时颜色变深
           
         }
       }
@@ -103,8 +103,7 @@
 
       .detail-value {
         font-size: 16px;
-        font-weight: bold;
-        color: #333;
+        color: #707070;
       }
     }
   }

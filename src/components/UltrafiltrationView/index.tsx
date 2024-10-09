@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text } from '@tarojs/components';
 import UltrafiltrationBall from '../UltrafiltrationBall';
-import UltrafiltrationCard from '../UltrafiltrationCard';
 import './index.scss';
-import TimePicker from '../TimePicker';
 
 interface UltrafiltrationViewProps {
   value: number;
@@ -35,7 +33,6 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
     <View className="ultrafiltration-view">
       <View className="ultrafiltration-header">
         <Text className="label">超滤量</Text>
-        <Text className="value">{Math.round(value)}ml</Text>
       </View>
       <View className="ultrafiltration-main">
         <View className="ball-container">
@@ -57,17 +54,6 @@ const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
           <Text className="detail-value">{currentSession}/{totalSession}</Text>
         </View>
       </View>
-      <TimePicker onTimeChange={handleOpenForm} />
-      {/* <UltrafiltrationCard 
-        isVisible={isFormVisible}
-        onClose={handleCloseForm}
-        onSave={handleSaveForm}
-        initialData={{
-          concentration: parseFloat(concentration),
-          infusionVolume: 0,
-          drainageVolume: value
-        }}
-      /> */}
     </View>
   );
 };
