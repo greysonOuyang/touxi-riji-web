@@ -1,61 +1,49 @@
-import React, { useState } from "react";
-
-import { View } from "@tarojs/components";
-
-import "./index.scss";
-import UltrafiltrationView from "@/components/UltrafiltrationView";
-import HealthCard from "@/components/HealthCard";
-import { cardLayout } from "@/data/healthData";
-
-interface HealthData {
-  // Define the structure of your health data here
-  ultrafiltration: {
-    value: number;
-    target: number;
-    concentration: string;
-    specification: string;
-    currentSession: number;
-    totalSession: number;
-  };
-  // Add other health data fields as needed
-}
+import React from 'react';
+import { View, ScrollView } from '@tarojs/components';
+import UltrafiltrationView from '@/components/UltrafiltrationView';
+import CardRenderer from '@/components/CardRenderer';
+import { cardConfig } from '@/data/cardConfig';
+import './index.scss';
 
 const HealthPage: React.FC = () => {
-  const [healthData, setHealthData] = useState<HealthData>({
-    ultrafiltration: {
-      value: 800,
-      target: 1000,
-      concentration: "1.5%",
-      specification: "2000ml",
-      currentSession: 1,
-      totalSession: 4,
-    },
-    // Initialize other health data fields here
-  });
+  // Simulated ultrafiltration data
+  const ultrafiltrationData = {
+    value: 800,
+    target: 1000,
+    concentration: "1.5%",
+    specification: "2000ml",
+    currentSession: 1,
+    totalSession: 4,
+  };
 
   return (
     <View className="main-content">
-      <View className="health-page">
+      <ScrollView className="health-page" scrollY>
+        {/* Fixed UltrafiltrationView */}
         <View className="cards-container">
-          <UltrafiltrationView
-            value={healthData.ultrafiltration.value}
-            target={healthData.ultrafiltration.target}
-            concentration={healthData.ultrafiltration.concentration}
-            specification={healthData.ultrafiltration.specification}
-            currentSession={healthData.ultrafiltration.currentSession}
-            totalSession={healthData.ultrafiltration.totalSession}
-          />
+          <UltrafiltrationView {...ultrafiltrationData} />
         </View>
 
-        <View className="health-grid">
-          {cardLayout.map((data) => (
-            <HealthCard key={data.id} data={data} />
-          ))}
+        {/* Dynamic cards rendering */}
+        <View className="cards-container">
+          <View className="health-grid">
+            {cardConfig.length > 0 ? (
+              cardConfig.map((card) => (
+                <CardRenderer
+                  key={card.id}
+                  type={card.type}
+                  id={card.id}
+                  isFullWidth={card.isFullWidth}
+                />
+              ))
+            ) : (
+              <View>No cards available</View>
+            )}
+          </View>
         </View>
-      </View>
+      </ScrollView>
     </View>
-);
-
+  );
 };
 
 export default HealthPage;

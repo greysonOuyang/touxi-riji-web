@@ -1,7 +1,8 @@
 .main-content {
-  padding: 5px; // 设置屏幕边距为10px
+  padding: 5px; // 设置屏幕边距为5px
   background: linear-gradient(to bottom, #e6f2ff, #f6f7fb);
   min-height: 100vh; // 确保背景覆盖整个页面
+
   .health-page {
     padding: 5px;
     display: flex;
@@ -10,73 +11,39 @@
 
     .header {
       margin-bottom: 20px;
-
-      .date-greeting {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-
-        .date-title {
-          font-size: 18px;
-          font-weight: bold;
-          margin-bottom: 5px;
-        }
-
-        .greeting {
-          font-size: 16px;
-          color: #666;
-        }
-      }
     }
 
     .cards-container {
       margin-bottom: 10px;
       width: 100%;
     }
-    
-    
-    
+
     .health-grid {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       width: 100%;
       // margin-top: 10px; // 这里可以适当调整上方间距
-    
+
       .half-width {
         width: calc(50% - 10px); // 确保两列布局，减去两边总间距
         margin-bottom: 10px; // 设置统一的下方间距
         box-sizing: border-box;
       }
-    
+
       .full-width {
         width: 100%;
         margin-bottom: 10px; // 设置全宽卡片的下方间距
       }
     }
-    
-
-    .quick-add-section {
-      margin-top: auto;
-      padding: 20px 0;
-      display: flex;
-      justify-content: center;
-
-      .quick-add-btn {
-        width: 80%;
-        height: 44px;
-        font-size: 16px;
-        background-color: #4A90E2;
-        color: #FFFFFF;
-        border: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .nut-icon {
-          margin-right: 8px;
-        }
-      }
-    }
   }
+}
+
+.health-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }
