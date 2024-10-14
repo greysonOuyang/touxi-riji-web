@@ -1,67 +1,147 @@
 .ultrafiltration-view {
+  width: 100%;
+
+  &__title {
+    margin-bottom: 15px; // Space below the title
+    font-size: 16px;
+    font-weight: 600; // Semi bold
+  }
+}
+
+.ultrafiltration-card { 
+  width: 100%;
+  height: 150px;
+  background-color: #e0e9ff;
+  border-radius: 16px;
   position: relative;
-  padding: 5px;
-  // background-color: #e6f2ff;  // Light blue background
-  border-radius: 10px;  // Rounded bottom corners
-  
-  .ultrafiltration-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
+  overflow: hidden;
+  margin-top: 15px; // 为 UltrafiltrationView 添加上边距
 
-    .label {
-      font-size: 16px;
-      color: #333;
-    }
-
-    .value {
-      font-size: 18px;
-      color: #1989fa;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background-image: url('../../assets/images/Banner.png');
+    background-size: cover;
+    background-position: center;
+    z-index: 1;
   }
+}
 
-  .ultrafiltration-main {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 16px;
+.card-content {
+  position: relative;
+  z-index: 2;
+  padding: 16px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+// Other styles remain the same...
+
+
+.ball-container {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ultrafiltration-ball {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.ball-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.ball-value {
+  position: relative;
+  z-index: 1;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.info-container {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.session-info, .concentration {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.update-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  align-self: flex-end;
+}
+
+// 加号按钮，不能动样式
+.add-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none; /* 确保按钮没有边框 */
+  outline: none; /* 移除可能的按钮外轮廓 */
+  z-index: 2;
+
+  .plus-icon {
     position: relative;
+    width: 14px;
+    height: 14px;
 
-    .ball-container {
-      width: 200px;
-      height: 200px;
-      position: relative;
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      background-color: #FFFFFF;
+      border-radius: 1px;
     }
-  }
 
-  .ultrafiltration-details {
-    display: flex;
-    justify-content: space-between;
-    padding: 0 4px;
+    &::before {
+      width: 100%;
+      height: 2px;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+    }
 
-    .detail-item {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-
-      &:last-child {
-        align-items: flex-end;
-      }
-
-      &:nth-child(2) {
-        align-items: center;
-      }
-
-      .detail-label {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 4px;
-      }
-
-      .detail-value {
-        font-size: 16px;
-        color: #707070;
-      }
+    &::after {
+      height: 100%;
+      width: 2px;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
     }
   }
 }
+
+

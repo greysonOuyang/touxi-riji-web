@@ -1,60 +1,55 @@
-import React, { useState } from 'react';
-import { View, Text } from '@tarojs/components';
-import UltrafiltrationBall from '../UltrafiltrationBall';
-import './index.scss';
+import React from "react";
+import { View, Text } from "@tarojs/components";
+import { Button } from "@nutui/nutui-react-taro";
+import "./index.scss";
 
-interface UltrafiltrationViewProps {
+interface UltrafiltrationCardProps {
   value: number;
   target: number;
-  concentration: string;
-  specification: string;
   currentSession: number;
   totalSession: number;
+  concentration: string;
+  updateTime: string;
 }
 
-const UltrafiltrationView: React.FC<UltrafiltrationViewProps> = ({
+const onAddClick = () => {
+  console.log("add");
+};
+
+const UltrafiltrationView: React.FC<UltrafiltrationCardProps> = ({
   value,
   target,
-  concentration,
-  specification,
   currentSession,
   totalSession,
+  concentration,
+  updateTime,
 }) => {
-  const [isFormVisible, setIsFormVisible] = useState(false);
-  
-  // Get current date
-  const currentDate = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-
-  const handleOpenForm = () => setIsFormVisible(true);
-  const handleCloseForm = () => setIsFormVisible(false);
-  const handleSaveForm = (newData) => {
-    console.log('New data:', newData);
-    setIsFormVisible(false);
-  };
+  const percentage = (value / target) * 100;
 
   return (
     <View className="ultrafiltration-view">
-      <View className="ultrafiltration-header">
-        <Text className="label">超滤量</Text>
-        <Text className="date">{currentDate}</Text>
-      </View>
-      <View className="ultrafiltration-main">
-        <View className="ball-container">
-          <UltrafiltrationBall value={value} maxValue={target} />
-        </View>
-      </View>
-      <View className="ultrafiltration-details">
-        <View className="detail-item">
-          <Text className="detail-label">浓度</Text>
-          <Text className="detail-value">{concentration}</Text>
-        </View>
-        <View className="detail-item">
-          <Text className="detail-label">规格</Text>
-          <Text className="detail-value">{specification}</Text>
-        </View>
-        <View className="detail-item">
-          <Text className="detail-label">次数</Text>
-          <Text className="detail-value">{currentSession}/{totalSession}</Text>
+      <Text className="ultrafiltration-view__title">超滤量</Text>
+      <View className="ultrafiltration-card">
+        <View className="card-content">
+          <View className="ball-container">
+            <View className="ultrafiltration-ball">
+              <View
+                className="ball-progress"
+                style={{ height: `${percentage}%` }}
+              />
+              <Text className="ball-value">{value} ml</Text>
+            </View>
+          </View>
+          <View className="info-container">
+            <Text className="session-info">
+              {currentSession} / {totalSession}次
+            </Text>
+            <Text className="concentration">浓度{concentration}</Text>
+            <Text className="update-time">更新于{updateTime}</Text>
+          </View>
+          <Button className="add-button" onClick={onAddClick}>
+            <View className="plus-icon" />
+          </Button>
         </View>
       </View>
     </View>

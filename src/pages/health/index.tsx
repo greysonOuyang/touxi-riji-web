@@ -11,38 +11,33 @@ const HealthPage: React.FC = () => {
     value: 800,
     target: 1000,
     concentration: "1.5%",
-    specification: "2000ml",
     currentSession: 1,
     totalSession: 4,
+    updateTime: "3天前"
   };
 
   return (
-    <View className="main-content">
-      <ScrollView className="health-page" scrollY>
-        {/* Fixed UltrafiltrationView */}
-        <View className="cards-container">
-          <UltrafiltrationView {...ultrafiltrationData} />
-        </View>
-
+    <ScrollView className="health-page" scrollY>
+      <View className="content-wrapper">
+        <UltrafiltrationView {...ultrafiltrationData} />
+        
         {/* Dynamic cards rendering */}
-        <View className="cards-container">
-          <View className="health-grid">
-            {cardConfig.length > 0 ? (
-              cardConfig.map((card) => (
-                <CardRenderer
-                  key={card.id}
-                  type={card.type}
-                  id={card.id}
-                  isFullWidth={card.isFullWidth}
-                />
-              ))
-            ) : (
-              <View>No cards available</View>
-            )}
-          </View>
+        <View className="health-grid">
+          {cardConfig.length > 0 ? (
+            cardConfig.map((card) => (
+              <CardRenderer
+                key={card.id}
+                type={card.type}
+                id={card.id}
+                isFullWidth={card.isFullWidth}
+              />
+            ))
+          ) : (
+            <View>No cards available</View>
+          )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
