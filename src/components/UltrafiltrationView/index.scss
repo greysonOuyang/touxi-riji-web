@@ -1,147 +1,142 @@
 .ultrafiltration-view {
   width: 100%;
-
-  &__title {
-    margin-bottom: 15px; // Space below the title
-    font-size: 16px;
-    font-weight: 600; // Semi bold
-  }
 }
 
-.ultrafiltration-card { 
+.ultrafiltration-view__title {
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.ultrafiltration-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
-  height: 150px;
+  height: 25vh; /* 使用视口高度单位，使其自适应不同屏幕 */
   background-color: #e0e9ff;
   border-radius: 16px;
   position: relative;
   overflow: hidden;
-  margin-top: 15px; // 为 UltrafiltrationView 添加上边距
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    background-image: url('../../assets/images/Banner.png');
-    background-size: cover;
-    background-position: center;
-    z-index: 1;
-  }
+  margin-top: 15px;
+  margin-bottom: 20px;
+  box-sizing: border-box;
 }
 
-.card-content {
-  position: relative;
-  z-index: 2;
-  padding: 16px;
-  height: 100%;
-  display: flex;
-  justify-content: space-between;
-}
-
-// Other styles remain the same...
-
-
-.ball-container {
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ultrafiltration-ball {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.ball-progress {
+.ultrafiltration-card::before {
+  content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.4);
-}
-
-.ball-value {
-  position: relative;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background-image: url('../../assets/images/Banner.png');
+  background-size: cover;
+  background-position: center;
   z-index: 1;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
 }
 
-.info-container {
-  width: 50%;
+.ball {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 40vw; /* 使用视口宽度单位 */
+  height: 40vw; 
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
 }
 
-.session-info, .concentration {
-  font-size: 14px;
-  color: #ffffff;
+.session-info {
+  position: absolute;
+  top: 4vw;
+  left: 5vw;
+  z-index: 2;
+  color: #FFFFFF;
+  padding: 1vw;
+}
+
+.concentration {
+  position: absolute;
+  right: 10vw;
+  bottom: 12vw;
+  font-size: 12px;
+  color: #FFFFFF;
+  z-index: 2;
 }
 
 .update-time {
+  position: absolute;
+  bottom: 4vw;
+  left: 5vw;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  align-self: flex-end;
+  color: #FFFFFF;
+  z-index: 2;
 }
 
-// 加号按钮，不能动样式
-.add-button {
+.view-button {
+  width: 20vw; /* 增大宽度 */
+  height: 6vw; /* 增大高度 */
   position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 32px;
-  height: 32px;
+  bottom: 4vw;
+  right: 5vw;
+  background-color: #C58BF2; 
+  color: #FFFFFF;
+  border: none;
+  border-radius: 5vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3vw; /* 调整字体大小 */
+  line-height: 1; /* 确保行高不影响显示 */
+  padding: 0; /* 去掉内边距，避免内容被挤出 */
+  z-index: 2;
+}
+
+.add-button {
+  margin-top: 4vw;
+  margin-right: 4vw;
+  width: 8vw;
+  height: 8vw;
   background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
-  border-radius: 20px;
+  border-radius: 5vw;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  border: none; /* 确保按钮没有边框 */
-  outline: none; /* 移除可能的按钮外轮廓 */
+  border: none;
+  outline: none;
   z-index: 2;
-
-  .plus-icon {
-    position: relative;
-    width: 14px;
-    height: 14px;
-
-    &::before,
-    &::after {
-      content: "";
-      position: absolute;
-      background-color: #FFFFFF;
-      border-radius: 1px;
-    }
-
-    &::before {
-      width: 100%;
-      height: 2px;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
-    }
-
-    &::after {
-      height: 100%;
-      width: 2px;
-      left: 50%;
-      top: 0;
-      transform: translateX(-50%);
-    }
-  }
 }
 
+.add-button .plus-icon {
+  position: relative;
+  width: 4vw;
+  height: 4vw;
+}
 
+.add-button .plus-icon::before,
+.add-button .plus-icon::after {
+  content: "";
+  position: absolute;
+  background-color: #FFFFFF;
+  border-radius: 1px;
+}
+
+.add-button .plus-icon::before {
+  width: 100%;
+  height: 0.5vw;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.add-button .plus-icon::after {
+  height: 100%;
+  width: 0.5vw;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}

@@ -44,7 +44,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
     const fillAngle = Math.PI * 2 * fillRatio;
 
-    const outerRingColor = 'rgba(200, 200, 200, 0.4)';  // 灰色透明环
+    const outerRingColor = 'rgba(200, 200, 200, 0.8)';  // 灰色透明环
 
     // 绘制灰色外环（没有透明渐变）
     ctx.beginPath();
@@ -69,8 +69,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
 
         // 绘制线条
         const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
-        gradientLine.addColorStop(0, `rgba(58, 126, 246, ${baseAlpha})`);  // 从内侧开始的透明蓝色
-        gradientLine.addColorStop(1, `rgba(58, 126, 246, ${alpha})`);  // 到外圈深蓝
+        gradientLine.addColorStop(0, `rgba(0, 122, 255, ${baseAlpha})`);  // 从内侧开始的透明蓝色
+        gradientLine.addColorStop(1, `rgba(0, 122, 255, ${alpha})`);  // 到外圈深蓝 
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
@@ -92,8 +92,8 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     // 绘制水波、光泽和中心数值
     drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, '#3874f5', timestamp);
     drawGloss(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2));
-    ctx.fillStyle = '#333';  // 深色字体
-    ctx.font = 'bold 16px Arial';
+    ctx.fillStyle = '#FFFFFF';  // 深色字体
+    ctx.font = 'bold 12px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     const displayValue = `${Math.round(currentValue)} ml`;

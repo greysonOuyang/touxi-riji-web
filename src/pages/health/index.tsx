@@ -9,7 +9,7 @@ const HealthPage: React.FC = () => {
   // Simulated ultrafiltration data
   const ultrafiltrationData = {
     value: 800,
-    target: 1000,
+    maxValue: 1000,
     concentration: "1.5%",
     currentSession: 1,
     totalSession: 4,
