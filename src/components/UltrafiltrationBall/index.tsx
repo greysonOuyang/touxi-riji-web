@@ -67,10 +67,14 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
         const alpha = Math.min(progress * 2, 1);
         const baseAlpha = Math.max(0.05, 0.1 - progress * 0.8);  // 调整起始透明度
 
+
+        // C58BF2 rgb(197, 139, 242)
+
+         // 92A3FD rgb(146, 163, 253)
         // 绘制线条
         const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
-        gradientLine.addColorStop(0, `rgba(0, 122, 255, ${baseAlpha})`);  // 从内侧开始的透明蓝色
-        gradientLine.addColorStop(1, `rgba(0, 122, 255, ${alpha})`);  // 到外圈深蓝 
+        gradientLine.addColorStop(0, `rgba(146, 163, 253, ${baseAlpha})`);  // 从内侧开始的透明蓝色
+        gradientLine.addColorStop(1, `rgba(146, 163, 253, ${alpha})`);  // 到外圈深蓝 
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
@@ -89,8 +93,13 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.fillStyle = '#FFFFFF';  // 白色
     ctx.fill();
 
+
+    let color = '#8d9ff1';  // 紫色
+    if (currentValue < 0) {
+      color = '#ff9200';  // 橙色
+    }
     // 绘制水波、光泽和中心数值
-    drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, '#3874f5', timestamp);
+    drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, color, timestamp);
     drawGloss(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2));
     ctx.fillStyle = '#FFFFFF';  // 深色字体
     ctx.font = 'bold 12px Arial';

@@ -8,7 +8,7 @@ import './index.scss';
 const HealthPage: React.FC = () => {
   // Simulated ultrafiltration data
   const ultrafiltrationData = {
-    value: 800,
+    value: 600,
     maxValue: 1000,
     concentration: "1.5%",
     currentSession: 1,
