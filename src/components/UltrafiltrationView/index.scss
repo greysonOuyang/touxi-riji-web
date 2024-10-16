@@ -96,12 +96,13 @@
 }
 
 .add-button {
-  margin-top: 15px; /* 4vw = 4 * 3.75px */
-  margin-right: 15px; /* 4vw = 4 * 3.75px */
-  width: 30px; /* 8vw = 8 * 3.75px */
-  height: 30px; /* 8vw = 8 * 3.75px */
+  position: absolute;
+  right: 15px;
+  top: 15px;
+  width: 32px; /* 8vw = 8 * 3.75px */
+  height: 32px; /* 8vw = 8 * 3.75px */
   background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
-  border-radius: 18.75px; /* 5vw = 5 * 3.75px */
+  border-radius: 20px; /* 5vw = 5 * 3.75px */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -111,7 +112,7 @@
   z-index: 2;
 }
 
-.add-button .plus-icon {
+ .plus-icon {
   position: relative;
   width: 15px; /* 4vw = 4 * 3.75px */
   height: 15px; /* 4vw = 4 * 3.75px */

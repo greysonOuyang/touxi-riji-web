@@ -31,12 +31,12 @@ const UltrafiltrationView = ({
         </View>
         <Text className="concentration">浓度 {concentration}</Text>
         <Text className="update-time">更新于 {updateTime}</Text>
-        <Button className="add-button" onClick={onAddClick}>
+        <View className="add-button" onClick={onAddClick}>
           <View className="plus-icon" />
-        </Button>
-        <Button className="view-button" onClick={onViewClick}>
+        </View>
+        <View className="view-button" onClick={onViewClick}>
           更多
-        </Button>
+        </View>
       </View>
     </View>
   );
