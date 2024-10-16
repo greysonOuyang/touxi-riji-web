@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Button } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
 import "./index.scss";
+import "../../app.scss"
 
 const onAddClick = () => {
   console.log("onAddClick");
@@ -21,7 +22,7 @@ const UltrafiltrationView = ({
 }) => {
   return (
     <View className="ultrafiltration-view">
-      <Text className="ultrafiltration-view__title">超滤量</Text>
+      <Text className="large_text_semi_bold">超滤量</Text>
       <View className="ultrafiltration-card">
         <Text className="session-info">
           {currentSession} / {totalSession}次

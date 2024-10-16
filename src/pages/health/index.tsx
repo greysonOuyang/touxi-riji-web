@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView } from '@tarojs/components';
 import UltrafiltrationView from '@/components/UltrafiltrationView';
 import CardRenderer from '@/components/CardRenderer';
 import { cardConfig } from '@/data/cardConfig';
 import './index.scss';
+import '../../app.scss'
 
 const HealthPage: React.FC = () => {
   // Simulated ultrafiltration data
@@ -20,7 +21,7 @@ const HealthPage: React.FC = () => {
     <ScrollView className="health-page" scrollY>
       <View className="content-wrapper">
         <UltrafiltrationView {...ultrafiltrationData} />
-        
+        <Text className="large_text_semi_bold">健康概览</Text>
         {/* Dynamic cards rendering */}
         <View className="health-grid">
           {cardConfig.length > 0 ? (
