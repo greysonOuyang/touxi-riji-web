@@ -1,13 +1,16 @@
 import React from 'react';
 import { View } from '@tarojs/components';
 import WeightCard from '@/components/WeightCard';
+import WaterIntakeCard from '../WaterIntakeCard';
 // 如果有更多卡片，继续引入
-// import AnotherCard from '@/components/AnotherCard';
+import AnotherCard from '@/components/AnotherCard';
+import './index.scss'
 
 const cardComponents = {
   weight: WeightCard,
   // 更多卡片类型的映射
-  // another: AnotherCard,
+//   another: AnotherCard,
+  water: WaterIntakeCard
 };
 
 interface CardRendererProps {

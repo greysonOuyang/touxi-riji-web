@@ -27,6 +27,17 @@ const HealthPage: React.FC = () => {
       updateTime: "2024-10-16 14:30",
       relativeTime: "2小时前"
     },
+    water: {
+      maxIntake: 1000, // 最大值
+      currentIntake: 450, // 当前喝水总量
+      records: [
+        { time: '6am - 8am', amount: 600 },
+        { time: '9am - 11am', amount: 500 },
+        { time: '11am - 2pm', amount: 1000 },
+        { time: '2pm - 4pm', amount: 700 },
+        { time: '4pm - now', amount: 900 },
+      ]
+    }
     // 其他卡片类型的数据
     // another: { ... }
   };

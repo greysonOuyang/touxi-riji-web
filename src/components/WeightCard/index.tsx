@@ -44,8 +44,8 @@ const WeightCard: React.FC<WeightCardProps> = ({ data }) => {
               style={{
                 backgroundImage: `url(${
                   data.weightChange > 1
-                    ? "../../assets/icons/arrow_up_red.jpg"
-                    : "../../assets/icons/arrow_up_green.jpg"
+                    ? "/assets/icons/arrow_up_red.jpg"
+                    : "/assets/icons/arrow_up_green.jpg"
                 })`,
               }}
             ></View>
@@ -55,8 +55,8 @@ const WeightCard: React.FC<WeightCardProps> = ({ data }) => {
               style={{
                 backgroundImage: `url(${
                   Math.abs(data.weightChange) > 1
-                    ? "../../assets/icons/arrow_down_red.jpg"
-                    : "../../assets/icons/arrow_down_green.jpg"
+                    ? "/assets/icons/arrow_down_red.jpg"
+                    : "/assets/icons/arrow_down_green.jpg"
                 })`,
               }}
             ></View>

@@ -4,6 +4,11 @@ export const cardConfig = [
       type: 'weight',
       isFullWidth: true,
     },
+    {
+        id: 1,
+        type: 'water',
+        isFullWidth: false,
+      },
     // 可以继续添加更多卡片配置
     // {
     //   id: 3,

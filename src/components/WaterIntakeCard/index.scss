@@ -1,0 +1,110 @@
+.water-card {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 315px; /* 设置卡片高度 */
+  }
+  
+  .water-header {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  
+  .water-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .water-tip {
+    font-size: 14px;
+    color: #92A3FD;
+  }
+  
+  .water-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 20px; /* 设置左右边距 */
+  }
+  
+  .water-progress-container {
+    width: 20px; /* 设置进度条宽度 */
+    height: 100%; /* 让进度条高度自适应父容器 */
+    background-color: #f0f0f0;
+    border-radius: 0px 0px 30px 30px; /* 设置圆角 */
+    margin: 20px 20px 20px 0; /* 设置上下和左边距 */
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .water-progress {
+    background: linear-gradient(180deg, #C58BF2 -83.11%, #B4C0FE 60.6%);
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    border-radius: 0px 0px 30px 30px; /* 设置圆角 */
+  }
+  
+  .water-records {
+    flex: 1;
+    position: relative;
+  }
+  
+  .water-record {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .water-record-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #CE9FFC;
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .water-record-info {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .water-record-time {
+    font-size: 12px;
+    color: #999;
+  }
+  
+  .water-record-amount {
+    font-size: 14px;
+    color: #CE9FFC;
+  }
+  
+  .drink-button {
+    background-color: #CE9FFC;
+    color: #fff;
+    border-radius: 16px;
+    padding: 8px 16px;
+    font-size: 16px;
+    margin-top: 16px;
+  }
+  
+  .water-records::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: repeating-linear-gradient(
+      to bottom,
+      #ccc,
+      #ccc 4px,
+      transparent 4px,
+      transparent 8px
+    );
+  }
