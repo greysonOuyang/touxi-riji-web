@@ -1,13 +1,11 @@
 import React from 'react';
 import { View } from '@tarojs/components';
 import WeightCard from '@/components/WeightCard';
-import UltrafiltrationCard from '@/components/UltrafiltrationCard';
 // 如果有更多卡片，继续引入
 // import AnotherCard from '@/components/AnotherCard';
 
 const cardComponents = {
   weight: WeightCard,
-  ultrafiltration: UltrafiltrationCard,
   // 更多卡片类型的映射
   // another: AnotherCard,
 };
@@ -16,9 +14,10 @@ interface CardRendererProps {
   type: string;
   id: number;
   isFullWidth: boolean;
+  data: any;  // 传递卡片数据
 }
 
-const CardRenderer: React.FC<CardRendererProps> = ({ type, id, isFullWidth }) => {
+const CardRenderer: React.FC<CardRendererProps> = ({ type, id, isFullWidth, data }) => {
   const CardComponent = cardComponents[type];
 
   if (!CardComponent) {
@@ -27,7 +26,7 @@ const CardRenderer: React.FC<CardRendererProps> = ({ type, id, isFullWidth }) =>
 
   return (
     <View className={`health-card ${isFullWidth ? 'full-width' : 'half-width'}`} key={id}>
-      <CardComponent />
+      <CardComponent data={data} />
     </View>
   );
 };

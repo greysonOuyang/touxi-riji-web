@@ -2,7 +2,7 @@ export const cardConfig = [
     {
       id: 1,
       type: 'weight',
-      isFullWidth: false,
+      isFullWidth: true,
     },
     // 可以继续添加更多卡片配置
     // {
