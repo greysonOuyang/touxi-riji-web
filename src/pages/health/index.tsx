@@ -31,11 +31,11 @@ const HealthPage: React.FC = () => {
       maxIntake: 1000, // 最大值
       currentIntake: 450, // 当前喝水总量
       records: [
-        { time: '6am - 8am', amount: 600 },
-        { time: '9am - 11am', amount: 500 },
-        { time: '11am - 2pm', amount: 1000 },
-        { time: '2pm - 4pm', amount: 700 },
-        { time: '4pm - now', amount: 900 },
+        { time: '18:40', amount: 600 },
+        { time: '16:32', amount: 500 },
+        { time: '13:11', amount: 1000 },
+        { time: '11:40', amount: 700 },
+        { time: '8:30', amount: 900 },
       ]
     }
     // 其他卡片类型的数据

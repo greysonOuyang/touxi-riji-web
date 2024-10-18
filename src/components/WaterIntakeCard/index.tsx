@@ -8,13 +8,13 @@ const WaterIntakeCard = ({ data }) => {
 
   return (
     <View className="water-card">
-      <View className="water-header">
-        <Text className="water-title">今日喝水</Text>
-        <Text className="water-tip">不宜超过{data.maxIntake}ml</Text>
+      <View className="water-progress-container">
+        <View className="water-progress" style={{ height: `${progressPercentage}%` }}></View>
       </View>
-      <View className="water-content">
-        <View className="water-progress-container">
-          <View className="water-progress" style={{ height: `${progressPercentage}%` }}></View>
+      <View className="water-info-container">
+        <View className="water-header">
+          <Text className="water-title">今日喝水</Text>
+          <Text className="water-tip">不宜超过{data.maxIntake}ml</Text>
         </View>
         <View className="water-records">
           {data.records.map((record, index) => (
@@ -27,8 +27,8 @@ const WaterIntakeCard = ({ data }) => {
             </View>
           ))}
         </View>
+        <Button className="drink-button">喝水</Button>
       </View>
-      <Button className="drink-button">喝水</Button>
     </View>
   );
 };
