@@ -65,42 +65,72 @@
     line-height: 18px;
     color: #ADA4A5;
   }
-  
   .water-records {
-    flex: 1;
     position: relative;
     width: 100%;
+    padding-left: 20px; /* 为节点和记录信息留出空间 */
   }
   
   .water-record {
+    position: relative;
     display: flex;
-    align-items: center;
-    margin-bottom: 8px;
+    align-items: flex-start; /* 确保信息与节点顶部对齐 */
+    margin-bottom: 20px; /* 节点之间的距离 */
   }
   
   .water-record-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
     border-radius: 50%;
-    margin-right: 8px;
+    position: relative;
+    z-index: 1;
   }
   
   .water-record-info {
     display: flex;
     flex-direction: column;
+    margin-left: 12px; /* 与节点的间距 */
   }
   
   .water-record-time {
     font-size: 12px;
     color: #999;
+    line-height: 1.2;
   }
   
   .water-record-amount {
     font-size: 14px;
-    color: #007AFF;
+    color: #92A3FD;
+    margin-top: 4px; /* 与时间的间距 */
   }
   
+  /* 在每个水记录后添加虚线，除了最后一个 */
+  .water-record::after {
+    content: '';
+    position: absolute;
+    left: 4px; /* 确保虚线在节点中心 */
+    top: 50%; /* 从节点的中点开始 */
+    bottom: -50%; /* 延伸到下一个节点的中点 */
+    width: 1px;
+    background: repeating-linear-gradient(
+      to bottom,
+      #ccc,
+      #ccc 4px,
+      transparent 4px,
+      transparent 8px
+    );
+    z-index: 0;
+  }
+  
+  /* 去掉最后一个水记录的虚线 */
+  .water-record:last-child::after {
+    display: none;
+  }
+  
+  
+  
+
   .drink-button {
     color: #fff;
     font-size: 12px;
@@ -115,20 +145,4 @@
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  .water-records::before {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: repeating-linear-gradient(
-      to bottom,
-      #ccc,
-      #ccc 4px,
-      transparent 4px,
-      transparent 8px
-    );
   }

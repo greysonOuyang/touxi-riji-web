@@ -37,6 +37,10 @@ const HealthPage: React.FC = () => {
         { time: '11:40', amount: 700 },
         { time: '8:30', amount: 900 },
       ]
+    },
+    urine: {
+      value: 500,
+      updateTime: "14:30",
     }
     // 其他卡片类型的数据
     // another: { ... }

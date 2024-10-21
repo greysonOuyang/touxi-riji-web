@@ -9,6 +9,11 @@ export const cardConfig = [
       type: 'weight',
       isFullWidth: true,
     },
+    {
+      id: 3,
+      type: 'urine',
+      isFullWidth: false,
+    }
     
     // 可以继续添加更多卡片配置
     // {
