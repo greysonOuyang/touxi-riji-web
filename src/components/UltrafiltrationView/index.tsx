@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, Button } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
+import AddButton from '@/components/AddButton';
 import "./index.scss";
 import "../../app.scss"
 
@@ -32,9 +33,10 @@ const UltrafiltrationView = ({
         </View>
         <Text className="concentration">浓度 {concentration}</Text>
         <Text className="update-time">更新于 {updateTime}</Text>
-        <View className="add-button" onClick={onAddClick}>
+        {/* <View className="add-button" onClick={onAddClick}>
           <View className="plus-icon" />
-        </View>
+        </View> */}
+        <AddButton size={32} onClick={onAddClick} />
         <View className="view-button" onClick={onViewClick}>
           更多
         </View>

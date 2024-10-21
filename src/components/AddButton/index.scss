@@ -1,0 +1,52 @@
+.add-button {
+    position: relative;
+    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+  
+    .plus-icon {
+      position: relative;
+      width: 15px;
+      height: 15px;
+  
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        background-color: #ffffff;
+        border-radius: 1px;
+      }
+  
+      &::before {
+        width: 100%;
+        height: 1.875px;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+      }
+  
+      &::after {
+        height: 100%;
+        width: 1.875px;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+      }
+    }
+  
+    &:hover {
+      transform: scale(1.1); /* 悬浮时放大 */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 添加阴影 */
+    }
+  
+    &:active {
+      transform: scale(1); /* 点击时恢复原始大小 */
+      box-shadow: none; /* 点击时去除阴影 */
+    }
+  }
+  

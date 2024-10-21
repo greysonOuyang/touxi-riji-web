@@ -94,9 +94,9 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.fill();
 
 
-    let color = '#c48cf0';  // 紫色 196,140,240
+    let color = '#5088F8';  // 蓝色
     if (currentValue < 0) {
-      color = '#F5906C';  // 橙色 245, 144, 108
+      color = '#C58BF2';  // 紫色 
     }
     // 绘制水波、光泽和中心数值
     drawWaves(ctx, centerX, centerY, ensurePositive(radius - maxLineWidth / 2), fillRatio, color, timestamp);
