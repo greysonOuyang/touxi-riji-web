@@ -1,52 +1,53 @@
 .add-button {
-    position: relative;
-    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: none;
-    outline: none;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
   
-    .plus-icon {
-      position: relative;
-      width: 15px;
-      height: 15px;
+  /* 悬浮状态 */
+  .add-button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
   
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        background-color: #ffffff;
-        border-radius: 1px;
-      }
+  /* 点击状态 */
+  .add-button:active {
+    transform: scale(0.95); /* 按下时缩小 */
+    box-shadow: none; /* 移除阴影 */
+  }
   
-      &::before {
-        width: 100%;
-        height: 1.875px;
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
-      }
+  .add-button .plus-icon {
+    width: 15px;
+    height: 15px;
+    position: relative;
+  }
   
-      &::after {
-        height: 100%;
-        width: 1.875px;
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-      }
-    }
+  .add-button .plus-icon::before,
+  .add-button .plus-icon::after {
+    content: "";
+    position: absolute;
+    background-color: #FFFFFF;
+    border-radius: 1px;
+  }
   
-    &:hover {
-      transform: scale(1.1); /* 悬浮时放大 */
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* 添加阴影 */
-    }
+  .add-button .plus-icon::before {
+    width: 100%;
+    height: 1.875px;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+  }
   
-    &:active {
-      transform: scale(1); /* 点击时恢复原始大小 */
-      box-shadow: none; /* 点击时去除阴影 */
-    }
+  .add-button .plus-icon::after {
+    height: 100%;
+    width: 1.875px;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
   }
   
