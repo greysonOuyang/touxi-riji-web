@@ -28,9 +28,9 @@ const UltrafiltrationView = ({
         <Text className="session-info">
           {currentSession} / {totalSession}次
         </Text>
-        {/* <View className="ball">
+        <View className="ball">
           <UltrafiltrationBall value={value} maxValue={maxValue} />
-        </View> */}
+        </View>
         <Text className="concentration">浓度 {concentration}</Text>
         <Text className="update-time">更新于 {updateTime}</Text>
         <AddButton size={32} className="add-button" onClick={onAddClick} />
