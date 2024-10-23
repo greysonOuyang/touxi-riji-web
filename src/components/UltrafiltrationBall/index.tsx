@@ -107,6 +107,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.textBaseline = 'middle';
     const displayValue = `${Math.round(currentValue)} ml`;
     ctx.fillText(displayValue, centerX, centerY);
+
 }, [ensurePositive]);
 
 const drawWaves = useCallback(

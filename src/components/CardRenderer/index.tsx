@@ -4,12 +4,14 @@ import WeightCard from '@/components/WeightCard';
 import WaterIntakeCard from '../WaterIntakeCard';
 // 如果有更多卡片，继续引入
 import UrineVolumeCard from '../UrineVolumeCard';
-import './index.scss'
+import BloodPressureCard from '../BloodPressureCard';
+// import './index.scss'
 
 const cardComponents = {
   weight: WeightCard,
   water: WaterIntakeCard,
-  urine: UrineVolumeCard
+  urine: UrineVolumeCard,
+  blood: BloodPressureCard,
 };
 
 interface CardRendererProps {

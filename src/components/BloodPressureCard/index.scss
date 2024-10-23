@@ -1,0 +1,71 @@
+.blood-pressure-card {
+    width: 100%;
+    height: auto;
+    padding: 15px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+  
+  
+  .header {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+  .title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    line-height: 1.2;
+    margin-bottom: 4px;
+  }
+  
+  .update-time {
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+  }
+  
+  .add-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-grow: 1;
+  }
+  
+  .value-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  
+  .value {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .unit {
+    font-size: 12px;
+    color: #999;
+    margin-top: 4px;
+  }
+  
+  .heart-icon {
+    width: 24px;
+    height: 24px;
+  }
+  

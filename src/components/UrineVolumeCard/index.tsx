@@ -1,30 +1,35 @@
 import React from 'react';
 import { View, Text, Image } from '@tarojs/components';
-import AddButton from '../AddButton'; // 假设有通用的AddButton组件
+import AddButton from '../AddButton';
 import './index.scss';
 
-const UrineVolumeCard = ({data }) => {
+interface UrineVolumeCardProps {
+  data: {
+    updateTime: string;
+    value: number;
+  };
+}
 
-    const onAddClick = () => {
-      console.log("onAddClick");
-    }
+const UrineVolumeCard: React.FC<UrineVolumeCardProps> = ({ data }) => {
+  const onAddClick = () => {
+    console.log("onAddClick");
+  };
 
   return (
     <View className="urine-volume-card">
       <View className="header">
-        <Text className="title">尿量</Text>
-        <Text className="update-time">{data.updateTime}更新</Text>
-      </View>
-      <View className="add-button" >
-      <AddButton size={24} onClick={onAddClick}/>
+        <View className="title-container">
+          <Text className="title">尿量</Text>
+          <Text className="update-time">{data.updateTime}更新</Text>
+        </View>
+        <AddButton size={32} className="add-button" onClick={onAddClick} />
       </View>
       <View className="content">
-        <Text className="value">{data.value}</Text>
-        <Text className="unit">毫升</Text>
-        <View className="icon">
-          {/* 这里可以放置尿量图标 */}
-          <Image src="../../assets/images/water_bottle.png" className="urine-icon" />
+        <View className="value-container">
+          <Text className="value">{data.value}</Text>
+          <Text className="unit">毫升</Text>
         </View>
+        <Image src="../../assets/images/water_bottle.png" className="urine-icon" />
       </View>
     </View>
   );

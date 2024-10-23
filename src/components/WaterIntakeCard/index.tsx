@@ -5,6 +5,9 @@ import './index.scss';
 const WaterIntakeCard = ({ data }) => {
   // 计算进度百分比
   const progressPercentage = (data.currentIntake / data.maxIntake) * 100;
+  console.log('Current Intake:', data.currentIntake);
+  console.log('Max Intake:', data.maxIntake);
+  console.log('Progress Percentage:', progressPercentage);
 
   return (
     <View className="water-card">

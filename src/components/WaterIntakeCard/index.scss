@@ -4,20 +4,22 @@
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
-    flex-direction: row; /* 左右排布 */
-    align-items: flex-start;
-    height: 315px; /* 设置卡片高度 */
-    position: relative; /* 为了让进度条绝对定位 */
-    margin-top: 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    height: auto;
+    min-height: 160px; /* 降低整体卡片的最小高度 */
   }
   
   .water-progress-container {
-    width: 20px; /* 设置进度条宽度 */
-    height: 100%; /* 设置进度条高度 */
-    
+    width: 20px;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    bottom: 20px;
     background-color: #f0f0f0;
-    border-radius: 30px 30px 30px 30px; /* 设置上下圆角 */
-    position: relative;
+    border-radius: 30px;
     overflow: hidden;
   }
   
@@ -26,123 +28,102 @@
     width: 100%;
     position: absolute;
     bottom: 0;
-    border-radius: 30px 30px 30px 30px; /* 设置上下圆角 */
+    height: 45%;
+    border-radius: 30px;
   }
   
   .water-info-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    margin-left: 20px; /* 为了让内容避开进度条 */
-    width: 100%; /* 占满剩余空间 */
+    margin-left: 40px;
+    flex-grow: 1;
   }
   
   .water-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 12px; /* 微调顶部间距 */
   }
   
   .water-title {
     font-family: 'Poppins';
-    font-style: normal;
     font-weight: 600;
     font-size: 14px;
-    line-height: 18px;
-    /* identical to box height, or 150% */
-
-    /* black */
     color: #1D242A;
+    display: block;
   }
   
   .water-tip {
     font-family: 'Poppins';
-    font-style: normal;
     font-weight: 600;
     font-size: 12px;
-    line-height: 18px;
     color: #ADA4A5;
+    white-space: nowrap; /* 禁止换行 */
+    overflow: hidden;
+    text-overflow: ellipsis; /* 超出部分以省略号展示 */
+    display: block;
   }
+  
   .water-records {
-    position: relative;
     width: 100%;
-    padding-left: 20px; /* 为节点和记录信息留出空间 */
+    margin-bottom: 10px;
   }
   
   .water-record {
     position: relative;
     display: flex;
-    align-items: flex-start; /* 确保信息与节点顶部对齐 */
-    margin-bottom: 20px; /* 节点之间的距离 */
+    align-items: flex-start;
+    margin-bottom: 12px; /* 缩短记录之间的间距 */
+  }
+  
+  .water-record::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 10px;
+    bottom: -100%;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom, #ccc, #ccc 3px, transparent 3px, transparent 6px); /* 缩短虚线和间距 */
   }
   
   .water-record-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px; /* 缩小 dot 大小 */
+    height: 8px;
     background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
     border-radius: 50%;
-    position: relative;
-    z-index: 1;
   }
   
   .water-record-info {
-    display: flex;
-    flex-direction: column;
-    margin-left: 12px; /* 与节点的间距 */
+    margin-left: 10px;
   }
   
   .water-record-time {
     font-size: 12px;
     color: #999;
-    line-height: 1.2;
   }
   
   .water-record-amount {
     font-size: 14px;
     color: #92A3FD;
-    margin-top: 4px; /* 与时间的间距 */
+    margin-top: 2px;
   }
   
-  /* 在每个水记录后添加虚线，除了最后一个 */
-  .water-record::after {
-    content: '';
-    position: absolute;
-    left: 4px; /* 确保虚线在节点中心 */
-    top: 50%; /* 从节点的中点开始 */
-    bottom: -50%; /* 延伸到下一个节点的中点 */
-    width: 1px;
-    background: repeating-linear-gradient(
-      to bottom,
-      #ccc,
-      #ccc 4px,
-      transparent 4px,
-      transparent 8px
-    );
-    z-index: 0;
-  }
-  
-  /* 去掉最后一个水记录的虚线 */
   .water-record:last-child::after {
     display: none;
   }
   
-  
-  
-
   .drink-button {
     color: #fff;
     font-size: 12px;
-    position: absolute;
     width: 70px;
     height: 20px;
     background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
     border-radius: 50px;
-    bottom: 20px; /* 距离卡片底部20px */
-    left: 60%; /* 水平居中 */
-    transform: translateX(-50%); /* 水平居中 */
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 5px;
   }
+  
