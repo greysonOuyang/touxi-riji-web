@@ -20,12 +20,71 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
   const currentValueRef = useRef(0);
   const targetValueRef = useRef(value);
 
-  const ensurePositive = useCallback(
-    (value: number) => Math.max(0.1, value),
-    []
-  );
+  const ensurePositive = (value: number) => Math.max(0.1, value);
 
-  const drawBall = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
+  const hexToRgb = (hex: string, alpha: number) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  const drawGloss = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number) => {
+    const gradient = ctx.createRadialGradient(centerX - radius / 3, centerY - radius / 3, ensurePositive(radius / 10), centerX, centerY, radius);
+    gradient.addColorStop(0, "rgba(255, 255, 255, 0.4)");
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.fillStyle = gradient;
+    ctx.fill();
+  };
+
+  const drawWaves = (ctx, centerX, centerY, radius, fillRatio, color, timestamp) => {
+    const waterLevel = centerY + radius - 2 * radius * fillRatio;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    ctx.clip();
+  
+    const wave = (x, wavelength, amplitude, speed, offset) => Math.sin((x + offset) / wavelength) * amplitude;
+  
+    const drawWave = (wavelength, amplitude, speed, baseAlpha, yOffset, phaseShift, offset) => {
+      ctx.beginPath();
+      ctx.moveTo(centerX - radius, waterLevel + yOffset);
+      for (let x = 0; x <= radius * 2; x++) {
+        const y = wave(x, wavelength, amplitude, speed, offset);
+        ctx.lineTo(centerX - radius + x, waterLevel + y + yOffset);
+      }
+      ctx.lineTo(centerX + radius, centerY + radius);
+      ctx.lineTo(centerX - radius, centerY + radius);
+      ctx.closePath();
+      const dynamicAlpha = baseAlpha + 0.3 * Math.sin(offset * 0.002 + phaseShift);
+      const gradient = ctx.createLinearGradient(0, waterLevel + yOffset, 0, centerY + radius);
+      gradient.addColorStop(0, hexToRgb(color, dynamicAlpha * 0.7));
+      gradient.addColorStop(1, hexToRgb(color, dynamicAlpha));
+      ctx.fillStyle = gradient;
+      ctx.fill();
+    };
+  
+    const offset = timestamp * 0.03; // Adjust speed here
+    drawWave(80, 8, 0.03, 0.5, 0, 0, offset);
+    drawWave(50, 6, 0.05, 0.3, -5, Math.PI, offset);
+    drawWave(100, 4, 0.02, 0.2, -3, Math.PI / 2, offset);
+  
+    ctx.restore();
+  };
+  
+  // 在动画帧函数中
+  const animate = (timestamp) => {
+    if (!canvasRef.current) return;
+    const { ctx, width, height } = canvasRef.current;
+    const diff = targetValueRef.current - currentValueRef.current;
+    currentValueRef.current += diff * 0.05;
+    drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
+    animationRef.current = requestAnimationFrame(animate);
+  };
+
+  const drawBall = (ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
     ctx.clearRect(0, 0, width, height);
     const centerX = width / 2;
     const centerY = height / 2;
@@ -35,13 +94,10 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     const maxLineWidth = ensurePositive(Math.min(8, radius / 5));
     const minLineWidth = maxLineWidth * 0.4;
     const outerRingWidth = maxLineWidth;
-
     const totalSegments = 500;
-
     const safeMaxValue = ensurePositive(maxValue);
     const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
     const fillAngle = Math.PI * 2 * fillRatio;
-
     const outerRingColor = 'rgba(200, 200, 200, 0.8)';
 
     // 绘制灰色外环
@@ -56,16 +112,13 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     for (let i = 0; i < totalSegments; i++) {
       const startAngle = -Math.PI / 2 + (fillAngle / totalSegments) * i;
       const endAngle = -Math.PI / 2 + (fillAngle / totalSegments) * (i + 1);
-
       const progress = i / totalSegments;
       const currentLineWidth = Math.min(minLineWidth + Math.sqrt(progress) * (maxLineWidth - minLineWidth), maxLineWidth);
       const alpha = Math.min(progress * 2, 1);
       const baseAlpha = Math.max(0.05, 0.1 - progress * 0.8);
-
       const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
       gradientLine.addColorStop(0, `rgba(146, 163, 253, ${baseAlpha})`);
       gradientLine.addColorStop(1, `rgba(146, 163, 253, ${alpha})`);
-
       ctx.beginPath();
       ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
       ctx.strokeStyle = gradientLine;
@@ -92,76 +145,10 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(`${Math.round(currentValue)} ml`, centerX, centerY);
-  }, [ensurePositive, drawWaves, drawGloss]);
-
-  const drawWaves = useCallback(
-    (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
-      const waterLevel = centerY + radius - 2 * radius * fillRatio;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.clip();
-
-      const wave = (x: number, wavelength: number, amplitude: number, speed: number) => Math.sin((x + timestamp * speed) / wavelength) * amplitude;
-
-      const drawWave = (wavelength: number, amplitude: number, speed: number, baseAlpha: number, yOffset: number, phaseShift: number) => {
-        ctx.beginPath();
-        ctx.moveTo(centerX - radius, waterLevel + yOffset);
-
-        for (let x = 0; x <= radius * 2; x++) {
-          const y = wave(x, wavelength, amplitude, speed);
-          ctx.lineTo(centerX - radius + x, waterLevel + y + yOffset);
-        }
-
-        ctx.lineTo(centerX + radius, centerY + radius);
-        ctx.lineTo(centerX - radius, centerY + radius);
-        ctx.closePath();
-
-        // 使用基于时间的动态透明度
-        const dynamicAlpha = baseAlpha + 0.3 * Math.sin(timestamp * 0.002 + phaseShift);
-        const gradient = ctx.createLinearGradient(0, waterLevel + yOffset, 0, centerY + radius);
-        gradient.addColorStop(0, hexToRgb(color, dynamicAlpha * 0.7));
-        gradient.addColorStop(1, hexToRgb(color, dynamicAlpha));
-
-        ctx.fillStyle = gradient;
-        ctx.fill();
-      };
-
-      // 为每个波浪层绘制时引入不同的相位偏移
-      drawWave(80, ensurePositive(8), 0.03, 0.5, 0, 0);
-      drawWave(50, ensurePositive(6), 0.05, 0.3, -5, Math.PI);
-      drawWave(100, ensurePositive(4), 0.02, 0.2, -3, Math.PI / 2);
-
-      ctx.restore();
-    },
-    [ensurePositive, hexToRgb]
-  );
-
-  const drawGloss = useCallback(
-    (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number) => {
-      const gradient = ctx.createRadialGradient(centerX - radius / 3, centerY - radius / 3, ensurePositive(radius / 10), centerX, centerY, radius);
-      gradient.addColorStop(0, "rgba(255, 255, 255, 0.4)");
-      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-    },
-    [ensurePositive]
-  );
-
-  const hexToRgb = useCallback((hex: string, alpha: number) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  }, []);
+  };
 
   useEffect(() => {
     if (!canvasReady) return;
-
     targetValueRef.current = value;
     if (!animationRef.current) {
       animateBall();
@@ -178,11 +165,9 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
           const canvas = res[0].node;
           const ctx = canvas.getContext("2d");
           const { pixelRatio } = Taro.getWindowInfo();
-
           canvas.width = res[0].width * pixelRatio;
           canvas.height = res[0].height * pixelRatio;
           ctx.scale(pixelRatio, pixelRatio);
-
           canvasRef.current = { canvas, ctx, width: res[0].width, height: res[0].height };
           setCanvasReady(true);
         }
@@ -199,29 +184,23 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     const animate = (timestamp: number) => {
       if (!canvasRef.current) return;
       const { ctx, width, height } = canvasRef.current;
-
       const diff = targetValueRef.current - currentValueRef.current;
       currentValueRef.current += diff * 0.05;
-
       drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
       animationRef.current = requestAnimationFrame(animate);
     };
-
     animationRef.current = requestAnimationFrame(animate);
   }, [drawBall, maxValue]);
 
   const handleTap = useCallback(
     (e: any) => {
       if (!canvasRef.current || !onChange) return;
-
       const { width, height } = canvasRef.current;
       const rect = e.target.getBoundingClientRect();
       const x = e.touches[0].clientX - rect.left;
       const y = e.touches[0].clientY - rect.top;
-
       const centerY = height / 2;
       const radius = ensurePositive(Math.min(width, height) / 2 - 10);
-
       const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
       onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
     },
