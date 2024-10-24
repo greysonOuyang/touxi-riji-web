@@ -6,12 +6,14 @@ import "./index.scss";
 interface UltrafiltrationBallProps {
   value: number;
   maxValue: number;
+  animate?: boolean; // 新增的属性
   onChange?: (value: number) => void;
 }
 
 const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
   value,
   maxValue,
+  animate = true, // 默认值为 true
   onChange,
 }) => {
   const canvasRef = useRef<any>(null);
@@ -39,16 +41,16 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.fill();
   };
 
-  const drawWaves = (ctx, centerX, centerY, radius, fillRatio, color, timestamp) => {
+  const drawWaves = (ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number, fillRatio: number, color: string, timestamp: number) => {
     const waterLevel = centerY + radius - 2 * radius * fillRatio;
     ctx.save();
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
     ctx.clip();
-  
-    const wave = (x, wavelength, amplitude, speed, offset) => Math.sin((x + offset) / wavelength) * amplitude;
-  
-    const drawWave = (wavelength, amplitude, speed, baseAlpha, yOffset, phaseShift, offset) => {
+
+    const wave = (x: number, wavelength: number, amplitude: number, speed: number, offset: number) => Math.sin((x + offset) / wavelength) * amplitude;
+
+    const drawWave = (wavelength: number, amplitude: number, speed: number, baseAlpha: number, yOffset: number, phaseShift: number, offset: number) => {
       ctx.beginPath();
       ctx.moveTo(centerX - radius, waterLevel + yOffset);
       for (let x = 0; x <= radius * 2; x++) {
@@ -65,23 +67,13 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
       ctx.fillStyle = gradient;
       ctx.fill();
     };
-  
-    const offset = timestamp * 0.03; // Adjust speed here
-    drawWave(80, 8, 0.03, 0.5, 0, 0, offset);
-    drawWave(50, 6, 0.05, 0.3, -5, Math.PI, offset);
-    drawWave(100, 4, 0.02, 0.2, -3, Math.PI / 2, offset);
-  
+
+    const offset = timestamp * 0.03; // 调整速度
+    drawWave(80, ensurePositive(8), 0.03, 0.5, 0, 0, offset);
+    drawWave(50, ensurePositive(6), 0.05, 0.3, -5, Math.PI, offset);
+    drawWave(100, ensurePositive(4), 0.02, 0.2, -3, Math.PI / 2, offset);
+
     ctx.restore();
-  };
-  
-  // 在动画帧函数中
-  const animate = (timestamp) => {
-    if (!canvasRef.current) return;
-    const { ctx, width, height } = canvasRef.current;
-    const diff = targetValueRef.current - currentValueRef.current;
-    currentValueRef.current += diff * 0.05;
-    drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
-    animationRef.current = requestAnimationFrame(animate);
   };
 
   const drawBall = (ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
@@ -148,12 +140,22 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
   };
 
   useEffect(() => {
-    if (!canvasReady) return;
-    targetValueRef.current = value;
-    if (!animationRef.current) {
-      animateBall();
+    if (canvasReady) {
+      targetValueRef.current = value;
+      if (!animationRef.current && animate) {
+        animateBall();
+      }
+      if (!animate && animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = undefined;
+      }
+      if (canvasRef.current) {
+        const { ctx, width, height } = canvasRef.current;
+        currentValueRef.current = targetValueRef.current;
+        drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), 0);
+      }
     }
-  }, [value, canvasReady]);
+  }, [value, animate, canvasReady]);
 
   useEffect(() => {
     const query = Taro.createSelectorQuery();
@@ -192,20 +194,17 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     animationRef.current = requestAnimationFrame(animate);
   }, [drawBall, maxValue]);
 
-  const handleTap = useCallback(
-    (e: any) => {
-      if (!canvasRef.current || !onChange) return;
-      const { width, height } = canvasRef.current;
-      const rect = e.target.getBoundingClientRect();
-      const x = e.touches[0].clientX - rect.left;
-      const y = e.touches[0].clientY - rect.top;
-      const centerY = height / 2;
-      const radius = ensurePositive(Math.min(width, height) / 2 - 10);
-      const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
-      onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
-    },
-    [onChange, maxValue, ensurePositive]
-  );
+  const handleTap = (e: any) => {
+    if (!canvasRef.current || !onChange) return;
+    const { width, height } = canvasRef.current;
+    const rect = e.target.getBoundingClientRect();
+    const x = e.touches[0].clientX - rect.left;
+    const y = e.touches[0].clientY - rect.top;
+    const centerY = height / 2;
+    const radius = ensurePositive(Math.min(width, height) / 2 - 10);
+    const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
+    onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
+  };
 
   return (
     <Canvas
