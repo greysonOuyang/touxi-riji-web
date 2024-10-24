@@ -18,10 +18,7 @@ const UrineVolumeCard: React.FC<UrineVolumeCardProps> = ({ data }) => {
   return (
     <View className="urine-volume-card">
       <View className="header">
-        <View className="title-container">
-          <Text className="title">尿量</Text>
-          <Text className="update-time">{data.updateTime}更新</Text>
-        </View>
+        <Text className="title">尿量</Text>
         <AddButton size={32} className="add-button" onClick={onAddClick} />
       </View>
       <View className="content">

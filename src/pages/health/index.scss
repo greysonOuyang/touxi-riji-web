@@ -1,32 +1,4 @@
-// .health-page {
-//   min-height: 100vh;
-//   overflow: hidden;
-//   box-sizing: border-box;
 
-//   .content-wrapper {
-//     padding: 15px 30px;
-//     width: 100%;
-//     box-sizing: border-box;
-//   }
-
-//   .health-grid {
-//     column-count: 2; /* 两列布局，可以根据需求调整列数 */
-//     column-gap: 16px; /* 列之间的间距 */
-//     padding: 0 15px;  /* 网格的左右内边距，避免贴边 */
-//     box-sizing: border-box;
-//   }
-  
-//   .health-card {
-//     break-inside: avoid; /* 防止卡片在列中拆分，保持整块排列 */
-//     margin-bottom: 16px; /* 控制卡片之间的间距 */
-//     background-color: #fff;
-//     border-radius: 16px;
-//     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-//     padding: 15px;
-//     box-sizing: border-box;
-//   }
-  
-// }
 .health-page {
   min-height: 100vh;
   overflow: hidden;
