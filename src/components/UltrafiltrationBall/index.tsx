@@ -68,7 +68,7 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
       ctx.fill();
     };
 
-    const offset = timestamp * 0.03; // 调整速度
+    const offset = timestamp * 0.03;
     drawWave(80, ensurePositive(8), 0.03, 0.5, 0, 0, offset);
     drawWave(50, ensurePositive(6), 0.05, 0.3, -5, Math.PI, offset);
     drawWave(100, ensurePositive(4), 0.02, 0.2, -3, Math.PI / 2, offset);
@@ -76,86 +76,69 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
     ctx.restore();
   };
 
-  const drawBall = (ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
-    ctx.clearRect(0, 0, width, height);
-    const centerX = width / 2;
-    const centerY = height / 2;
-    const minDimension = Math.min(width, height);
-    const radius = ensurePositive(minDimension / 2 - 20);
-    const outerRadius = radius + 5;
-    const maxLineWidth = ensurePositive(Math.min(8, radius / 5));
-    const minLineWidth = maxLineWidth * 0.4;
-    const outerRingWidth = maxLineWidth;
-    const totalSegments = 500;
-    const safeMaxValue = ensurePositive(maxValue);
-    const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
-    const fillAngle = Math.PI * 2 * fillRatio;
-    const outerRingColor = 'rgba(200, 200, 200, 0.8)';
-
-    // 绘制灰色外环
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-    ctx.strokeStyle = outerRingColor;
-    ctx.lineWidth = outerRingWidth;
-    ctx.lineCap = 'round';
-    ctx.stroke();
-
-    // 动态调整线条厚度
-    for (let i = 0; i < totalSegments; i++) {
-      const startAngle = -Math.PI / 2 + (fillAngle / totalSegments) * i;
-      const endAngle = -Math.PI / 2 + (fillAngle / totalSegments) * (i + 1);
-      const progress = i / totalSegments;
-      const currentLineWidth = Math.min(minLineWidth + Math.sqrt(progress) * (maxLineWidth - minLineWidth), maxLineWidth);
-      const alpha = Math.min(progress * 2, 1);
-      const baseAlpha = Math.max(0.05, 0.1 - progress * 0.8);
-      const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
-      gradientLine.addColorStop(0, `rgba(146, 163, 253, ${baseAlpha})`);
-      gradientLine.addColorStop(1, `rgba(146, 163, 253, ${alpha})`);
+    const drawBall = (ctx: CanvasRenderingContext2D, width: number, height: number, currentValue: number, maxValue: number, timestamp: number) => {
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const minDimension = Math.min(width, height);
+      const radius = ensurePositive(minDimension / 2 - 20);
+      const outerRadius = radius + 5;
+      const maxLineWidth = ensurePositive(Math.min(8, radius / 5));
+      const minLineWidth = maxLineWidth * 0.4;
+      const outerRingWidth = maxLineWidth;
+      const totalSegments = 500;
+      const safeMaxValue = ensurePositive(maxValue);
+      const fillRatio = Math.min(Math.abs(currentValue) / safeMaxValue, 1);
+      const fillAngle = Math.PI * 2 * fillRatio;
+      const outerRingColor = 'rgba(200, 200, 200, 0.8)';
+  
+      // 绘制灰色外环
       ctx.beginPath();
-      ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
-      ctx.strokeStyle = gradientLine;
-      ctx.lineWidth = currentLineWidth;
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = outerRingColor;
+      ctx.lineWidth = outerRingWidth;
       ctx.lineCap = 'round';
       ctx.stroke();
-    }
-
-    // 绘制端点圆点
-    const endX = centerX + outerRadius * Math.cos(-Math.PI / 2 + fillAngle);
-    const endY = centerY + outerRadius * Math.sin(-Math.PI / 2 + fillAngle);
-    ctx.beginPath();
-    ctx.arc(endX, endY, 8, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fill();
-
-    // 绘制水波和数值
-    const color = currentValue < 0 ? '#C58BF2' : '#5088F8';
-    drawWaves(ctx, centerX, centerY, ensurePositive(radius - outerRingWidth / 2), fillRatio, color, timestamp);
-    drawGloss(ctx, centerX, centerY, ensurePositive(radius - outerRingWidth / 2));
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.font = 'bold 12px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`${Math.round(currentValue)} ml`, centerX, centerY);
-  };
-
-  useEffect(() => {
-    if (canvasReady) {
-      targetValueRef.current = value;
-      if (!animationRef.current && animate) {
-        animateBall();
+  
+      // 动态调整线条厚度
+      for (let i = 0; i < totalSegments; i++) {
+        const startAngle = -Math.PI / 2 + (fillAngle / totalSegments) * i;
+        const endAngle = -Math.PI / 2 + (fillAngle / totalSegments) * (i + 1);
+        const progress = i / totalSegments;
+        const currentLineWidth = Math.min(minLineWidth + Math.sqrt(progress) * (maxLineWidth - minLineWidth), maxLineWidth);
+        const alpha = Math.min(progress * 2, 1);
+        const baseAlpha = Math.max(0.05, 0.1 - progress * 0.8);
+        const gradientLine = ctx.createRadialGradient(centerX, centerY, radius, centerX, centerY, outerRadius);
+        gradientLine.addColorStop(0, `rgba(146, 163, 253, ${baseAlpha})`);
+        gradientLine.addColorStop(1, `rgba(146, 163, 253, ${alpha})`);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, outerRadius, startAngle, endAngle);
+        ctx.strokeStyle = gradientLine;
+        ctx.lineWidth = currentLineWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
       }
-      if (!animate && animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-        animationRef.current = undefined;
-      }
-      if (canvasRef.current) {
-        const { ctx, width, height } = canvasRef.current;
-        currentValueRef.current = targetValueRef.current;
-        drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), 0);
-      }
-    }
-  }, [value, animate, canvasReady]);
+  
+      // 绘制端点圆点
+      const endX = centerX + outerRadius * Math.cos(-Math.PI / 2 + fillAngle);
+      const endY = centerY + outerRadius * Math.sin(-Math.PI / 2 + fillAngle);
+      ctx.beginPath();
+      ctx.arc(endX, endY, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fill();
+  
+      // 绘制水波和数值
+      const color = currentValue < 0 ? '#C58BF2' : '#5088F8';
+      drawWaves(ctx, centerX, centerY, ensurePositive(radius - outerRingWidth / 2), fillRatio, color, timestamp);
+      drawGloss(ctx, centerX, centerY, ensurePositive(radius - outerRingWidth / 2));
+  
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 12px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(`${Math.round(currentValue)} ml`, centerX, centerY);
+    };
+  
 
   useEffect(() => {
     const query = Taro.createSelectorQuery();
@@ -176,45 +159,52 @@ const UltrafiltrationBall: React.FC<UltrafiltrationBallProps> = ({
       });
 
     return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      cancelAnimationFrame(animationRef.current);
     };
   }, []);
 
   const animateBall = useCallback(() => {
-    const animate = (timestamp: number) => {
+    let frameCount = 0;
+    const animate = (timestamp) => {
       if (!canvasRef.current) return;
-      const { ctx, width, height } = canvasRef.current;
-      const diff = targetValueRef.current - currentValueRef.current;
-      currentValueRef.current += diff * 0.05;
-      drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
+
+      if (frameCount % 3 === 0) {
+        const { ctx, width, height } = canvasRef.current;
+        const diff = targetValueRef.current - currentValueRef.current;
+        currentValueRef.current += diff * 0.05;
+        drawBall(ctx, width, height, currentValueRef.current, Math.max(1, maxValue), timestamp);
+      }
+      frameCount += 1;
       animationRef.current = requestAnimationFrame(animate);
     };
     animationRef.current = requestAnimationFrame(animate);
   }, [drawBall, maxValue]);
 
+  useEffect(() => {
+    if (canvasReady) {
+      targetValueRef.current = value;
+      if (animate && !animationRef.current) {
+        animateBall();
+      } else if (!animate && animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = undefined;
+      }
+    }
+  }, [value, animate, canvasReady]);
+
   const handleTap = (e: any) => {
     if (!canvasRef.current || !onChange) return;
     const { width, height } = canvasRef.current;
     const rect = e.target.getBoundingClientRect();
-    const x = e.touches[0].clientX - rect.left;
-    const y = e.touches[0].clientY - rect.top;
-    const centerY = height / 2;
-    const radius = ensurePositive(Math.min(width, height) / 2 - 10);
-    const newValue = ((centerY + radius - y) / (2 * radius)) * maxValue * 2 - maxValue;
-    onChange(Math.max(-maxValue, Math.min(maxValue, newValue)));
+    const x = e.clientX - rect.left - width / 2;
+    const y = e.clientY - rect.top - height / 2;
+    const angle = Math.atan2(y, x);
+    const newValue = Math.max(0, Math.round((angle + Math.PI) / (2 * Math.PI) * maxValue));
+    onChange(newValue);
   };
 
   return (
-    <Canvas
-      type="2d"
-      id="ultrafiltrationBall"
-      className="ultrafiltration-ball"
-      canvasId="ultrafiltrationBall"
-      ref={canvasRef}
-      onTouchStart={handleTap}
-    />
+    <Canvas type="2d" id="ultrafiltrationBall" className="ultrafiltrationBall" onClick={handleTap} />
   );
 };
 

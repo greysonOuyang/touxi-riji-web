@@ -13,7 +13,7 @@ const UltrafiltrationView = ({
   totalSession,
   updateTime,
 }) => {
-  const [animate, setAnimate] = useState(false); // 将 useState 移动到组件内部
+  const [animate, setAnimate] = useState(true); // 将 useState 移动到组件内部
 
   const onAddClick = () => {
     console.log("onAddClick");
