@@ -15,21 +15,25 @@ const UrineVolumeCard: React.FC<UrineVolumeCardProps> = ({ data }) => {
     console.log("onAddClick");
   };
 
-  return (
-    <View className="urine-volume-card">
-      <View className="header">
-        <Text className="title">尿量</Text>
-        <AddButton size={32} className="add-button" onClick={onAddClick} />
-      </View>
-      <View className="content">
-        <View className="value-container">
-          <Text className="value">{data.value}</Text>
-          <Text className="unit">毫升</Text>
-        </View>
-        <Image src="../../assets/images/water_bottle.png" className="urine-icon" />
+// UrineVolumeCard.jsx
+return (
+  <View className="urine-volume-card">
+    <View className="small-card-header">
+      <Text className="small-card-title">尿量</Text>
+      <AddButton size={24} className="small-card-add-button" onClick={onAddClick} />
+    </View>
+    <View className="content">
+      <View className="urine-value-container">
+        <Text className="global-value">{data.value}</Text>
+        <Text className="global-unit urine-unit">毫升</Text>
       </View>
     </View>
-  );
+    <View className="footer">
+      <Text className="update-time">{data.updateTime} 更新</Text>
+      <Image src="../../assets/images/water_bottle.png" className="urine-icon" />
+    </View>
+  </View>
+);
 };
 
 export default UrineVolumeCard;

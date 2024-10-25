@@ -7,23 +7,30 @@ const BloodPressureCard = ({ data }) => {
   const onAddClick = () => {
     console.log("onAddClick");
   };
-
   return (
     <View className="blood-pressure-card">
-      <View className="header">
-        <Text className="title">血压</Text>
-        <Text className="update-time">{data.updateTime}更新</Text>
-        <AddButton size={32} className="add-button" onClick={onAddClick} />
+      <View className="small-card-header">
+        <Text className="small-card-title">血压</Text>
+        <AddButton size={24} className="small-card-add-button" onClick={onAddClick} />
       </View>
+      
       <View className="content">
         <View className="value-container">
-          <Text className="value">{data.value}</Text>
-          <Text className="unit">mmHg</Text>
+          <Text className="global-value">{data.high}</Text>
+          <Text className="global-value">/</Text>
+          <Text className="global-value">{data.low}</Text>
         </View>
-        <Image src="../../assets/images/heart_icon.png" className="heart-icon" />
+        
+        <Text className="global-unit blood-unit">mmHg</Text>
       </View>
+      
+      <Text className="update-time">{data.updateTime} 更新</Text>
+      
+      <Image src="../../assets/images/heart_icon.png" className="heart-icon" />
     </View>
   );
+  
+  
 };
 
 export default BloodPressureCard;

@@ -13,7 +13,7 @@ const UltrafiltrationView = ({
   totalSession,
   updateTime,
 }) => {
-  const [animate, setAnimate] = useState(true); // 将 useState 移动到组件内部
+  const [animate, setAnimate] = useState(false); // 将 useState 移动到组件内部
 
   const onAddClick = () => {
     console.log("onAddClick");
@@ -38,8 +38,8 @@ const UltrafiltrationView = ({
           <UltrafiltrationBall value={value} maxValue={maxValue} animate={animate} />
         </View>
         <Text className="concentration">浓度 {concentration}</Text>
-        <Text className="update-time">更新于 {updateTime}</Text>
-        <AddButton size={32} className="add-button" onClick={onAddClick} />
+        <Text className="ultrafiltration-update-time">更新于 {updateTime}</Text>
+        <AddButton size={32} className="ultrafiltration-add-button" onClick={onAddClick} />
         <View className="view-button" onClick={onViewClick}>
           更多
         </View>

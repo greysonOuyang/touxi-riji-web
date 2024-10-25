@@ -40,45 +40,49 @@ const HealthPage: React.FC = () => {
       ],
     },
     urine: {
-      value: 500,
+      value: 1000,
       updateTime: "14:30",
     },
     blood: {
-      value: "130/80",
+      high: 130,
+      low: 80,
       updateTime: "12:11",
     },
   };
 
   return (
     <ScrollView className="health-page" scrollY>
-      <View className="content-wrapper">
-        {/* 超滤量卡片 */}
-        <UltrafiltrationView {...ultrafiltrationData} />
-        <Text className="large_text_semi_bold">健康概览</Text>
-        
-        {/* 固定布局的健康卡片 */}
-        <View className="health-grid">
-          <View className="top-row">
-            {/* 左侧：喝水卡片 */}
-            <View className="left-column">
-              <WaterIntakeCard data={cardData.water} />
-            </View>
-            
-            {/* 右侧：尿液卡片和血压卡片 */}
-            <View className="right-column">
-              <UrineVolumeCard data={cardData.urine} />
-              <BloodPressureCard data={cardData.blood} />
-            </View>
-          </View>
-          
-          {/* 底部跨两列的体重卡片 */}
-          <View className="full-width-card">
-            <WeightCard data={cardData.weight} />
-          </View>
+  <View className="content-wrapper">
+    {/* 超滤量卡片 */}
+    <UltrafiltrationView {...ultrafiltrationData} />
+    <Text className="large_text_semi_bold">健康概览</Text>
+
+    {/* 固定布局的健康卡片 */}
+    <View className="health-grid">
+      <View className="top-row">
+        {/* 左侧：喝水卡片 */}
+        <View className="left-column">
+          <WaterIntakeCard data={cardData.water} />
+        </View>
+
+        {/* 右侧：尿液卡片和血压卡片 */}
+        <View className="right-column">
+          <UrineVolumeCard data={cardData.urine} />
+          <BloodPressureCard data={cardData.blood} />
         </View>
       </View>
-    </ScrollView>
+
+      {/* 底部跨两列的体重卡片 */}
+      <View className="full-width-card">
+        <WeightCard data={cardData.weight} />
+      </View>
+    </View>
+  </View>
+</ScrollView>
   );
+  
+  
+  
 };
 
 export default HealthPage;

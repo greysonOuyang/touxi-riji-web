@@ -61,10 +61,10 @@
   z-index: 2;
 }
 
-.update-time {
+.ultrafiltration-update-time {
   position: absolute;
   bottom: 15px; /* 4vw = 4 * 3.75px */
-  left: 18.75px; /* 5vw = 5 * 3.75px */
+  left: 15px; /* 5vw = 5 * 3.75px */
   font-size: 12px;
   color: #FFFFFF;
   z-index: 2;
@@ -88,7 +88,7 @@
   padding: 0; /* 去掉内边距，避免内容被挤出 */
   z-index: 2;
 }
-.add-button {
+.ultrafiltration-add-button {
   position: absolute;
   top: 15px !important;
   right: 15px !important;
