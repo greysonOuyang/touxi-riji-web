@@ -4,7 +4,7 @@
   height: 50%; /* 卡片高度占右侧容器的 50% */
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 轻微且紧贴元素的阴影 */
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
