@@ -44,8 +44,8 @@ const HealthPage: React.FC = () => {
       updateTime: "14:30",
     },
     blood: {
-      high: 130,
-      low: 80,
+      high: 135,
+      low: 59,
       updateTime: "12:11",
     },
   };
