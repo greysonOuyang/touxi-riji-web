@@ -1,26 +1,27 @@
-// /api/auth.ts
+import Taro from '@tarojs/taro';
 import { get } from '../utils/request';
 
 interface LoginParams {
   code: string;
 }
 
-interface LoginResponse extends Response {
+interface LoginResponse {
   data: {
     token: string;
+    user: any;
   };
 }
 
-// export const alogin = async ({ code }: LoginParams): Promise<LoginResponse> => {
-//   console.log('授权登录：'+ code)
-//   try {
-//     const response = await get('/auth/mini-app/login', { code });
-//     console.log('授权登录：'+ response)
-//     return response as LoginResponse;
-//   } catch (error) {
-//     throw new Error(error.message || '登录失败');
-//   }
-// };
-export async function alogin(params) {
-  return await get(`/auth/mini-app/login`,params);
-} 
+export async function alogin(params: LoginParams): Promise<LoginResponse> {
+  try {
+    const response = await get('/auth/mini-app/login', params) as LoginResponse;
+    const { token } = response.data;
+    if (token) {
+      // 使用 Taro 的存储方法来存储 token
+      Taro.setStorageSync('token', token);
+    }
+    return response;
+  } catch (error: any) {
+    throw new Error(error.message || '登录失败');
+  }
+}
