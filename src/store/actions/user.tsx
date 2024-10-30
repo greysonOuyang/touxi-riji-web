@@ -1,0 +1,7 @@
+// src/store/actions/user.js
+export const SET_TOKEN = 'SET_TOKEN';
+
+export const setToken = token => ({
+  type: SET_TOKEN,
+  payload: token,
+});

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Button } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
 import AddButton from '@/components/AddButton';
+import { checkLogin } from '@/utils/auth'; // 引入公共方法
 import "./index.scss";
 import "../../app.scss";
 
@@ -13,9 +14,13 @@ const UltrafiltrationView = ({
   totalSession,
   updateTime,
 }) => {
-  const [animate, setAnimate] = useState(true); // 将 useState 移动到组件内部
+  const [animate, setAnimate] = useState(true);
 
-  const onAddClick = () => {
+  const onAddClick = async () => {
+    const isLoggedIn = await checkLogin();
+    if (!isLoggedIn) return;
+
+    // 用户已登录的逻辑
     console.log("onAddClick");
   };
 

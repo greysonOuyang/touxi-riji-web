@@ -3,16 +3,10 @@ export default {
     'pages/health/index',
     'pages/record/index',
     'pages/statistics/index',
-    'pages/profile/index'
+    'pages/profile/index',
+    'pages/login/index'
   ],
   window: {
-    // backgroundTextStyle: 'light',
-    // navigationBarBackgroundColor: '#e6f2ff',  // 设置导航栏背景颜色为浅灰色
-    // navigationBarTitleText: '健康概览',
-    // navigationBarTextStyle: 'black',  // 导航栏文字颜色设置为黑色
-    // // navigationStyle: 'custom'
-    // backgroundColor: '#e6f2ff'
-
     backgroundTextStyle: 'light',
     navigationBarBackgroundColor: '#FCFCFC',
     navigationBarTitleText: '健康概览',

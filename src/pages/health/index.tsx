@@ -11,7 +11,7 @@ import '../../app.scss';
 const HealthPage: React.FC = () => {
   // 模拟超滤数据
   const ultrafiltrationData = {
-    value: 500,
+    value: -400,
     maxValue: 1000,
     concentration: "1.5%",
     currentSession: 1,
