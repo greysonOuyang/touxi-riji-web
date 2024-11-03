@@ -30,7 +30,7 @@ const WaterIntakeCard = ({ data }) => {
             </View>
           ))}
         </View>
-        <Button className="drink-button">喝水</Button>
+        <View className="drink-button">喝水</View>
       </View>
     </View>
   );

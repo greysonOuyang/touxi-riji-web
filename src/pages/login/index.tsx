@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import { View, Button, Image, Checkbox, CheckboxGroup, Text } from '@tarojs/components';
 import { alogin } from '../../api/auth'; // 确保引入 login 函数
 import './index.scss';
+import { get } from '../utils/request';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -23,16 +24,16 @@ const Login: React.FC = () => {
     try {
       const { code } = await Taro.login(); // 调用微信
       console.log("调用登录接口", code)
-      const response = await alogin({ code }); // 调用登录接口
+      const response = await get('/auth/mini-app/login', code);
       console.log("调用登录接口111111", response)
-      if (response.success) {
+      if (response.isSuccess()) {
         Taro.setStorageSync('token', response.data.token); // 保存 Token
         Taro.showToast({
           title: '登录成功',
           icon: 'success',
           duration: 2000,
         });
-
+        
         // 跳转回之前的页面
         const redirectUrl = Taro.getStorageSync('redirectUrl');
         if (redirectUrl) {
@@ -40,6 +41,8 @@ const Login: React.FC = () => {
         } else {
           Taro.switchTab({ url: '/pages/home/index' }); // 默认跳转到首页
         }
+      } else {
+        console.error('登录失败:', response.msg);
       }
     } catch (error) {
       Taro.showToast({
