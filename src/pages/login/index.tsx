@@ -2,13 +2,36 @@
 import React, { useState } from 'react';
 import Taro from '@tarojs/taro';
 import { View, Button, Image, Checkbox, CheckboxGroup, Text } from '@tarojs/components';
-import { alogin } from '../../api/auth'; // 确保引入 login 函数
 import './index.scss';
-import { get } from '../utils/request';
+import { get } from '@/utils/request';
+
+interface User {
+  id: number; // 用户唯一标识
+  username: string; // 用户名
+  passwordHash: string; // 密码的哈希值
+  wechatOpenid: string; // 微信用户的OpenID
+  unionid: string; // 用户在同一公众号下的唯一标识
+  phoneNumber?: string; // 用户的手机号（可选）
+  email?: string; // 用户的邮箱地址（可选）
+  avatarUrl?: string; // 用户头像的URL（可选）
+  status: number; // 用户状态
+  loginType: string; // 登录方式标识
+  createdAt: string; // 注册时间
+  updatedAt: string; // 最后一次信息更新时间
+  lastLoginAt?: string; // 最后一次登录时间（可选）
+  extraInfo?: string; // 其他扩展信息（可选）
+}
+
+interface LoginResponse {
+  token: string; // 登录后的 Token
+  user: User; // 用户信息
+}
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  
 
   const handleLogin = async () => {
     if (!isChecked) {
@@ -23,11 +46,18 @@ const Login: React.FC = () => {
     setLoading(true);
     try {
       const { code } = await Taro.login(); // 调用微信
-      console.log("调用登录接口", code)
-      const response = await get('/auth/mini-app/login', code);
-      console.log("调用登录接口111111", response)
+      console.log("调用登录接口", code);
+      
+      const response = await get<LoginResponse>('/auth/mini-app/login', { code });
+      console.log("调用登录接口返回:", response);
+      
       if (response.isSuccess()) {
+        console.log('获取数据成功:', response.data);
+        
+        // 保存 Token 和 User
         Taro.setStorageSync('token', response.data.token); // 保存 Token
+        Taro.setStorageSync('user', response.data.user); // 保存 User
+    
         Taro.showToast({
           title: '登录成功',
           icon: 'success',
@@ -39,7 +69,7 @@ const Login: React.FC = () => {
         if (redirectUrl) {
           Taro.redirectTo({ url: redirectUrl });
         } else {
-          Taro.switchTab({ url: '/pages/home/index' }); // 默认跳转到首页
+          Taro.switchTab({ url: '/pages/health/index' }); // 默认跳转到首页
         }
       } else {
         console.error('登录失败:', response.msg);
