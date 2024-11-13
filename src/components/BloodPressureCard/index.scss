@@ -1,10 +1,10 @@
 .blood-pressure-card {
   position: relative;
   width: 100%;
-  height: 50%; /* 卡片高度占右侧容器的 50% */
+  height: 50%;
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 轻微且紧贴元素的阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
@@ -12,47 +12,60 @@
   justify-content: center;
 }
 
-
-
-.high-red {
-  color: red; /* 高压高于130时，显示为红色 */
-}
-
-.high-green {
-  color: green; /* 高压低于90时，显示为绿色 */
-}
-
-.low-red {
-  color: red; /* 低压高于80时，显示为红色 */
-}
-
-.low-green {
-  color: green; /* 低压低于60时，显示为绿色 */
-}
-
-
 .content {
   position: absolute;
-  top: 50%; 
+  top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); 
-  display: flex;
-  flex-direction: column; /* 改为纵向布局 */
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
+  transform: translate(-50%, -50%);
+  width: 90%;
 }
 
 .value-container {
   display: flex;
-  flex-direction: row; /* 保持高压、低压和斜杠在一行 */
-  align-items: baseline; /* 垂直对齐基线 */
+  flex-direction: column;
+  align-items: flex-start;
 }
 
+.values, .heart-rate-container {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+}
 
-.blood-unit {
-    margin-top: 2px; /* 为单位与数值之间添加间隙 */
-    text-align: center; /* 单位居中对齐 */
+.systolic-value, .diastolic-value, .heart-rate-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.blood-unit, .heart-rate-unit {
+  font-size: 14px;
+  color: #999;
+  margin-left: 4px;
+}
+
+.separator {
+  margin: 0 4px;
+}
+
+.heart-rate-container {
+  margin-top: 8px;
+}
+
+.high-red {
+  color: red;
+}
+
+.high-green {
+  color: green;
+}
+
+.low-red {
+  color: red;
+}
+
+.low-green {
+  color: green;
 }
 
 .heart-icon {
@@ -61,4 +74,29 @@
   bottom: 15px;
   width: 24px;
   height: 24px;
+}
+
+// 弹窗样式
+.popup-content {
+  padding: 16px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.input-group Text {
+  width: 60px;
+  color: #333;
+}
+
+.popup-input {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px;
+  font-size: 14px;
+  color: #333;
 }
