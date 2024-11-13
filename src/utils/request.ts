@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro';
 import axios, { AxiosResponse } from 'axios';
 
 // 定义接口响应的封装类
-class ApiResponse<T> {
+export class ApiResponse<T> {
   code: number;
   msg: string;
   data: T;
@@ -18,6 +18,8 @@ class ApiResponse<T> {
     return this.code === 0;
   }
 }
+
+
 
 axios.defaults.baseURL = 'http://localhost:8080';
 axios.defaults.timeout = 120000;
