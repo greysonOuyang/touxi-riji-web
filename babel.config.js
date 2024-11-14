@@ -13,12 +13,11 @@ module.exports = {
     [
       "import",
       {
-        "libraryName": "@nutui/nutui-react-taro",
-        "libraryDirectory": "dist/esm",
-        "style": 'css',
-        "camel2DashComponentName": false
+        "libraryName": "@antmjs/vantui",
+        "libraryDirectory": "es",
+        "style": true // 自动引入样式
       },
-      'nutui-react-taro'
-    ]
+      "@antmjs/vantui"
+    ],
   ]
 }

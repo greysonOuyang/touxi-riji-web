@@ -1,10 +1,10 @@
 export default {
   pages: [
     'pages/health/index',
-    'pages/record/index',
     'pages/statistics/index',
     'pages/profile/index',
-    'pages/login/index'
+    'pages/login/index',
+    'pages/BloodPressureInputPage/index'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -22,12 +22,12 @@ export default {
         iconPath: 'assets/icons/home.png',
         selectedIconPath: 'assets/icons/home_selected.png'
       },
-      {
-        pagePath: 'pages/record/index',
-        text: '记录',
-        iconPath: 'assets/icons/calendar.png',
-        selectedIconPath: 'assets/icons/calendar_a.png'
-      },
+      // {
+      //   pagePath: 'pages/record/index',
+      //   text: '记录',
+      //   iconPath: 'assets/icons/calendar.png',
+      //   selectedIconPath: 'assets/icons/calendar_a.png'
+      // },
       {
         pagePath: 'pages/statistics/index',
         text: '统计',

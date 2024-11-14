@@ -46,7 +46,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         pxtransform: {
           enable: true,
           config: {
-            selectorBlackList: ['nut-']
+            selectorBlackList: []
           }
         },
         cssModules: {

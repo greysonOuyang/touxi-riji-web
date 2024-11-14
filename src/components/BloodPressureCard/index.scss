@@ -20,37 +20,41 @@
   width: 90%;
 }
 
-.value-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
 
-.values, .heart-rate-container {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-}
 
-.systolic-value, .diastolic-value, .heart-rate-value {
+.systolic-value,.separator, .diastolic-value, .heart-rate-value {
   font-size: 18px;
   font-weight: bold;
   color: #333;
 }
 
 .blood-unit, .heart-rate-unit {
-  font-size: 14px;
+  font-size: 12px;
   color: #999;
   margin-left: 4px;
 }
 
-.separator {
-  margin: 0 4px;
+
+.value-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-right: 16px;
 }
 
-.heart-rate-container {
-  margin-top: 8px;
+.values {
+  display: flex;
+  align-items: baseline;
 }
+
+.separator {
+  margin: 0 3px;
+}
+
+.heart-rate-row {
+  margin-top: 5px;
+}
+
 
 .high-red {
   color: red;
@@ -74,29 +78,4 @@
   bottom: 15px;
   width: 24px;
   height: 24px;
-}
-
-// 弹窗样式
-.popup-content {
-  padding: 16px;
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.input-group Text {
-  width: 60px;
-  color: #333;
-}
-
-.popup-input {
-  flex: 1;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  font-size: 14px;
-  color: #333;
 }

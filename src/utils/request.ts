@@ -96,13 +96,23 @@ function handleResponse<T>(response: AxiosResponse): ApiResponse<T> {
 }
 
 // GET 方法封装
-export function get<T>(url: string, params?: object): Promise<ApiResponse<T>> {
+export function get<T>(url: string, params?: object): Promise<ApiResponse<T> | null> {
+  // 检查本地是否存在 token
+  const token = Taro.getStorageSync('token');
+  if (!token) {
+    console.warn('未找到 token，取消请求');
+    return Promise.resolve(null); // 返回一个 resolved Promise，表示没有请求
+  }
+
+  // 设置 axios 请求头
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
   return axios
     .get(url, { params })
     .then((response) => handleResponse<T>(response))
     .catch((error) => {
       console.error('GET 请求出错', error);
-      throw error;
+      throw error; // 继续抛出错误，以便调用者处理
     });
 }
 
