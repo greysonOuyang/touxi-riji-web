@@ -19,7 +19,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     plugins: [
       '@tarojs/plugin-html',
       '@emotion/babel-plugin',
-      '@tarojs/plugin-http'
+      '@tarojs/plugin-http',
     ],
     defineConstants: {
     },
@@ -62,6 +62,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       }
     },
     h5: {
+      esnextModules: ['taro-ui'],
       publicPath: '/',
       staticDirectory: 'static',
       output: {

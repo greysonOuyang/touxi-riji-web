@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import Taro from '@tarojs/taro';
 import { View, Button, Image, Checkbox, CheckboxGroup, Text } from '@tarojs/components';
-import './index.scss';
+
 import { get } from '@/utils/request';
+import './index.scss';
 
 interface User {
   id: number; // 用户唯一标识

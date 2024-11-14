@@ -4,8 +4,7 @@ import Taro from '@tarojs/taro';
 import { View, Text, Image } from '@tarojs/components';
 import AddButton from '../AddButton';
 import { fetchLatestBloodPressure } from '@/api';
-import './index.scss';
-
+import './index.scss'
 const BloodPressureCard = ({ data }) => {
   const [bpData, setBpData] = useState(data || { systolic: 0, diastolic: 0, heartRate: 0, formattedMeasurementTime: '暂无数据' });
 
