@@ -13,7 +13,7 @@ const BloodPressureCard = ({ data }) => {
     const fetchData = async () => {
       try {
         const response = await fetchLatestBloodPressure();
-        if (response.isSuccess() && response.data) {
+        if (response?.isSuccess() && response.data) {
           setBpData(response.data);
         } else {
           setBpData({ systolic: 0, diastolic: 0, heartRate: 0, formattedMeasurementTime: '暂无数据' });
