@@ -104,7 +104,7 @@ const HealthPage: React.FC = () => {
 
           {/* 底部跨两列的体重卡片 */}
           <View className="full-width-card">
-            <WeightCard data={cardData.weight} />
+            <WeightCard  />
           </View>
         </View>
       </View>
