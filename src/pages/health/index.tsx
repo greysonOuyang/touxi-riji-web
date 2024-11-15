@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import UltrafiltrationView from '@/components/UltrafiltrationView';
 import WaterIntakeCard from '@/components/WaterIntakeCard';
@@ -7,8 +7,30 @@ import BloodPressureCard from '@/components/BloodPressureCard';
 import WeightCard from '@/components/WeightCard';
 import './index.scss';
 import '../../app.scss';
+import { useDidShow } from '@tarojs/taro';
 
 const HealthPage: React.FC = () => {
+
+   // 为每个需要刷新的组件添加刷新触发器
+   const [refreshTriggers, setRefreshTriggers] = useState({
+    bloodPressure: 0,
+    waterIntake: 0,
+    urineVolume: 0,
+    weight: 0,
+    ultrafiltration: 0
+  });
+
+  // 页面显示时触发刷新
+  useDidShow(() => {
+    setRefreshTriggers(prev => ({
+      bloodPressure: prev.bloodPressure + 1,
+      waterIntake: prev.waterIntake + 1,
+      urineVolume: prev.urineVolume + 1,
+      weight: prev.weight + 1,
+      ultrafiltration: prev.ultrafiltration + 1
+    }));
+  });
+
   // 模拟超滤数据
   const ultrafiltrationData = {
     value: -400,

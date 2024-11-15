@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Taro from '@tarojs/taro';
 import { View, Button, Image, Checkbox, CheckboxGroup, Text } from '@tarojs/components';
 
-import { get } from '@/utils/request';
+import { get, post } from '@/utils/request';
 import './index.scss';
 
 interface User {
@@ -31,8 +31,53 @@ interface LoginResponse {
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+// pages/login/index.tsx
+const handleRedirect = () => {
+  try {
+    // 恢复之前保存的表单数据
+    const tempState = Taro.getStorageSync('tempState');
+    if (tempState) {
+      Taro.setStorageSync('tempBloodPressureData', tempState);
+      Taro.removeStorageSync('tempState');
+    }
 
-  
+    const redirectUrl = Taro.getStorageSync('redirectUrl');
+    console.log('重定向URL:', redirectUrl);
+
+    if (redirectUrl) {
+      Taro.removeStorageSync('redirectUrl');
+      
+      // 确保路径格式正确
+      const formattedUrl = redirectUrl.startsWith('/') ? redirectUrl : `/${redirectUrl}`;
+      console.log('格式化后的URL:', formattedUrl);
+
+      // 使用 redirectTo 而不是 navigateTo
+      Taro.redirectTo({
+        url: formattedUrl,
+        success: () => {
+          console.log('跳转成功到:', formattedUrl);
+        },
+        fail: (error) => {
+          console.error('跳转失败:', error);
+          // 跳转失败时跳转到默认页面
+          Taro.switchTab({
+            url: '/pages/health/index'
+          });
+        }
+      });
+    } else {
+      Taro.switchTab({
+        url: '/pages/health/index'
+      });
+    }
+  } catch (error) {
+    console.error('重定向错误:', error);
+    Taro.switchTab({
+      url: '/pages/health/index'
+    });
+  }
+};
+
 
   const handleLogin = async () => {
     if (!isChecked) {
@@ -43,39 +88,44 @@ const Login: React.FC = () => {
       });
       return;
     }
-
+  
     setLoading(true);
     try {
-      const { code } = await Taro.login(); // 调用微信
-      console.log("调用登录接口", code);
+      const { code } = await Taro.login();
+      // 使用 POST 方法发送登录请求
+      const response = await post<LoginResponse>('/auth/mini-app/login', { code });
       
-      const response = await get<LoginResponse>('/auth/mini-app/login', { code });
-      console.log("调用登录接口返回:", response);
-      
-      if (response.isSuccess()) {
+      if (response?.isSuccess()) {
         console.log('获取数据成功:', response.data);
         
-        // 保存 Token 和 User
-        Taro.setStorageSync('token', response.data.token); // 保存 Token
-        Taro.setStorageSync('user', response.data.user); // 保存 User
+        // 先清除旧的 token
+        Taro.removeStorageSync('token');
+        
+        // 设置新的 token 和用户信息
+        Taro.setStorageSync('token', response.data.token);
+        Taro.setStorageSync('user', response.data.user);
+        
+        // 打印存储的 token 进行确认
+        console.log('存储的token:', Taro.getStorageSync('token'));
     
         Taro.showToast({
           title: '登录成功',
           icon: 'success',
-          duration: 2000,
+          duration: 1500,
         });
         
-        // 跳转回之前的页面
-        const redirectUrl = Taro.getStorageSync('redirectUrl');
-        if (redirectUrl) {
-          Taro.redirectTo({ url: redirectUrl });
-        } else {
-          Taro.switchTab({ url: '/pages/health/index' }); // 默认跳转到首页
-        }
+        // 等待 toast 显示完成后再跳转
+        setTimeout(handleRedirect, 1500);
       } else {
-        console.error('登录失败:', response.msg);
+        console.error('登录失败:', response?.msg);
+        Taro.showToast({
+          title: response?.msg || '登录失败',
+          icon: 'none',
+          duration: 2000,
+        });
       }
     } catch (error) {
+      console.error('登录错误:', error);
       Taro.showToast({
         title: error.message || '登录失败',
         icon: 'none',
@@ -85,6 +135,8 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+
+
 
   const handleCheckboxChange = e => {
     setIsChecked(e.detail.value.length > 0);

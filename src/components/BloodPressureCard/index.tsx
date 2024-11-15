@@ -1,33 +1,80 @@
-// BloodPressureCard.js
+// BloodPressureCard.tsx
 import React, { useEffect, useState } from 'react';
 import Taro from '@tarojs/taro';
 import { View, Text, Image } from '@tarojs/components';
 import AddButton from '../AddButton';
 import { fetchLatestBloodPressure } from '@/api';
 import './index.scss'
-const BloodPressureCard = ({ data }) => {
-  const [bpData, setBpData] = useState(data || { systolic: 0, diastolic: 0, heartRate: 0, formattedMeasurementTime: '暂无数据' });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchLatestBloodPressure();
-        if (response?.isSuccess() && response.data) {
-          setBpData(response.data);
-        } else {
-          setBpData({ systolic: 0, diastolic: 0, heartRate: 0, formattedMeasurementTime: '暂无数据' });
-        }
-      } catch (error) {
-        console.error('获取血压数据时出错:', error);
-        setBpData({ systolic: 0, diastolic: 0, heartRate: 0, formattedMeasurementTime: '暂无数据' });
+interface BloodPressureCardProps {
+  data?: any;
+  refreshTrigger?: number;
+}
+
+const BloodPressureCard: React.FC<BloodPressureCardProps> = ({ data, refreshTrigger }) => {
+  const [bpData, setBpData] = useState(data || { 
+    systolic: 0, 
+    diastolic: 0, 
+    heartRate: 0, 
+    formattedMeasurementTime: '暂无数据' 
+  });
+  const [loading, setLoading] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetchLatestBloodPressure();
+      if (response?.isSuccess() && response.data) {
+        setBpData(response.data);
+      } else {
+        setBpData({ 
+          systolic: 0, 
+          diastolic: 0, 
+          heartRate: 0, 
+          formattedMeasurementTime: '暂无数据' 
+        });
       }
-    };
+    } catch (error) {
+      console.error('获取血压数据时出错:', error);
+      setBpData({ 
+        systolic: 0, 
+        diastolic: 0, 
+        heartRate: 0, 
+        formattedMeasurementTime: '暂无数据' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 首次加载时获取数据
+  useEffect(() => {
     fetchData();
   }, []);
 
+  // 当 refreshTrigger 变化时重新获取数据
+  useEffect(() => {
+    if (refreshTrigger?.toString()) {  // 使用可选链操作符
+      fetchData();
+    }
+  }, [refreshTrigger]);
+
   const onAddClick = () => {
-    Taro.navigateTo({ url: '/pages/BloodPressureInputPage/index' }); // 新增的页面路径
+    Taro.navigateTo({ url: '/pages/BloodPressureInputPage/index' });
   };
+
+  if (loading) {
+    return (
+      <View className="blood-pressure-card">
+        <View className="small-card-header">
+          <Text className="small-card-title">血压</Text>
+        </View>
+        <View className="content">
+          <Text>加载中...</Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="blood-pressure-card">

@@ -1,143 +1,234 @@
-import { View, Text, Input, Picker } from '@tarojs/components'
-import { useState } from 'react'
-import { AtButton, AtToast } from 'taro-ui'
-import Taro from '@tarojs/taro'
-import { addBloodPressureRecord } from '@/api'
-import './index.scss'
+// pages/BloodPressureInputPage/index.tsx
+import React, { useState, useEffect } from 'react';
+import Taro from '@tarojs/taro';
+import { View, Button, Form, Input, Text, Picker } from '@tarojs/components';
+import { withAuth } from '@/utils/auth';
+import { addBloodPressureRecord } from '@/api/bloodPressureApi';
+import './index.scss';
 
-const BloodPressureInputPage = () => {
-  const [systolic, setSystolic] = useState('')
-  const [diastolic, setDiastolic] = useState('')
-  const [heartRate, setHeartRate] = useState('')
-  const [measurementTime, setMeasurementTime] = useState('')
-  const [isOpened, setIsOpened] = useState(false)
-  const [toastText, setToastText] = useState('')
+interface BloodPressureData {
+  systolic: string | number;
+  diastolic: string | number;
+  heartRate: string | number;
+  measureDate: string;
+  measureTime: string;
+  note: string;
+}
 
-  // 处理输入值变化
-  const handleSystolicChange = (e) => {
-    setSystolic(e.detail.value)
-  }
+const BloodPressureInputPage: React.FC = () => {
+  // 初始化表单数据
+  const [formData, setFormData] = useState<BloodPressureData>(() => {
+    const savedData = Taro.getStorageSync('tempBloodPressureData');
+    const now = new Date();
+    const defaultDate = now.toISOString().split('T')[0];
+    const defaultTime = now.toTimeString().split(' ')[0].substring(0, 5);
+    
+    return savedData || {
+      systolic: '',
+      diastolic: '',
+      heartRate: '',
+      measureDate: defaultDate,
+      measureTime: defaultTime,
+      note: ''
+    };
+  });
 
-  const handleDiastolicChange = (e) => {
-    setDiastolic(e.detail.value)
-  }
+  const [errors, setErrors] = useState<Partial<Record<keyof BloodPressureData, string>>>({});
 
-  const handleHeartRateChange = (e) => {
-    setHeartRate(e.detail.value)
-  }
+  // 在组件卸载时保存表单数据
+  useEffect(() => {
+    return () => {
+      if (formData.systolic || formData.diastolic) {
+        Taro.setStorageSync('tempBloodPressureData', formData);
+      }
+    };
+  }, [formData]);
 
-  // 处理日期时间选择
-  const handleTimeChange = (e) => {
-    setMeasurementTime(e.detail.value)
-  }
+  // 处理输入变化
+  const handleInputChange = (field: keyof BloodPressureData, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
-  // 校验输入值
-  const validateInputs = () => {
-    if (!systolic || !diastolic || !heartRate || !measurementTime) {
-      setToastText('请填写所有数据')
-      setIsOpened(true)
-      return false
+  // 表单验证
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof BloodPressureData, string>> = {};
+
+    if (!formData.systolic) {
+      newErrors.systolic = '请输入收缩压';
+    } else if (Number(formData.systolic) < 60 || Number(formData.systolic) > 250) {
+      newErrors.systolic = '收缩压数值异常';
     }
-    if (parseInt(systolic, 10) <= 0 || parseInt(diastolic, 10) <= 0 || parseInt(heartRate, 10) <= 0) {
-      setToastText('数值必须大于 0')
-      setIsOpened(true)
-      return false
-    }
-    return true
-  }
 
-  // 确认按钮点击事件
-  const handleConfirm = async () => {
-    if (!validateInputs()) return
+    if (!formData.diastolic) {
+      newErrors.diastolic = '请输入舒张压';
+    } else if (Number(formData.diastolic) < 40 || Number(formData.diastolic) > 150) {
+      newErrors.diastolic = '舒张压数值异常';
+    }
+
+    if (formData.heartRate && (Number(formData.heartRate) < 40 || Number(formData.heartRate) > 200)) {
+      newErrors.heartRate = '心率数值异常';
+    }
+
+    if (!formData.measureDate) {
+      newErrors.measureDate = '请选择测量日期';
+    }
+
+    if (!formData.measureTime) {
+      newErrors.measureTime = '请选择测量时间';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 处理日期选择
+  const handleDateChange = (e: any) => {
+    handleInputChange('measureDate', e.detail.value);
+  };
+
+  // 处理时间选择
+  const handleTimeChange = (e: any) => {
+    handleInputChange('measureTime', e.detail.value);
+  };
+
+  // 表单提交处理
+  const handleSubmit = withAuth(async () => {
+    if (!validateForm()) {
+      return;
+    }
 
     try {
-      const user = Taro.getStorageSync('user')
-      const newRecord = {
-        systolic: parseFloat(systolic),
-        diastolic: parseFloat(diastolic),
-        heartRate: parseFloat(heartRate),
-        userId: user.id,
-        measurementTime,
-      }
+      // 合并日期和时间
+      const measureDateTime = `${formData.measureDate} ${formData.measureTime}`;
+      
+      const submitData = {
+        ...formData,
+        systolic: Number(formData.systolic),
+        diastolic: Number(formData.diastolic),
+        heartRate: formData.heartRate ? Number(formData.heartRate) : undefined,
+        measureTime: measureDateTime
+      };
 
-      const response = await addBloodPressureRecord(newRecord)
-      if (response.isSuccess()) {
-        Taro.showToast({ title: '记录添加成功', icon: 'success', duration: 2000 })
-        Taro.navigateBack()
-      } else {
-        throw new Error(response.msg || '添加记录失败')
-      }
+      await addBloodPressureRecord(submitData);
+      
+      Taro.removeStorageSync('tempBloodPressureData');
+      Taro.showToast({
+        title: '添加成功',
+        icon: 'success',
+        duration: 2000
+      });
+
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 2000);
     } catch (error) {
-      setToastText(error.message || '网络错误，请稍后重试')
-      setIsOpened(true)
+      console.error('提交失败:', error);
+      Taro.showToast({
+        title: '提交失败',
+        icon: 'none',
+        duration: 2000
+      });
     }
-  }
-
-  // 取消按钮点击事件
-  const handleCancel = () => {
-    Taro.navigateBack()
-  }
+  }, {
+    saveState: () => formData
+  });
 
   return (
     <View className='blood-pressure-input-page'>
-      <View className='input-group'>
-        <Text className='label'>收缩压 (mmHg)</Text>
-        <Input
-          className='input'
-          type='number'
-          value={systolic}
-          onInput={handleSystolicChange}
-          placeholder='请输入收缩压'
-        />
-      </View>
+      <Form onSubmit={handleSubmit}>
+        <View className='input-group'>
+          <Text className='label'>收缩压</Text>
+          <Input
+            type='number'
+            className='input'
+            value={formData.systolic as string}
+            onInput={e => handleInputChange('systolic', e.detail.value)}
+            placeholder='请输入收缩压'
+          />
+          <Text className='unit'>mmHg</Text>
+        </View>
+        {errors.systolic && <Text className='error-text'>{errors.systolic}</Text>}
 
-      <View className='input-group'>
-        <Text className='label'>舒张压 (mmHg)</Text>
-        <Input
-          className='input'
-          type='number'
-          value={diastolic}
-          onInput={handleDiastolicChange}
-          placeholder='请输入舒张压'
-        />
-      </View>
+        <View className='input-group'>
+          <Text className='label'>舒张压</Text>
+          <Input
+            type='number'
+            className='input'
+            value={formData.diastolic as string}
+            onInput={e => handleInputChange('diastolic', e.detail.value)}
+            placeholder='请输入舒张压'
+          />
+          <Text className='unit'>mmHg</Text>
+        </View>
+        {errors.diastolic && <Text className='error-text'>{errors.diastolic}</Text>}
 
-      <View className='input-group'>
-        <Text className='label'>心率 (次/分)</Text>
-        <Input
-          className='input'
-          type='number'
-          value={heartRate}
-          onInput={handleHeartRateChange}
-          placeholder='请输入心率'
-        />
-      </View>
+        <View className='input-group'>
+          <Text className='label'>心率</Text>
+          <Input
+            type='number'
+            className='input'
+            value={formData.heartRate as string}
+            onInput={e => handleInputChange('heartRate', e.detail.value)}
+            placeholder='请输入心率（选填）'
+          />
+          <Text className='unit'>次/分</Text>
+        </View>
+        {errors.heartRate && <Text className='error-text'>{errors.heartRate}</Text>}
 
-      <View className='input-group'>
-        <Text className='label'>测量时间</Text>
-        <Picker
-          mode='dateTime'
-          onChange={handleTimeChange}
-          value={measurementTime}
-        >
-          <View className='picker'>
-            {measurementTime || '请选择测量时间'}
+        <View className='input-group'>
+          <Text className='label'>日期</Text>
+          <View className='picker-wrapper'>
+            <Picker
+              mode='date'
+              value={formData.measureDate}
+              onChange={handleDateChange}
+            >
+              <View className='picker-content'>
+                {formData.measureDate || '请选择测量日期'}
+              </View>
+            </Picker>
           </View>
-        </Picker>
-      </View>
+        </View>
+        {errors.measureDate && <Text className='error-text'>{errors.measureDate}</Text>}
 
-      <View className='button-group'>
-        <AtButton onClick={handleCancel}>取消</AtButton>
-        <AtButton type='primary' onClick={handleConfirm}>确认</AtButton>
-      </View>
+        <View className='input-group'>
+          <Text className='label'>时间</Text>
+          <View className='picker-wrapper'>
+            <Picker
+              mode='time'
+              value={formData.measureTime}
+              onChange={handleTimeChange}
+            >
+              <View className='picker-content'>
+                {formData.measureTime || '请选择测量时间'}
+              </View>
+            </Picker>
+          </View>
+        </View>
+        {errors.measureTime && <Text className='error-text'>{errors.measureTime}</Text>}
 
-      <AtToast
-        isOpened={isOpened}
-        text={toastText}
-        onClose={() => setIsOpened(false)}
-      />
+        <View className='input-group'>
+          <Text className='label'>备注</Text>
+          <Input
+            className='input'
+            value={formData.note}
+            onInput={e => handleInputChange('note', e.detail.value)}
+            placeholder='请输入备注（选填）'
+          />
+        </View>
+
+        <Button
+          formType='submit'
+          className='confirm-button'
+        >
+          确认
+        </Button>
+      </Form>
     </View>
-  )
-}
+  );
+};
 
-export default BloodPressureInputPage
+export default BloodPressureInputPage;

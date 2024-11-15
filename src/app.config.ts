@@ -12,6 +12,7 @@ export default {
     navigationBarTitleText: '健康概览',
     navigationBarTextStyle: 'black'
   },
+  
 
   tabBar: {
     

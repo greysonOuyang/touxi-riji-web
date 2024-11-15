@@ -1,45 +1,79 @@
+// pages/BloodPressureInputPage/index.scss
 .blood-pressure-input-page {
   padding: 20px;
 
   .input-group {
+    display: flex;
+    align-items: center;
     margin-bottom: 20px;
+    padding: 0 15px;
     
     .label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 28px;
+      min-width: 60px;
+      font-size: 14px;
       color: #333;
+      margin-right: 10px;
+    }
+
+    .picker-wrapper {
+      flex: 1;
+      
+      .picker-content {
+        height: 44px;
+        line-height: 44px;
+        padding: 0 15px;
+        background: #F7F8F8;
+        border-radius: 14px;
+        font-size: 14px;
+        color: #333;
+        text-align: left;
+      }
     }
 
     .input {
-      width: 100%;
-      height: 80px;
-      padding: 0 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 28px;
+      flex: 1;
+      height: 44px;
+      line-height: 44px;
+      padding: 0 15px;
+      background: #F7F8F8;
+      border: none;
+      border-radius: 14px;
+      font-size: 14px;
+      color: #333;
+      margin-right: 10px;
+
+      &::placeholder {
+        color: #999;
+      }
     }
 
-    .picker {
-      width: 100%;
-      height: 80px;
-      line-height: 80px;
-      padding: 0 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 28px;
-      color: #333;
+    .unit {
+      font-size: 14px;
+      color: #666;
+      min-width: 45px;
     }
   }
 
-  .button-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 40px;
-    padding: 0 20px;
+  .error-text {
+    font-size: 12px;
+    color: #ff4d4f;
+    margin: -15px 0 15px 85px;
+  }
 
-    .at-button {
-      width: 45%;
+  .confirm-button {
+    margin: 30px 20px;
+    height: 48px;
+    line-height: 48px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+    box-shadow: 0px 10px 22px rgba(149, 173, 254, 0.3);
+    border-radius: 99px;
+
+    &:active {
+      opacity: 0.9;
     }
   }
 }

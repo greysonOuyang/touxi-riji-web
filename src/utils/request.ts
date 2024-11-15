@@ -1,6 +1,5 @@
 import Taro from '@tarojs/taro';
-import axios, { AxiosResponse } from 'axios';
-import { checkLogin } from './auth';
+import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 // 定义接口响应的封装类
 export class ApiResponse<T> {
@@ -14,21 +13,43 @@ export class ApiResponse<T> {
     this.data = response.data.data;
   }
 
-  // 判断请求是否成功
   isSuccess() {
     return this.code === 200;
   }
 }
 
-axios.defaults.baseURL = 'http://localhost:8080';
-axios.defaults.timeout = 120000;
-axios.defaults.headers.post['Content-Type'] = 'application/json';
+// 基础配置
+const instance = axios.create({
+  baseURL: 'http://localhost:8080',
+  timeout: 120000,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
 
-axios.interceptors.request.use(
-  (config) => {
-    const token = Taro.getStorageSync('token');
-    if (token && config.url !== '/auth/mini-app/login') {
-      config.headers.Authorization = ` ${token}`;
+// 不需要 token 的白名单路径
+const whiteList = [
+  '/auth/mini-app/login',
+  '/auth/register',
+  // 添加其他不需要token的路径
+];
+
+// 判断是否为白名单路径
+const isWhiteListUrl = (url: string): boolean => {
+  return whiteList.some(path => url.includes(path));
+};
+
+// 请求拦截器
+instance.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    // 每次请求都重新获取 token，而不是依赖实例创建时的配置
+    if (!isWhiteListUrl(config.url ?? '')) {
+      const token = Taro.getStorageSync('token');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        // 打印请求头信息，用于调试
+        console.log('Request headers:', config.headers);
+      }
     }
     return config;
   },
@@ -36,115 +57,113 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+// utils/request.ts
 
-axios.interceptors.response.use(
+// 响应拦截器
+instance.interceptors.response.use(
   (response) => {
-    console.log('收到了响应:', response);
-
-    // 检查后端返回的 code 字段是否为 200
+    // 添加响应日志，用于调试
+    console.log('Response:', response);
+    
     if (response.data && response.data.code !== 200) {
-      // 如果 code 不是 200，抛出错误信息到 error 拦截器
-      Taro.showToast({
-        title: `请求错误: ${response.data.msg || '未知错误'}`,
-        icon: 'none',
-        duration: 2000,
-      });
-      return Promise.reject(new Error(response.data.msg || '请求错误'));
+      const error = new Error(response.data.msg || '请求错误');
+      (error as any).response = response;
+      return Promise.reject(error);
+    }
+    return response;
+  },
+  (error) => {
+    // 添加错误日志，用于调试
+    console.error('Response error:', error);
+    
+    if (error.response?.status === 401) {
+      // 清除本地存储的登录信息
+      Taro.removeStorageSync('token');
+      Taro.removeStorageSync('user');
+
+      const config = error.config;
+      const currentInstance = Taro.getCurrentInstance();
+      const currentPath = currentInstance.router?.path;
+      
+      // 只有在以下条件都满足时才进行登录跳转：
+      // 1. 非GET请求
+      // 2. 非登录页面
+      // 3. 不在白名单中的页面
+      if (
+        config?.method?.toUpperCase() !== 'GET' && 
+        currentPath && 
+        currentPath !== '/pages/login/index' && 
+        !isWhiteListUrl(currentPath)
+      ) {
+        Taro.setStorageSync('redirectUrl', currentPath);
+        
+        Taro.showToast({
+          title: '请重新登录',
+          icon: 'none',
+          duration: 1500
+        });
+
+        setTimeout(() => {
+          Taro.navigateTo({
+            url: '/pages/login/index'
+          });
+        }, 1500);
+      }
+
+      return Promise.reject(error);
     }
 
-    return response; // 正常返回响应
-  },
-  async (error) => {
-    console.log('拦截器触发了'); // 检查拦截器是否执行
-
-    if (error.response) {
-      console.log('错误响应：', error.response); // 输出错误的响应信息
-      if (error.response.status === 401) {
-        console.log('检测到401错误');
-        const isLoggedIn = await checkLogin();
-        if (!isLoggedIn) {
-          console.error('未授权，用户选择不登录或登录失败');
-          return Promise.reject(new Error('未授权'));
-        }
-      } else {
-        console.log('非401错误');
-        Taro.showToast({
-          title: `请求错误: ${error.response.statusText}`,
-          icon: 'none',
-          duration: 2000,
-        });
-        console.error('请求出错', error.response);
-      }
-    } else {
-      console.log('无响应的网络错误');
+    // 处理网络错误
+    if (!error.response) {
       Taro.showToast({
         title: '网络错误，请稍后重试',
         icon: 'none',
-        duration: 2000,
+        duration: 2000
       });
-      console.error('网络错误或无响应', error);
+      return Promise.reject(error);
     }
+
+    // 其他错误处理
+    const errorMessage = error.response.data?.msg || '请求失败';
+    Taro.showToast({
+      title: errorMessage,
+      icon: 'none',
+      duration: 2000
+    });
 
     return Promise.reject(error);
   }
 );
 
 
-
+// 统一响应处理
 function handleResponse<T>(response: AxiosResponse): ApiResponse<T> {
   return new ApiResponse<T>(response);
 }
 
 // GET 方法封装
-export function get<T>(url: string, params?: object): Promise<ApiResponse<T> | null> {
-  // 检查本地是否存在 token
-  const token = Taro.getStorageSync('token');
-  if (!token) {
-    console.warn('未找到 token，取消请求');
-    return Promise.resolve(null); // 返回一个 resolved Promise，表示没有请求
-  }
-
-  // 设置 axios 请求头
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-  return axios
-    .get(url, { params })
-    .then((response) => handleResponse<T>(response))
-    .catch((error) => {
-      console.error('GET 请求出错', error);
-      throw error; // 继续抛出错误，以便调用者处理
-    });
+export async function get<T>(url: string, params?: object): Promise<ApiResponse<T>> {
+  const response = await instance.get(url, { params });
+  return handleResponse<T>(response);
 }
 
 // POST 方法封装
-export function post<T>(url: string, params: object): Promise<ApiResponse<T>> {
-  return axios
-    .post(url, params)
-    .then((response) => handleResponse<T>(response))
-    .catch((error) => {
-      console.error('POST 请求出错', error);
-      throw error;
-    });
+export async function post<T>(url: string, data: object): Promise<ApiResponse<T>> {
+  const response = await instance.post(url, data);
+  return handleResponse<T>(response);
 }
 
 // PUT 方法封装
-export function put<T>(url: string, params: object): Promise<ApiResponse<T>> {
-  return axios
-    .put(url, params)
-    .then((response) => handleResponse<T>(response))
-    .catch((error) => {
-      console.error('PUT 请求出错', error);
-      throw error;
-    });
+export async function put<T>(url: string, data: object): Promise<ApiResponse<T>> {
+  const response = await instance.put(url, data);
+  return handleResponse<T>(response);
 }
 
 // DELETE 方法封装
-export function deleted<T>(url: string, params?: object): Promise<ApiResponse<T>> {
-  return axios
-    .delete(url, { params })
-    .then((response) => handleResponse<T>(response))
-    .catch((error) => {
-      console.error('DELETE 请求出错', error);
-      throw error;
-    });
+export async function deleted<T>(url: string, params?: object): Promise<ApiResponse<T>> {
+  const response = await instance.delete(url, { params });
+  return handleResponse<T>(response);
 }
+
+// 导出实例以便直接使用
+export default instance;
