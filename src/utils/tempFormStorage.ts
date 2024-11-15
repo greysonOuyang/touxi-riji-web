@@ -1,67 +1,81 @@
-// /utils/tempFormStorage.ts
+// utils/tempFormStorage.ts
 import Taro from '@tarojs/taro';
 
-const TEMP_FORM_KEYS = {
-  BLOOD_PRESSURE: 'tempBloodPressureData',
-  // 添加其他表单的key
-};
+// 定义表单类型
+export const FORM_TYPES = {
+  BLOOD_PRESSURE: 'BLOOD_PRESSURE',
+  // 其他表单类型...
+} as const;
 
-// 检查是否有未提交的数据
-export const hasUnsubmittedData = (): boolean => {
-  try {
-    return Object.values(TEMP_FORM_KEYS).some(key => {
-      const data = Taro.getStorageSync(key);
-      return !!data;
-    });
-  } catch (error) {
-    console.error('检查临时数据失败:', error);
-    return false;
-  }
-};
+type FormType = keyof typeof FORM_TYPES;
 
-// 清除所有临时表单数据
-export const clearAllTempFormData = (): void => {
-  try {
-    Object.values(TEMP_FORM_KEYS).forEach(key => {
-      Taro.removeStorageSync(key);
-    });
-    console.log('所有临时表单数据已清除');
-  } catch (error) {
-    console.error('清除临时表单数据失败:', error);
-  }
+// 定义存储键
+export const TEMP_FORM_KEYS = {
+  [FORM_TYPES.BLOOD_PRESSURE]: 'tempBloodPressureData',
+  // 其他表单的key...
 };
 
 // 保存临时表单数据
-export const saveTempFormData = (key: string, data: any): void => {
+export const saveTempFormData = (formType: FormType, data: any) => {
+  const storageKey = TEMP_FORM_KEYS[formType];
+  if (!storageKey) {
+    console.error('Invalid form type:', formType);
+    return;
+  }
   try {
-    if (TEMP_FORM_KEYS[key]) {
-      Taro.setStorageSync(TEMP_FORM_KEYS[key], data);
-    }
+    Taro.setStorageSync(storageKey, data);
   } catch (error) {
-    console.error('保存临时表单数据失败:', error);
+    console.error('Failed to save temp form data:', error);
   }
 };
 
-// 获取临时表单数据
-export const getTempFormData = (key: string): any => {
-  try {
-    if (TEMP_FORM_KEYS[key]) {
-      return Taro.getStorageSync(TEMP_FORM_KEYS[key]);
+// 修改获取临时表单数据的函数
+export const getTempFormData = (formType: FormType) => {
+    const storageKey = TEMP_FORM_KEYS[formType];
+    if (!storageKey) {
+      console.error('Invalid form type:', formType);
+      return null;
     }
-    return null;
-  } catch (error) {
-    console.error('获取临时表单数据失败:', error);
-    return null;
-  }
-};
-
-// 清除特定的临时表单数据
-export const clearTempFormData = (key: string): void => {
-  try {
-    if (TEMP_FORM_KEYS[key]) {
-      Taro.removeStorageSync(TEMP_FORM_KEYS[key]);
+    try {
+      const data = Taro.getStorageSync(storageKey);
+      if (data) {
+        // 获取后立即清除数据
+        clearTempFormData(formType);
+      }
+      return data;
+    } catch (error) {
+      console.error('Failed to get temp form data:', error);
+      return null;
     }
-  } catch (error) {
-    console.error('清除临时表单数据失败:', error);
-  }
-};
+  };
+  
+  // 修改清除临时表单数据的函数
+  export const clearTempFormData = (formType: FormType) => {
+    const storageKey = TEMP_FORM_KEYS[formType];
+    if (!storageKey) {
+      console.error('Invalid form type:', formType);
+      return;
+    }
+    try {
+      if (Taro.getStorageSync(storageKey)) {
+        Taro.removeStorageSync(storageKey);
+        console.log(`Cleared temp form data for ${formType}`);
+      }
+    } catch (error) {
+      console.error('Failed to clear temp form data:', error);
+    }
+  };
+  
+  // 添加一个新的函数用于检查是否存在临时数据
+  export const hasTempFormData = (formType: FormType): boolean => {
+    const storageKey = TEMP_FORM_KEYS[formType];
+    if (!storageKey) {
+      return false;
+    }
+    try {
+      return !!Taro.getStorageSync(storageKey);
+    } catch (error) {
+      console.error('Failed to check temp form data:', error);
+      return false;
+    }
+  };

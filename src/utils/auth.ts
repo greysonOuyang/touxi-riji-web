@@ -1,6 +1,7 @@
+// utils/auth.ts
+
 import Taro from "@tarojs/taro";
 
-// utils/auth.ts
 interface AuthRequestOptions {
   onBeforeRequest?: () => void;
   onSuccess?: (response: any) => void;
@@ -8,9 +9,48 @@ interface AuthRequestOptions {
   onComplete?: () => void;
   saveState?: () => any;
   showErrorToast?: boolean;
+  loginMessage?: string;
 }
 
-// utils/auth.ts
+export const isLoggedIn = () => {
+  return !!Taro.getStorageSync('token');
+};
+
+// 保存当前页面状态
+const saveCurrentPageState = (saveState?: () => any) => {
+  if (saveState) {
+    const state = saveState();
+    Taro.setStorageSync('tempState', state);
+  }
+
+  const pages = Taro.getCurrentPages();
+  const currentPage = pages[pages.length - 1];
+  if (currentPage) {
+    const path = `/${currentPage.route}`;
+    console.log('保存重定向路径:', path);
+    Taro.setStorageSync('redirectUrl', path);
+  }
+};
+
+// 显示登录确认框
+const showLoginConfirm = (message: string = '请先登录') => {
+  return new Promise((resolve) => {
+    Taro.showModal({
+      title: '提示',
+      content: message,
+      confirmText: '去登录',
+      success: (res) => {
+        if (res.confirm) {
+          Taro.navigateTo({
+            url: '/pages/login/index'
+          });
+        }
+        resolve(res.confirm);
+      }
+    });
+  });
+};
+
 export const withAuth = (
   requestFn: (...args: any[]) => Promise<any>,
   options: AuthRequestOptions = {}
@@ -22,7 +62,8 @@ export const withAuth = (
       onError,
       onComplete,
       saveState,
-      showErrorToast = true
+      showErrorToast = true,
+      loginMessage
     } = options;
 
     try {
@@ -30,32 +71,8 @@ export const withAuth = (
 
       const token = Taro.getStorageSync('token');
       if (!token) {
-        if (saveState) {
-          const state = saveState();
-          Taro.setStorageSync('tempState', state);
-        }
-
-        // 保存当前页面路径
-        const pages = Taro.getCurrentPages();
-        const currentPage = pages[pages.length - 1];
-        if (currentPage) {
-          const path = `/${currentPage.route}`;
-          console.log('保存重定向路径:', path);
-          Taro.setStorageSync('redirectUrl', path);
-        }
-
-        Taro.showModal({
-          title: '提示',
-          content: '请先登录',
-          confirmText: '去登录',
-          success: (res) => {
-            if (res.confirm) {
-              Taro.navigateTo({
-                url: '/pages/login/index'
-              });
-            }
-          }
-        });
+        saveCurrentPageState(saveState);
+        await showLoginConfirm(loginMessage);
         return null;
       }
 
@@ -65,36 +82,10 @@ export const withAuth = (
     } catch (error) {
       console.error('请求错误:', error);
       
-      // 处理 401 错误
       if (error.response?.status === 401) {
-        // 清除失效的 token
         Taro.removeStorageSync('token');
-        
-        if (saveState) {
-          const state = saveState();
-          Taro.setStorageSync('tempState', state);
-        }
-
-        // 保存当前页面路径
-        const pages = Taro.getCurrentPages();
-        const currentPage = pages[pages.length - 1];
-        if (currentPage) {
-          const path = `/${currentPage.route}`;
-          Taro.setStorageSync('redirectUrl', path);
-        }
-
-        Taro.showModal({
-          title: '提示',
-          content: '登录已过期，请重新登录',
-          confirmText: '去登录',
-          success: (res) => {
-            if (res.confirm) {
-              Taro.navigateTo({
-                url: '/pages/login/index'
-              });
-            }
-          }
-        });
+        saveCurrentPageState(saveState);
+        await showLoginConfirm('登录已过期，请重新登录');
         return null;
       }
 
@@ -110,5 +101,20 @@ export const withAuth = (
     } finally {
       onComplete?.();
     }
+  };
+};
+
+// 用于普通登录检查的包装器
+export const withLoginCheck = (
+  callback: Function,
+  message?: string
+) => {
+  return async (...args: any[]) => {
+    if (!isLoggedIn()) {
+      const confirmed = await showLoginConfirm(message);
+      if (!confirmed) return;
+      return;
+    }
+    return callback(...args);
   };
 };

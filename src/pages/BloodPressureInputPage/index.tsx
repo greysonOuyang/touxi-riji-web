@@ -1,9 +1,9 @@
-// pages/BloodPressureInputPage/index.tsx
+
 import React, { useState, useEffect } from 'react';
 import Taro from '@tarojs/taro';
 import { View, Button, Form, Input, Text, Picker } from '@tarojs/components';
-import { withAuth } from '@/utils/auth';
 import { addBloodPressureRecord } from '@/api/bloodPressureApi';
+import { FORM_TYPES, saveTempFormData, getTempFormData, clearTempFormData } from '@/utils/tempFormStorage';
 import './index.scss';
 
 interface BloodPressureData {
@@ -16,14 +16,13 @@ interface BloodPressureData {
 }
 
 const BloodPressureInputPage: React.FC = () => {
-  // 初始化表单数据
-  const [formData, setFormData] = useState<BloodPressureData>(() => {
-    const savedData = Taro.getStorageSync('tempBloodPressureData');
+  // 初始化表单数据函数
+  const initFormData = () => {
     const now = new Date();
     const defaultDate = now.toISOString().split('T')[0];
     const defaultTime = now.toTimeString().split(' ')[0].substring(0, 5);
     
-    return savedData || {
+    return {
       systolic: '',
       diastolic: '',
       heartRate: '',
@@ -31,18 +30,20 @@ const BloodPressureInputPage: React.FC = () => {
       measureTime: defaultTime,
       note: ''
     };
-  });
+  };
 
+  const [formData, setFormData] = useState<BloodPressureData>(initFormData());
   const [errors, setErrors] = useState<Partial<Record<keyof BloodPressureData, string>>>({});
 
-  // 在组件卸载时保存表单数据
-  useEffect(() => {
-    return () => {
-      if (formData.systolic || formData.diastolic) {
-        Taro.setStorageSync('tempBloodPressureData', formData);
-      }
-    };
-  }, [formData]);
+// 修改 useEffect
+useEffect(() => {
+  const tempData = getTempFormData(FORM_TYPES.BLOOD_PRESSURE);
+  if (tempData) {
+    setFormData(tempData);
+    // 恢复后清除临时数据
+    clearTempFormData(FORM_TYPES.BLOOD_PRESSURE);
+  }
+}, []);
 
   // 处理输入变化
   const handleInputChange = (field: keyof BloodPressureData, value: string) => {
@@ -94,14 +95,32 @@ const BloodPressureInputPage: React.FC = () => {
     handleInputChange('measureTime', e.detail.value);
   };
 
-  // 表单提交处理
-  const handleSubmit = withAuth(async () => {
+  const handleSubmit = async () => {
     if (!validateForm()) {
       return;
     }
-
+  
+    // 检查登录状态
+    const token = Taro.getStorageSync('token');
+    if (!token) {
+      // 保存临时数据
+      saveTempFormData(FORM_TYPES.BLOOD_PRESSURE, formData);
+      // 保存当前页面路径，登录后需要返回到这个页面
+      Taro.setStorageSync('redirectUrl', '/pages/BloodPressureInputPage/index');
+      // 跳转到登录页
+      Taro.navigateTo({
+        url: '/pages/login/index'
+      });
+      return;
+    }
+  
     try {
-      // 合并日期和时间
+      // 显示加载提示
+      Taro.showLoading({
+        title: '提交中...',
+        mask: true
+      });
+  
       const measureDateTime = `${formData.measureDate} ${formData.measureTime}`;
       
       const submitData = {
@@ -112,24 +131,41 @@ const BloodPressureInputPage: React.FC = () => {
         measureTime: measureDateTime,
         userId: Taro.getStorageSync('userId')
       };
-
+  
+      // 提交数据
       await addBloodPressureRecord(submitData);
-      
-      // 清除临时数据
-      Taro.removeStorageSync('tempBloodPressureData');
-      Taro.showToast({
+  
+      // 隐藏加载提示
+      Taro.hideLoading();
+  
+      // 清除临时表单数据
+      clearTempFormData(FORM_TYPES.BLOOD_PRESSURE);
+  
+      // 显示成功提示并跳转到首页
+      await Taro.showToast({
         title: '添加成功',
         icon: 'success',
-        duration: 2000
+        mask: true,
+        duration: 1000
       });
-
-      // 提交成功后返回首页
+  
+      // 确保 Toast 显示后跳转到首页
       setTimeout(() => {
-        Taro.switchTab({
-          url: '/pages/health/index' // 跳转到首页
+        Taro.reLaunch({
+          url: '/pages/health/index',
+          fail: (error) => {
+            console.error('跳转失败:', error);
+            Taro.redirectTo({
+              url: '/pages/health/index'
+            });
+          }
         });
-      }, 2000);
+      }, 1000);
+  
     } catch (error) {
+      // 隐藏加载提示
+      Taro.hideLoading();
+      
       console.error('提交失败:', error);
       Taro.showToast({
         title: '提交失败',
@@ -137,9 +173,8 @@ const BloodPressureInputPage: React.FC = () => {
         duration: 2000
       });
     }
-  }, {
-    saveState: () => formData
-  });
+  };
+  
 
   return (
     <View className='blood-pressure-input-page'>

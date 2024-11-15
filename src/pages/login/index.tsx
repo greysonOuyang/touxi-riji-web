@@ -1,15 +1,14 @@
-// /pages/login/index.tsx
+// pages/login/index.tsx
+
 import React, { useState } from 'react';
-import Taro, { useDidShow } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
 import { View, Button, Image, Checkbox, CheckboxGroup, Text } from '@tarojs/components';
-import { get, post } from '@/utils/request';
-import { restoreAllTempFormData, hasUnsubmittedData } from '@/utils/tempFormStorage';
+import { post } from '@/utils/request';
 import './index.scss';
 
 interface User {
   id: number;
   username: string;
-  passwordHash: string;
   wechatOpenid: string;
   unionid: string;
   phoneNumber?: string;
@@ -31,32 +30,29 @@ interface LoginResponse {
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [hasTemp, setHasTemp] = useState(false);
-
-  useDidShow(() => {
-    const hasTempData = hasUnsubmittedData();
-    setHasTemp(hasTempData);
-  });
 
   const handleRedirect = () => {
-    try {
-      // 不在登录成功时清除临时表单数据
-      // 返回上一页，让表单页面处理数据的提交和清除
-      Taro.navigateBack({
-        delta: 1,
-        success: () => {
-          console.log('成功返回上一页');
-        },
-        fail: (error) => {
-          console.error('返回上一页失败:', error);
-          // 如果返回失败，则跳转到首页
+    const redirectUrl = Taro.getStorageSync('redirectUrl');
+    
+    if (redirectUrl) {
+      Taro.removeStorageSync('redirectUrl');
+      Taro.redirectTo({
+        url: redirectUrl,
+        fail: () => {
+          // 如果重定向失败（可能是 tabBar 页面），则使用 switchTab
           Taro.switchTab({
-            url: '/pages/health/index'
+            url: redirectUrl,
+            fail: () => {
+              // 如果还是失败，返回首页
+              Taro.switchTab({
+                url: '/pages/health/index'
+              });
+            }
           });
         }
       });
-    } catch (error) {
-      console.error('重定向错误:', error);
+    } else {
+      // 没有重定向地址时返回首页
       Taro.switchTab({
         url: '/pages/health/index'
       });
@@ -87,16 +83,16 @@ const Login: React.FC = () => {
         Taro.setStorageSync('user', response.data.user);
         Taro.setStorageSync('userId', response.data.user.id);
         
-        // 显示成功提示并立即处理重定向
         Taro.showToast({
           title: '登录成功',
           icon: 'success',
-          duration: 1500,
-          success: () => {
-            // 登录成功后直接返回上一页
-            handleRedirect();
-          }
+          duration: 1500
         });
+
+        // 延迟跳转，确保 Toast 显示完成
+        setTimeout(() => {
+          handleRedirect();
+        }, 1500);
       } else {
         Taro.showToast({
           title: response?.msg || '登录失败',
@@ -116,7 +112,6 @@ const Login: React.FC = () => {
     }
   };
 
-
   const handleCheckboxChange = e => {
     setIsChecked(e.detail.value.length > 0);
   };
@@ -131,12 +126,6 @@ const Login: React.FC = () => {
     <View className='login-container'>
       <Image className='avatar' src='../../assets/images/heart-rate-chart.png' />
       <Text className='welcome-text'>欢迎使用腹透日记</Text>
-
-      {hasTemp && (
-        <View className='temp-data-tip'>
-          检测到未保存的表单数据，登录后将自动恢复
-        </View>
-      )}
 
       <Button 
         className='login-button' 
