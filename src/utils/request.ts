@@ -46,7 +46,7 @@ instance.interceptors.request.use(
     if (!isWhiteListUrl(config.url ?? '')) {
       const token = Taro.getStorageSync('token');
       if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `${token}`;
         // 打印请求头信息，用于调试
         console.log('Request headers:', config.headers);
       }

@@ -109,11 +109,13 @@ const BloodPressureInputPage: React.FC = () => {
         systolic: Number(formData.systolic),
         diastolic: Number(formData.diastolic),
         heartRate: formData.heartRate ? Number(formData.heartRate) : undefined,
-        measureTime: measureDateTime
+        measureTime: measureDateTime,
+        userId: Taro.getStorageSync('userId')
       };
 
       await addBloodPressureRecord(submitData);
       
+      // 清除临时数据
       Taro.removeStorageSync('tempBloodPressureData');
       Taro.showToast({
         title: '添加成功',
@@ -121,8 +123,11 @@ const BloodPressureInputPage: React.FC = () => {
         duration: 2000
       });
 
+      // 提交成功后返回首页
       setTimeout(() => {
-        Taro.navigateBack();
+        Taro.switchTab({
+          url: '/pages/health/index' // 跳转到首页
+        });
       }, 2000);
     } catch (error) {
       console.error('提交失败:', error);
