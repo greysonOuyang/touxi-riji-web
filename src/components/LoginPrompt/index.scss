@@ -1,0 +1,48 @@
+.login-prompt-wrapper {
+    padding: 0 16px;  // 设置左右边距
+    margin: 8px 0;    // 上下间距
+    
+    .login-prompt {
+      display: flex;
+      align-items: center;
+      padding: 6px 12px;
+      background: rgba(59, 124, 255, 0.05);
+      border-radius: 4px;
+      
+      .dot {
+        color: #3B7CFF;
+        margin-right: 4px;
+        font-weight: bold;
+        font-size: 16px;
+        line-height: 1;
+      }
+      
+      .message {
+        color: #666;
+        flex: 1;
+        font-size: 14px;
+        line-height: 1;
+      }
+      
+      .login-link {
+        color: #3B7CFF;
+        font-size: 14px;
+        margin-left: 8px;
+        font-weight: 500;
+        position: relative;
+        padding-left: 8px;
+        
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 1px;
+          height: 12px;
+          background-color: rgba(59, 124, 255, 0.2);
+        }
+      }
+    }
+  }
+  

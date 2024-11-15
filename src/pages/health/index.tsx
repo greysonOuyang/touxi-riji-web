@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
+import Taro, { useDidShow } from '@tarojs/taro';
+import LoginPrompt from '@/components/LoginPrompt';
 import UltrafiltrationView from '@/components/UltrafiltrationView';
 import WaterIntakeCard from '@/components/WaterIntakeCard';
 import UrineVolumeCard from '@/components/UrineVolumeCard';
@@ -7,12 +9,12 @@ import BloodPressureCard from '@/components/BloodPressureCard';
 import WeightCard from '@/components/WeightCard';
 import './index.scss';
 import '../../app.scss';
-import { useDidShow } from '@tarojs/taro';
 
 const HealthPage: React.FC = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!Taro.getStorageSync('token'));
 
-   // 为每个需要刷新的组件添加刷新触发器
-   const [refreshTriggers, setRefreshTriggers] = useState({
+  // 为每个需要刷新的组件添加刷新触发器
+  const [refreshTriggers, setRefreshTriggers] = useState({
     bloodPressure: 0,
     waterIntake: 0,
     urineVolume: 0,
@@ -22,6 +24,7 @@ const HealthPage: React.FC = () => {
 
   // 页面显示时触发刷新
   useDidShow(() => {
+    setIsLoggedIn(!!Taro.getStorageSync('token'));
     setRefreshTriggers(prev => ({
       bloodPressure: prev.bloodPressure + 1,
       waterIntake: prev.waterIntake + 1,
@@ -74,37 +77,39 @@ const HealthPage: React.FC = () => {
 
   return (
     <ScrollView className="health-page" scrollY>
-  <View className="content-wrapper">
-    {/* 超滤量卡片 */}
-    <UltrafiltrationView {...ultrafiltrationData} />
-    <Text className="large_text_semi_bold">健康概览</Text>
+     {!isLoggedIn && (
+  <LoginPrompt 
+    
+  />
+)}
+      <View className="content-wrapper">
+        {/* 超滤量卡片 */}
+        <UltrafiltrationView {...ultrafiltrationData} />
+        <Text className="large_text_semi_bold">健康概览</Text>
 
-    {/* 固定布局的健康卡片 */}
-    <View className="health-grid">
-      <View className="top-row">
-        {/* 左侧：喝水卡片 */}
-        <View className="left-column">
-          <WaterIntakeCard data={cardData.water} />
-        </View>
+        {/* 固定布局的健康卡片 */}
+        <View className="health-grid">
+          <View className="top-row">
+            {/* 左侧：喝水卡片 */}
+            <View className="left-column">
+              <WaterIntakeCard data={cardData.water} />
+            </View>
 
-        {/* 右侧：尿液卡片和血压卡片 */}
-        <View className="right-column">
-          <UrineVolumeCard data={cardData.urine} />
-          <BloodPressureCard data={cardData.blood} />
+            {/* 右侧：尿液卡片和血压卡片 */}
+            <View className="right-column">
+              <UrineVolumeCard data={cardData.urine} />
+              <BloodPressureCard data={cardData.blood} />
+            </View>
+          </View>
+
+          {/* 底部跨两列的体重卡片 */}
+          <View className="full-width-card">
+            <WeightCard data={cardData.weight} />
+          </View>
         </View>
       </View>
-
-      {/* 底部跨两列的体重卡片 */}
-      <View className="full-width-card">
-        <WeightCard data={cardData.weight} />
-      </View>
-    </View>
-  </View>
-</ScrollView>
+    </ScrollView>
   );
-  
-  
-  
 };
 
 export default HealthPage;
