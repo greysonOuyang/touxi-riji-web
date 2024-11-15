@@ -1,6 +1,48 @@
-// pages/BloodPressureInputPage/index.scss
 .blood-pressure-input-page {
   padding: 20px;
+
+  // 新增日期时间组样式
+  .datetime-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    gap: 15px;
+
+    .datetime-item {
+      flex: 1;
+      background: #F7F8F8;
+      border-radius: 14px;
+      padding: 12px 15px;
+
+      .datetime-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .icon {
+          width: 20px;
+          height: 20px;
+          margin-right: 8px;
+        }
+
+        .title {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+
+      .picker-wrapper {
+        .picker-content {
+          font-size: 16px;
+          color: #333;
+          height: 24px;
+          line-height: 24px;
+          background: transparent;
+          padding: 0;
+        }
+      }
+    }
+  }
 
   .input-group {
     display: flex;
@@ -13,21 +55,6 @@
       font-size: 14px;
       color: #333;
       margin-right: 10px;
-    }
-
-    .picker-wrapper {
-      flex: 1;
-      
-      .picker-content {
-        height: 44px;
-        line-height: 44px;
-        padding: 0 15px;
-        background: #F7F8F8;
-        border-radius: 14px;
-        font-size: 14px;
-        color: #333;
-        text-align: left;
-      }
     }
 
     .input {
@@ -58,6 +85,10 @@
     font-size: 12px;
     color: #ff4d4f;
     margin: -15px 0 15px 85px;
+
+    &.datetime-error {
+      margin: -25px 0 15px 15px;
+    }
   }
 
   .confirm-button {

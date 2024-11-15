@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Taro from '@tarojs/taro';
-import { View, Button, Form, Input, Text, Picker } from '@tarojs/components';
+import { View, Button, Form, Input, Text, Picker,Image } from '@tarojs/components';
 import { addBloodPressureRecord } from '@/api/bloodPressureApi';
 import { FORM_TYPES, saveTempFormData, getTempFormData, clearTempFormData } from '@/utils/tempFormStorage';
 import './index.scss';
@@ -179,6 +179,47 @@ useEffect(() => {
   return (
     <View className='blood-pressure-input-page'>
       <Form onSubmit={handleSubmit}>
+
+      <View className='datetime-group'>
+      <View className='datetime-item'>
+        <View className='datetime-header'>
+          <Image className='icon' src='../../assets/icons/calendar_icon.png' />
+          <Text className='title'>测量日期</Text>
+        </View>
+        <View className='picker-wrapper'>
+          <Picker
+            mode='date'
+            value={formData.measureDate}
+            onChange={handleDateChange}
+          >
+            <View className='picker-content'>
+              {formData.measureDate || '请选择日期'}
+            </View>
+          </Picker>
+        </View>
+      </View>
+
+      <View className='datetime-item'>
+        <View className='datetime-header'>
+          <Image className='icon' src='../../assets/icons/clock.png' />
+          <Text className='title'>测量时间</Text>
+        </View>
+        <View className='picker-wrapper'>
+          <Picker
+            mode='time'
+            value={formData.measureTime}
+            onChange={handleTimeChange}
+          >
+            <View className='picker-content'>
+              {formData.measureTime || '请选择时间'}
+            </View>
+          </Picker>
+        </View>
+      </View>
+    </View>
+    {errors.measureDate && <Text className='error-text datetime-error'>{errors.measureDate}</Text>}
+    {errors.measureTime && <Text className='error-text datetime-error'>{errors.measureTime}</Text>}
+
         <View className='input-group'>
           <Text className='label'>收缩压</Text>
           <Input
@@ -218,37 +259,6 @@ useEffect(() => {
         </View>
         {errors.heartRate && <Text className='error-text'>{errors.heartRate}</Text>}
 
-        <View className='input-group'>
-          <Text className='label'>日期</Text>
-          <View className='picker-wrapper'>
-            <Picker
-              mode='date'
-              value={formData.measureDate}
-              onChange={handleDateChange}
-            >
-              <View className='picker-content'>
-                {formData.measureDate || '请选择测量日期'}
-              </View>
-            </Picker>
-          </View>
-        </View>
-        {errors.measureDate && <Text className='error-text'>{errors.measureDate}</Text>}
-
-        <View className='input-group'>
-          <Text className='label'>时间</Text>
-          <View className='picker-wrapper'>
-            <Picker
-              mode='time'
-              value={formData.measureTime}
-              onChange={handleTimeChange}
-            >
-              <View className='picker-content'>
-                {formData.measureTime || '请选择测量时间'}
-              </View>
-            </Picker>
-          </View>
-        </View>
-        {errors.measureTime && <Text className='error-text'>{errors.measureTime}</Text>}
 
         <View className='input-group'>
           <Text className='label'>备注</Text>
@@ -260,12 +270,11 @@ useEffect(() => {
           />
         </View>
 
-        <Button
-          formType='submit'
+        <View
           className='confirm-button'
         >
           确认
-        </Button>
+        </View>
       </Form>
     </View>
   );
