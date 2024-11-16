@@ -11,16 +11,22 @@ export interface WeightComparisonVO {
 
 // 添加新的体重记录请求参数
 export interface NewWeightRecord {
+  userId: number;
   weight: number;
+  measurementDatetime: string;
+  scaleType: string;
 }
+
 
 /**
  * 获取最新的体重记录（包含比较数据）
+ * @param userId 用户ID
  * @returns Promise<ApiResponse<WeightComparisonVO>>
  */
-export const getLatestWeight = (): Promise<ApiResponse<WeightComparisonVO>> => {
-  return get<WeightComparisonVO>('/api/weight/latest');
+export const getLatestWeight = (userId: number): Promise<ApiResponse<WeightComparisonVO>> => {
+  return get<WeightComparisonVO>(`/api/weight/latest/${userId}`);
 };
+
 
 /**
  * 添加新的体重记录

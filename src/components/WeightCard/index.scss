@@ -176,3 +176,14 @@
     top: 15px;
     right: 15px;
 }
+
+.weight-error, .weight-empty {
+    padding: 40px 0;
+    text-align: center;
+    color: #999;
+    font-size: 28px;
+  }
+  
+  .weight-error {
+    color: #ff4d4f;
+  }

@@ -3,50 +3,61 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Image } from "@tarojs/components";
 import dayjs from "dayjs";
 import AddButton from "../AddButton";
+import WeightInputPopup from "../WeightInputPopup";
 import { getLatestWeight, WeightComparisonVO } from '@/api/weightApi';
 import arrowUpGreen from '../../assets/icons/arrow_up_green.jpg'
 import arrowDownGreen from "../../assets/icons/arrow_down_green.jpg";
 import arrowUpRed from '../../assets/icons/arrow_up_red.jpg'
 import arrowDownRed from "../../assets/icons/arrow_down_red.jpg";
 import "./index.scss";
+import Taro from "@tarojs/taro";
 
 const WeightCard: React.FC = () => {
   const [weightData, setWeightData] = useState<WeightComparisonVO | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
     fetchLatestWeight();
   }, []);
 
   const fetchLatestWeight = async () => {
-    try {
-      const res = await getLatestWeight();
-      if (res.data) {
+    const userId = Taro.getStorageSync('userId');
+      const res = await getLatestWeight(userId);
+      if (res?.isSuccess()) { // 假设 0 是成功状态码
         setWeightData(res.data);
+        console.log("获取体重数据成功:", res.data);
+      } else {
+        console.error("获取体重数据失败:", res.msg);
+        setWeightData(null);
       }
-    } catch (error) {
-      console.error("获取体重数据失败:", error);
-    }
   };
 
   const handleAddClick = () => {
-    // 处理添加按钮点击事件
-    console.log('添加体重记录');
+    setIsPopupOpen(true);
   };
 
-  // 使用模拟数据进行测试
-  const mockData: WeightComparisonVO = {
-    latestWeight: 66.5,
-    weightChange: -0.6,
-    latestMeasureTime: "2024-03-18 08:28",
-    comparisonInfo: "相比于3日前"
+  const handlePopupClose = () => {
+    setIsPopupOpen(false);
   };
 
-  const data = weightData || mockData;
-  const [integerPart, decimalPart] = data.latestWeight.toFixed(1).split(".");
-  const isWeightIncreased = data.weightChange > 0;
-  const isSignificantChange = Math.abs(data.weightChange) >= 1;
+  // 弹窗关闭后刷新数据
+  const handlePopupAfterSubmit = () => {
+    setIsPopupOpen(false);
+    fetchLatestWeight();
+  };
 
-  // 根据变化量和方向选择对应的箭头图标
+  // 获取显示数据
+  const displayData = {
+    weight: weightData?.latestWeight || 0.0,
+    change: weightData?.weightChange || 0,
+    measureTime: weightData?.latestMeasureTime || '',
+    comparisonInfo: weightData?.comparisonInfo || ''
+  };
+
+  const [integerPart, decimalPart] = displayData.weight.toFixed(1).split(".");
+  const isWeightIncreased = displayData.change > 0;
+  const isSignificantChange = Math.abs(displayData.change) >= 1;
+
   const getArrowIcon = () => {
     if (isWeightIncreased) {
       return isSignificantChange ? arrowUpRed : arrowUpGreen;
@@ -67,24 +78,36 @@ const WeightCard: React.FC = () => {
           <Text className="weight-decimal">.{decimalPart}</Text>
           <Text className="weight-unit">公斤</Text>
         </View>
-        <Text className="weight-update-time">
-          {dayjs(data.latestMeasureTime).format('M月D日 HH:mm')}
-        </Text>
+        {displayData.measureTime && (
+          <Text className="weight-update-time">
+            {dayjs(displayData.measureTime).format('M月D日 HH:mm')}
+          </Text>
+        )}
       </View>
 
       <View className="weight-change-container">
         <View className="weight-change-row">
           <Text className="weight-change">
-            {Math.abs(data.weightChange).toFixed(1)}
+            {Math.abs(displayData.change).toFixed(1)}
           </Text>
-          <Image
-            className={`weight-change-icon-${isWeightIncreased ? 'up' : 'down'}`}
-            src={getArrowIcon()}
-            mode="aspectFit"
-          />
+          {displayData.change !== 0 && (
+            <Image
+              className={`weight-change-icon-${isWeightIncreased ? 'up' : 'down'}`}
+              src={getArrowIcon()}
+              mode="aspectFit"
+            />
+          )}
         </View>
-        <Text className="weight-relative-time">{data.comparisonInfo}</Text>
+        {displayData.comparisonInfo && (
+          <Text className="weight-relative-time">{displayData.comparisonInfo}</Text>
+        )}
       </View>
+
+      <WeightInputPopup 
+        isOpen={isPopupOpen}
+        onClose={handlePopupClose}
+        onAfterSubmit={handlePopupAfterSubmit}
+      />
     </View>
   );
 };

@@ -1,48 +1,78 @@
+import { View } from '@tarojs/components'
 import React from 'react'
-import { View, Image } from '@tarojs/components'
-import { Popup } from '@nutui/nutui-react-taro'
 import './index.scss'
 
-import quedingIcon from '../../assets/icons/queding2.svg'
-import quxiaoIcon from '../../assets/icons/quxiao2.svg'
-
 interface CustomPopupProps {
-  visible: boolean
+  isOpened: boolean
   onClose: () => void
-  onConfirm: () => void
-  children: React.ReactNode
-  height?: string | number
+  onConfirm?: () => void
+  children?: React.ReactNode
+  title?: string
+  confirmText?: string
+  cancelText?: string
+  showFooter?: boolean
 }
 
 const CustomPopup: React.FC<CustomPopupProps> = ({
-  visible,
+  isOpened,
   onClose,
   onConfirm,
   children,
-  height = '50%'
+  title,
+  confirmText = '确定',
+  cancelText = '取消',
+  showFooter = true
 }) => {
+  if (!isOpened) return null
+
+  const handleMaskClick = (e) => {
+    e.stopPropagation()
+    onClose()
+  }
+
+  const handlePopupClick = (e) => {
+    e.stopPropagation()
+  }
+
+  const handleConfirm = () => {
+    if (onConfirm) {
+      onConfirm()
+    }
+    onClose()
+  }
+
   return (
-    <Popup
-      visible={visible}
-      position="bottom"
-      onClose={onClose}
-      style={{ height }}
-    >
-      <View className="custom-popup">
-        <View className="custom-popup__header">
-          <View className="custom-popup__cancel" onClick={onClose}>
-            <Image src={quxiaoIcon} className="icon svg-icon" />
+    <View className='custom-popup-mask' onClick={handleMaskClick}>
+      <View className='custom-popup-content' onClick={handlePopupClick}>
+        {title && (
+          <View className='custom-popup-title'>
+            {showFooter && (
+              <>
+                <View 
+                  className='custom-popup-btn custom-popup-cancel' 
+                  onClick={onClose}
+                >
+                  {cancelText}
+                </View>
+                <View 
+                  className='custom-popup-btn custom-popup-confirm' 
+                  onClick={handleConfirm}
+                >
+                  {confirmText}
+                </View>
+              </>
+            )}
+            {title}
           </View>
-          <View className="custom-popup__confirm" onClick={onConfirm}>
-            <Image src={quedingIcon} className="icon svg-icon" />
-          </View>
-        </View>
-        <View className="custom-popup__content">
+        )}
+        
+        <View className='custom-popup-body'>
           {children}
         </View>
       </View>
-    </Popup>
+    </View>
   )
+
 }
 
 export default CustomPopup

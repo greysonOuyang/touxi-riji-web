@@ -1,28 +1,70 @@
 .custom-popup {
-    .custom-popup__header {
-      display: flex;
-      justify-content: space-between;
-      padding: 16px;
-    }
-  
-    .custom-popup__cancel,
-    .custom-popup__confirm {
-      cursor: pointer;
-      transition: transform 0.1s ease-in-out, opacity 0.1s ease-in-out;
-  
-      &:active {
-        transform: scale(0.95);
-        opacity: 0.7;
-      }
-    }
-  
-    .custom-popup__content {
-      padding: 16px;
-    }
-  
-  
-    .svg-icon {
-      width: 22px; /* 调整宽度 */
-      height: 22px; /* 调整高度 */
+  &-mask {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+  }
+
+  &-content {
+    position: fixed; // 改为fixed定位
+    left: 0;
+    bottom: 0; // 贴底
+    width: 100%;
+    background-color: #fff;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+  }
+
+  &-title {
+    position: relative;
+    padding: 16px;
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+  }
+
+  &-body {
+    padding: 0 16px 24px;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  &-btn {
+    position: absolute;
+    top: 12px;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    
+    &:active {
+      opacity: 0.8;
+      transform: scale(0.98);
+      transition: all 0.2s;
     }
   }
+
+  &-cancel {
+    left: 16px;
+    color: #666;
+  }
+
+  &-confirm {
+    right: 16px;
+    color: #1890ff;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
