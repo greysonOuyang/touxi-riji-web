@@ -1,120 +1,68 @@
-// utils/auth.ts
+// src/utils/auth.ts
+import Taro from '@tarojs/taro';
+import { post } from './request';
 
-import Taro from "@tarojs/taro";
-
-interface AuthRequestOptions {
-  onBeforeRequest?: () => void;
-  onSuccess?: (response: any) => void;
-  onError?: (error: any) => void;
-  onComplete?: () => void;
-  saveState?: () => any;
-  showErrorToast?: boolean;
-  loginMessage?: string;
+// 定义用户接口
+export interface User {
+  id: number;
+  username: string;
+  wechatOpenid: string;
+  unionid: string;
+  phoneNumber?: string;
+  email?: string;
+  avatarUrl?: string;
+  status: number;
+  loginType: string;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt?: string;
+  extraInfo?: string;
 }
 
-export const isLoggedIn = () => {
-  return !!Taro.getStorageSync('token');
-};
+// 定义登录响应接口
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
 
-// 保存当前页面状态
-const saveCurrentPageState = (saveState?: () => any) => {
-  if (saveState) {
-    const state = saveState();
-    Taro.setStorageSync('tempState', state);
-  }
-
-  const pages = Taro.getCurrentPages();
-  const currentPage = pages[pages.length - 1];
-  if (currentPage) {
-    const path = `/${currentPage.route}`;
-    console.log('保存重定向路径:', path);
-    Taro.setStorageSync('redirectUrl', path);
-  }
-};
-
-// 显示登录确认框
-const showLoginConfirm = (message: string = '请先登录') => {
-  return new Promise((resolve) => {
-    Taro.showModal({
-      title: '提示',
-      content: message,
-      confirmText: '去登录',
-      success: (res) => {
-        if (res.confirm) {
-          Taro.navigateTo({
-            url: '/pages/login/index'
-          });
-        }
-        resolve(res.confirm);
-      }
-    });
-  });
-};
-
-export const withAuth = (
-  requestFn: (...args: any[]) => Promise<any>,
-  options: AuthRequestOptions = {}
-) => {
-  return async (...args: any[]) => {
-    const {
-      onBeforeRequest,
-      onSuccess,
-      onError,
-      onComplete,
-      saveState,
-      showErrorToast = true,
-      loginMessage
-    } = options;
-
-    try {
-      onBeforeRequest?.();
-
-      const token = Taro.getStorageSync('token');
-      if (!token) {
-        saveCurrentPageState(saveState);
-        await showLoginConfirm(loginMessage);
-        return null;
-      }
-
-      const response = await requestFn(...args);
-      onSuccess?.(response);
-      return response;
-    } catch (error) {
-      console.error('请求错误:', error);
+// 自动登录方法
+export async function autoLogin() {
+  try {
+    const { code } = await Taro.login();
+    const response = await post<LoginResponse>('/auth/mini-app/login', { code });
+    
+    if (response?.isSuccess()) {
+      // 清除旧的 token
+      Taro.removeStorageSync('token');
       
-      if (error.response?.status === 401) {
-        Taro.removeStorageSync('token');
-        saveCurrentPageState(saveState);
-        await showLoginConfirm('登录已过期，请重新登录');
-        return null;
-      }
-
-      onError?.(error);
-      if (showErrorToast) {
-        Taro.showToast({
-          title: error.message || '请求失败',
-          icon: 'none',
-          duration: 2000
-        });
-      }
-      throw error;
-    } finally {
-      onComplete?.();
+      // 设置新的 token 和用户信息
+      Taro.setStorageSync('token', response.data.token);
+      Taro.setStorageSync('user', response.data.user);
+      Taro.setStorageSync('userId', response.data.user.id);
+      return response.data;
+    } else {
+      throw new Error(response?.msg || '自动登录失败');
     }
-  };
-};
+  } catch (error) {
+    console.error('自动登录错误:', error);
+    throw error;
+  }
+}
 
-// 用于普通登录检查的包装器
-export const withLoginCheck = (
-  callback: Function,
-  message?: string
-) => {
-  return async (...args: any[]) => {
-    if (!isLoggedIn()) {
-      const confirmed = await showLoginConfirm(message);
-      if (!confirmed) return;
-      return;
-    }
-    return callback(...args);
-  };
-};
+// 检查登录状态
+export function checkLoginStatus(): boolean {
+  const token = Taro.getStorageSync('token');
+  return !!token;
+}
+
+// 获取当前用户信息
+export function getCurrentUser(): User | null {
+  return Taro.getStorageSync('user') || null;
+}
+
+// 退出登录
+export function logout() {
+  Taro.removeStorageSync('token');
+  Taro.removeStorageSync('user');
+  Taro.removeStorageSync('userId');
+}

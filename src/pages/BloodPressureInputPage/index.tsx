@@ -96,21 +96,8 @@ useEffect(() => {
   };
 
   const handleSubmit = async () => {
+    console.log("handleSubmit");
     if (!validateForm()) {
-      return;
-    }
-  
-    // 检查登录状态
-    const token = Taro.getStorageSync('token');
-    if (!token) {
-      // 保存临时数据
-      saveTempFormData(FORM_TYPES.BLOOD_PRESSURE, formData);
-      // 保存当前页面路径，登录后需要返回到这个页面
-      Taro.setStorageSync('redirectUrl', '/pages/BloodPressureInputPage/index');
-      // 跳转到登录页
-      Taro.navigateTo({
-        url: '/pages/login/index'
-      });
       return;
     }
   
@@ -271,7 +258,7 @@ useEffect(() => {
         </View>
 
         <View
-          className='confirm-button'
+          className='confirm-button' onClick={handleSubmit}
         >
           确认
         </View>

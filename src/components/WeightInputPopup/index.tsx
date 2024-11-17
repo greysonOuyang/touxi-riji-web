@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Picker } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import dayjs from 'dayjs';
 import CustomPopup from '../CustomPopup';
-import { addWeightRecord, NewWeightRecord } from '../../api/weightApi';
+import { addWeightRecord, NewWeightRecord, getLatestWeight } from '../../api/weightApi';
 import './index.scss';
 
 interface WeightInputPopupProps {
@@ -12,11 +12,10 @@ interface WeightInputPopupProps {
   onAfterSubmit: () => void;
 }
 
-// 简化后的 FormState，只包含表单需要的字段
 interface FormState {
-  weight: string; // 前端输入时用string类型
+  weight: string;
   measurementDatetime: string;
-  displayDateTime: string; // 用于显示的日期时间格式
+  displayDateTime: string;
 }
 
 const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
@@ -24,12 +23,40 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
   onClose,
   onAfterSubmit,
 }) => {
-  const now = dayjs();
-  const [formData, setFormData] = useState<FormState>({
-    weight: '60.0',
-    measurementDatetime: now.format('YYYY-MM-DD HH:mm:ss'),
-    displayDateTime: now.format('YYYY年MM月DD日 HH:mm')
+  // 初始化状态
+  const [formData, setFormData] = useState<FormState>(() => {
+    const initialNow = dayjs();
+    return {
+      weight: '60.0',
+      measurementDatetime: initialNow.format('YYYY-MM-DD HH:mm:ss'),
+      displayDateTime: initialNow.format('YYYY年MM月DD日 HH:mm')
+    };
   });
+
+  // 每次打开弹窗时更新时间和获取最新体重
+  useEffect(() => {
+    if (isOpen) {
+      const currentTime = dayjs();
+      setFormData(prev => ({
+        ...prev,
+        measurementDatetime: currentTime.format('YYYY-MM-DD HH:mm:ss'),
+        displayDateTime: currentTime.format('YYYY年MM月DD日 HH:mm')
+      }));
+
+      // 获取最新体重
+      const fetchLatestWeight = async () => {
+        const userId = Taro.getStorageSync('userId');
+        const res = await getLatestWeight(userId);
+        if (res?.isSuccess() && res.data?.latestWeight) {
+          setFormData(prev => ({
+            ...prev,
+            weight: res.data.latestWeight.toFixed(1)
+          }));
+        }
+      };
+      fetchLatestWeight();
+    }
+  }, [isOpen]);
 
   const generateDateTimeColumns = () => {
     const months = Array.from({ length: 12 }, (_, i) => `${i + 1}月`);
@@ -47,7 +74,8 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
 
   const handleDateTimeChange = (e) => {
     const [month, day, hour, minute] = e.detail.value;
-    const dateTimeValue = now
+    const currentDate = dayjs();
+    const dateTimeValue = currentDate
       .month(month)
       .date(day + 1)
       .hour(Number(hour))
@@ -60,6 +88,16 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
     }));
   };
 
+  const getWeightPickerValue = () => {
+    const [integer, decimal] = formData.weight.split('.');
+    return [
+      parseInt(integer),
+      0, // 小数点的索引
+      parseInt(decimal),
+      0  // "公斤"的索引
+    ];
+  };
+
   const handleWeightChange = (e) => {
     const [integer, , decimal] = e.detail.value;
     const weightValue = `${integer}.${decimal}`;
@@ -69,32 +107,32 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
   const handleSubmit = async () => {
     const userId = Taro.getStorageSync('userId');
       
-      const requestData: NewWeightRecord = {
-        userId,
-        weight: parseFloat(formData.weight),
-        measurementDatetime: formData.measurementDatetime,
-        scaleType: 'MANUAL'
-      };
-  
-      const response = await addWeightRecord(requestData);
-      
-      if (response?.isSuccess()) {
-        await Taro.showToast({
-          title: '添加成功',
-          icon: 'success',
-          mask: true,
-          duration: 1000
-        });
-        onAfterSubmit();
-        onClose();
-      } else {
-        await Taro.showToast({
-          title: response?.msg || '添加失败',
-          icon: 'error',
-          mask: true,
-          duration: 2000
-        });
-      }
+    const requestData: NewWeightRecord = {
+      userId,
+      weight: parseFloat(formData.weight),
+      measurementDatetime: formData.measurementDatetime,
+      scaleType: 'MANUAL'
+    };
+
+    const response = await addWeightRecord(requestData);
+    
+    if (response?.isSuccess()) {
+      await Taro.showToast({
+        title: '添加成功',
+        icon: 'success',
+        mask: true,
+        duration: 1000
+      });
+      onAfterSubmit();
+      onClose();
+    } else {
+      await Taro.showToast({
+        title: response?.msg || '添加失败',
+        icon: 'error',
+        mask: true,
+        duration: 2000
+      });
+    }
   };
   
   return (
@@ -111,7 +149,7 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
             <Picker
               mode="multiSelector"
               range={generateWeightColumns()}
-              value={[60, 0, 0, 0]}
+              value={getWeightPickerValue()}
               onChange={handleWeightChange}
             >
               <View className="value">
@@ -128,7 +166,12 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
             <Picker
               mode="multiSelector"
               range={generateDateTimeColumns()}
-              value={[now.month(), now.date() - 1, now.hour(), now.minute()]}
+              value={[
+                dayjs(formData.measurementDatetime).month(),
+                dayjs(formData.measurementDatetime).date() - 1,
+                dayjs(formData.measurementDatetime).hour(),
+                dayjs(formData.measurementDatetime).minute()
+              ]}
               onChange={handleDateTimeChange}
             >
               <View className="value">

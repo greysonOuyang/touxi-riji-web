@@ -23,7 +23,7 @@ const WeightCard: React.FC = () => {
   const fetchLatestWeight = async () => {
     const userId = Taro.getStorageSync('userId');
       const res = await getLatestWeight(userId);
-      if (res?.isSuccess()) { // 假设 0 是成功状态码
+      if (res?.isSuccess()) { 
         setWeightData(res.data);
         console.log("获取体重数据成功:", res.data);
       } else {

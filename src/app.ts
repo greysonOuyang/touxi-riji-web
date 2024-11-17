@@ -1,22 +1,31 @@
-import React, { useEffect } from 'react'
-import { useDidShow, useDidHide } from '@tarojs/taro'
-// 全局样式
-import './app.scss'
+// app.ts
+import { Component } from 'react'
+import { autoLogin } from '@/utils/auth'
+import Taro from '@tarojs/taro'
 
-function App(props) {
-  // 可以使用所有的 React Hooks
-  useEffect(() => {})
+interface IProps {
+  children: React.ReactNode
+}
 
-  // 对应 onShow
-  useDidShow(() => {
-    
-  })
+class App extends Component<IProps> {
+  componentDidMount() {
+    this.checkLoginStatus()
+  }
 
+  async checkLoginStatus() {
+    try {
+      const token = Taro.getStorageSync('token')
+      if (!token) {
+        await autoLogin()
+      }
+    } catch (error) {
+      console.error('登录状态检查失败:', error)
+    }
+  }
 
-  // 对应 onHide
-  useDidHide(() => {})
-
-  return props.children
+  render() {
+    return this.props.children
+  }
 }
 
 export default App
