@@ -97,3 +97,16 @@
   justify-content: space-between;
   align-items: center;
 }
+
+// TimeSelector 样式
+:global {
+  .time-selector {
+    padding: 10px 0;
+    border-bottom: 1px solid #EEEEEE;
+    
+    .label-wrapper {
+      font-size: 15px;
+      color: #333333;
+    }
+  }
+}

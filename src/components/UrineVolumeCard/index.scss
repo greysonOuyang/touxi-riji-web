@@ -4,7 +4,8 @@
   height: 50%;
   background-color: #fff;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 轻微且紧贴元素的阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* 轻微且紧贴元素的阴影 */
   box-sizing: border-box;
   overflow: hidden;
   display: flex;
@@ -19,13 +20,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2px; /* 调整数值和单位之间的间距 */
-  flex-shrink: 0; /* 防止缩小 */
-  white-space: nowrap; /* 防止换行 */
+  gap: 2px;
+  /* 调整数值和单位之间的间距 */
+  flex-shrink: 0;
+  /* 防止缩小 */
+  white-space: nowrap;
+  /* 防止换行 */
   padding: 10px;
   overflow: hidden;
   margin-top: 3px;
 }
+
 .urine-unit {
   margin-left: 5px;
 }
@@ -38,5 +43,3 @@
   right: 7px;
   bottom: 7px;
 }
-
-
