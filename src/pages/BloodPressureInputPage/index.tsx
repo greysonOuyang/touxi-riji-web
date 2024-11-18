@@ -10,6 +10,7 @@ import {
 } from "@/utils/tempFormStorage";
 import TimeSelector from "@/components/TimeSelector";
 import "./index.scss";
+import CustomTimePicker from "@/components/CustomTimePicker";
 
 interface BloodPressureData {
   systolic: string | number;

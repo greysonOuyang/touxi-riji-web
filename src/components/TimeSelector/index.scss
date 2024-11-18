@@ -19,31 +19,6 @@
             font-size: 16px;
             color: #333;
 
-            .date-time-display {
-                display: flex;
-                align-items: center;
-
-                .date {
-                    margin-right: 10px;
-                }
-
-                .time-container {
-                    display: flex;
-                    align-items: center;
-
-                    .time {
-                        font-size: 16px;
-                        margin-right: 2px;
-                    }
-
-                    .time-unit {
-                        font-size: 12px;
-                        color: #666;
-                        margin-right: 4px;
-                    }
-                }
-            }
-
             .arrow {
                 width: 15px;
                 height: 15px;

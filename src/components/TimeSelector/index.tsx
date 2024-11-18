@@ -18,44 +18,43 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
 }) => {
   const currentDate = dayjs();
 
-  // 生成日期+时间的列数据
+  // 生成日期、小时、分钟列的数据
   const generateDateTimeOptions = () => {
-    const maxDays = allowFuture ? 365 : 30;
+    const maxDays = allowFuture ? 365 : 30; // 控制允许选择的天数范围
     const days: string[] = [];
     const today = currentDate.startOf("day");
 
     for (let i = 0; i <= maxDays; i++) {
       const date = today.subtract(maxDays - i, "day");
-      days.push(date.format("MM月DD日"));
+      days.push(date.format("MM月DD日")); // 日期保持为 MM月DD日 格式
     }
 
-    const hours = Array.from({ length: 24 }, (_, i) =>
-      i.toString().padStart(2, "0")
+    const hours = Array.from(
+      { length: 24 },
+      (_, i) => `${i.toString().padStart(2, "0")}时`
     );
-    const hourUnits = ["时"];
-
-    const minutes = Array.from({ length: 60 }, (_, i) =>
-      i.toString().padStart(2, "0")
+    const minutes = Array.from(
+      { length: 60 },
+      (_, i) => `${i.toString().padStart(2, "0")}分`
     );
-    const minuteUnits = ["分"];
 
-    return [days, hours, hourUnits, minutes, minuteUnits];
+    return [days, hours, minutes];
   };
 
   const handleChange = (e) => {
-    const [dayIndex, hourIndex, , minuteIndex] = e.detail.value;
+    const [dayIndex, hourIndex, minuteIndex] = e.detail.value;
     const daysColumn = generateDateTimeOptions()[0];
     const hoursColumn = generateDateTimeOptions()[1];
-    const minutesColumn = generateDateTimeOptions()[3];
+    const minutesColumn = generateDateTimeOptions()[2];
 
-    // 使用当前年份构建完整日期
+    // 解析选中的日期时间
     const selectedDate = dayjs()
-      .month(parseInt(daysColumn[dayIndex].split("月")[0]) - 1)
-      .date(parseInt(daysColumn[dayIndex].split("月")[1]))
-      .hour(Number(hoursColumn[hourIndex]))
-      .minute(Number(minutesColumn[minuteIndex]));
+      .month(parseInt(daysColumn[dayIndex].split("月")[0]) - 1) // 月份解析
+      .date(parseInt(daysColumn[dayIndex].split("月")[1])) // 日期解析
+      .hour(Number(hoursColumn[hourIndex].replace("时", ""))) // 小时解析
+      .minute(Number(minutesColumn[minuteIndex].replace("分", ""))); // 分钟解析
 
-    onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss"));
+    onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss")); // 输出完整时间格式
   };
 
   const dateTimeOptions = generateDateTimeOptions();
@@ -73,9 +72,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
               (item) => item === currentValue.format("MM月DD日")
             ),
             currentValue.hour(),
-            0, // 时单位列的固定索引
             currentValue.minute(),
-            0, // 分单位列的固定索引
           ]}
           onChange={handleChange}
         >
