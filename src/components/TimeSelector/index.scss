@@ -1,19 +1,23 @@
-.time-selector-wrapper {
-    padding: 10px 0;
-    border-bottom: 1px solid #F0F0F0;
+.time-selector {
+    display: flex;
+    align-items: center; // 确保文字和时间值在同一行垂直对齐
+    padding: 10px 10px; // 增加适当的内边距
 
-    .time-selector {
+    .label {
+        font-size: 16px;
+        color: #333;
+        margin-right: 16px; // 与 `value-wrapper` 之间的间隔
+        white-space: nowrap; // 确保标签不换行
+    }
+
+    .value-wrapper {
+        flex: 1; // 占据剩余空间
+        text-align: right; // 数值靠右对齐
         display: flex;
         align-items: center;
-        justify-content: space-between;
+        justify-content: flex-end;
 
-        .label {
-            font-size: 16px;
-            color: #333333;
-            margin-right: 16px;
-        }
-
-        .picker-value {
+        .value {
             display: flex;
             align-items: center;
             font-size: 16px;
@@ -22,7 +26,7 @@
             .arrow {
                 width: 15px;
                 height: 15px;
-                margin-left: 2px;
+                margin-left: 4px; // 箭头和文字之间的间距
                 object-fit: contain;
             }
         }

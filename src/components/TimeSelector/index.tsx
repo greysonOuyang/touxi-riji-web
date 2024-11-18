@@ -8,25 +8,26 @@ interface TimeSelectorProps {
   value: string;
   onChange: (value: string) => void;
   allowFuture?: boolean;
+  showLabel?: boolean; // 新增的属性
 }
 
 const TimeSelector: React.FC<TimeSelectorProps> = ({
-  label = "测量时间",
+  label = "时间",
   value,
   onChange,
   allowFuture = false,
+  showLabel = true, // 默认值为 true
 }) => {
   const currentDate = dayjs();
 
-  // 生成日期、小时、分钟列的数据
   const generateDateTimeOptions = () => {
-    const maxDays = allowFuture ? 365 : 30; // 控制允许选择的天数范围
+    const maxDays = allowFuture ? 365 : 30;
     const days: string[] = [];
     const today = currentDate.startOf("day");
 
     for (let i = 0; i <= maxDays; i++) {
       const date = today.subtract(maxDays - i, "day");
-      days.push(date.format("MM月DD日")); // 日期保持为 MM月DD日 格式
+      days.push(date.format("MM月DD日"));
     }
 
     const hours = Array.from(
@@ -47,23 +48,23 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
     const hoursColumn = generateDateTimeOptions()[1];
     const minutesColumn = generateDateTimeOptions()[2];
 
-    // 解析选中的日期时间
     const selectedDate = dayjs()
-      .month(parseInt(daysColumn[dayIndex].split("月")[0]) - 1) // 月份解析
-      .date(parseInt(daysColumn[dayIndex].split("月")[1])) // 日期解析
-      .hour(Number(hoursColumn[hourIndex].replace("时", ""))) // 小时解析
-      .minute(Number(minutesColumn[minuteIndex].replace("分", ""))); // 分钟解析
+      .month(parseInt(daysColumn[dayIndex].split("月")[0]) - 1)
+      .date(parseInt(daysColumn[dayIndex].split("月")[1]))
+      .hour(Number(hoursColumn[hourIndex].replace("时", "")))
+      .minute(Number(minutesColumn[minuteIndex].replace("分", "")));
 
-    onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss")); // 输出完整时间格式
+    onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss"));
   };
 
   const dateTimeOptions = generateDateTimeOptions();
   const currentValue = value ? dayjs(value) : dayjs();
 
   return (
-    <View className="form-item time-selector-wrapper">
-      <View className="time-selector">
-        <Text className="label">{label}</Text>
+    <View className="time-selector">
+      {showLabel && <Text className="label">{label}</Text>}{" "}
+      {/* 根据 showLabel 控制显示 */}
+      <View className="value-wrapper">
         <Picker
           mode="multiSelector"
           range={dateTimeOptions}
@@ -76,7 +77,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           ]}
           onChange={handleChange}
         >
-          <View className="picker-value">
+          <View className="value">
             <Text>{currentValue.format("YYYY年MM月DD日 HH:mm")}</Text>
             <Image className="arrow" src="../../assets/icons/right_arrow.png" />
           </View>

@@ -146,12 +146,6 @@ const BloodPressureInputPage: React.FC = () => {
     <View className="blood-pressure-input-page">
       <Form onSubmit={handleSubmit}>
         <View className="input-section">
-          <TimeSelector
-            value={formData.measureDateTime}
-            onChange={handleDateTimeChange}
-            allowFuture={false}
-          />
-
           <View className="form-item">
             <Text className="label">
               收缩压<Text className="required">*</Text>
@@ -206,6 +200,13 @@ const BloodPressureInputPage: React.FC = () => {
               <Text className="error-text">{errors.heartRate}</Text>
             )}
           </View>
+
+          <TimeSelector
+            showLabel={false}
+            value={formData.measureDateTime}
+            onChange={handleDateTimeChange}
+            allowFuture={false}
+          />
         </View>
 
         <View className="note-section">

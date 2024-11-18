@@ -22,25 +22,30 @@
 
 .top-row {
   display: flex;
-  gap: 15px; /* 间隙 */
-  align-items: stretch; /* 让左右两列的高度保持一致 */
+  gap: 15px;
+  /* 间隙 */
+  align-items: stretch;
+  /* 让左右两列的高度保持一致 */
 }
 
 .left-column {
   flex: 1;
-  height: 100%; /* 确保左侧喝水卡片的父容器占满高度 */
+  height: 100%;
+  /* 确保左侧喝水卡片的父容器占满高度 */
 }
 
 
- .right-column {
-  flex: 1; /* 让左右列宽度一致 */
+.right-column {
+  flex: 1;
+  /* 让左右列宽度一致 */
 }
 
 
 .right-column {
   display: flex;
   flex-direction: column;
-  gap: 15px; /* 上下卡片之间的间隙 */
+  gap: 15px;
+  /* 上下卡片之间的间隙 */
 }
 
 
@@ -49,12 +54,15 @@
 .urine-bp-cards {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* 控制两个方形卡片之间的间隙 */
-  height: 100%; /* 占满父容器的高度 */
+  gap: 16px;
+  /* 控制两个方形卡片之间的间隙 */
+  height: 100%;
+  /* 占满父容器的高度 */
 }
 
-.urine-bp-cards > * {
-  flex: 1; /* 保证尿液和血压卡片平分右侧列的高度 */
+.urine-bp-cards>* {
+  flex: 1;
+  /* 保证尿液和血压卡片平分右侧列的高度 */
 }
 
 
@@ -68,6 +76,7 @@
   top: 10px;
   left: 10px;
 }
+
 .update-time {
   font-size: 10px;
   color: #999;
@@ -103,7 +112,7 @@
   .time-selector {
     padding: 10px 0;
     border-bottom: 1px solid #EEEEEE;
-    
+
     .label-wrapper {
       font-size: 15px;
       color: #333333;
