@@ -1,31 +1,30 @@
-// components/TimeSelector/index.scss
-.time-selector {
-    display: flex;
-    align-items: center;
+// TimeSelector 样式调整
+.time-selector-wrapper {
+    padding: 10px 0;
+    border-bottom: 1px solid #F0F0F0;
 
-    .label-wrapper {
-        width: 120px;
-        font-size: 16px;
-        color: #333333;
-    }
+    .time-selector {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
-    .picker-wrapper {
-        flex: 1;
+        .label {
+            font-size: 16px;
+            color: #333333;
+            margin-right: 16px;
+        }
 
         .picker-value {
             display: flex;
-            justify-content: flex-end;
             align-items: center;
             font-size: 16px;
-            color: #333333;
+            color: #333;
 
             .arrow {
-                width: 15px; // 设置宽度
-                height: 15px; // 设置高度
+                width: 15px;
+                height: 15px;
                 margin-left: 2px;
-                color: #999999;
-                font-size: 18px;
-                object-fit: contain; // 确保图片保持比例
+                object-fit: contain;
             }
         }
     }

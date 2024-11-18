@@ -83,12 +83,11 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   };
 
   return (
-    <View className="time-selector">
-      {/* 修改标签渲染方式，支持 ReactNode */}
-      <View className="label-wrapper">
-        {typeof label === "string" ? <Text>{label}</Text> : label}
-      </View>
-      <View className="picker-wrapper">
+    <View className="form-item time-selector-wrapper">
+      <View className="time-selector">
+        <Text className="label">
+          {typeof label === "string" ? label : label}
+        </Text>
         <Picker
           mode="multiSelector"
           range={generateDateTimeColumns()}
@@ -104,8 +103,6 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
           <View className="picker-value">
             <Text>{dayjs(value).format("YYYY年M月D日 HH:mm")}</Text>
             <Image className="arrow" src="../../assets/icons/right_arrow.png" />
-            {/* 
-            <Text className="arrow">›</Text> */}
           </View>
         </Picker>
       </View>
