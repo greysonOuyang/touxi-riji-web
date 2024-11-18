@@ -20,35 +20,46 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
 
   // 生成日期+时间的列数据
   const generateDateTimeOptions = () => {
-    const maxDays = allowFuture ? 365 : 30; // 设置过去30天，如果不允许未来时间
+    const maxDays = allowFuture ? 365 : 30;
     const days: string[] = [];
     const today = currentDate.startOf("day");
 
     for (let i = 0; i <= maxDays; i++) {
-      const date = today.subtract(maxDays - i, "day"); // 从当前日期开始向过去递增
+      const date = today.subtract(maxDays - i, "day");
       days.push(date.format("MM月DD日"));
     }
 
     const hours = Array.from({ length: 24 }, (_, i) =>
       i.toString().padStart(2, "0")
     );
+    const hourUnits = ["时"];
+
     const minutes = Array.from({ length: 60 }, (_, i) =>
       i.toString().padStart(2, "0")
     );
+    const minuteUnits = ["分"];
 
-    return [days, hours, minutes];
+    return [days, hours, hourUnits, minutes, minuteUnits];
   };
 
   const handleChange = (e) => {
-    const [dayIndex, hourIndex, minuteIndex] = e.detail.value;
+    const [dayIndex, hourIndex, , minuteIndex] = e.detail.value;
     const daysColumn = generateDateTimeOptions()[0];
+    const hoursColumn = generateDateTimeOptions()[1];
+    const minutesColumn = generateDateTimeOptions()[3];
 
-    const selectedDate = dayjs(daysColumn[dayIndex], "MM月DD日")
-      .hour(Number(generateDateTimeOptions()[1][hourIndex]))
-      .minute(Number(generateDateTimeOptions()[2][minuteIndex]));
+    // 使用当前年份构建完整日期
+    const selectedDate = dayjs()
+      .month(parseInt(daysColumn[dayIndex].split("月")[0]) - 1)
+      .date(parseInt(daysColumn[dayIndex].split("月")[1]))
+      .hour(Number(hoursColumn[hourIndex]))
+      .minute(Number(minutesColumn[minuteIndex]));
 
     onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss"));
   };
+
+  const dateTimeOptions = generateDateTimeOptions();
+  const currentValue = value ? dayjs(value) : dayjs();
 
   return (
     <View className="form-item time-selector-wrapper">
@@ -56,18 +67,20 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
         <Text className="label">{label}</Text>
         <Picker
           mode="multiSelector"
-          range={generateDateTimeOptions()}
+          range={dateTimeOptions}
           value={[
-            generateDateTimeOptions()[0].findIndex(
-              (item) => item === dayjs(value).format("MM月DD日")
+            dateTimeOptions[0].findIndex(
+              (item) => item === currentValue.format("MM月DD日")
             ),
-            dayjs(value).hour(),
-            dayjs(value).minute(),
+            currentValue.hour(),
+            0, // 时单位列的固定索引
+            currentValue.minute(),
+            0, // 分单位列的固定索引
           ]}
           onChange={handleChange}
         >
           <View className="picker-value">
-            <Text>{dayjs(value).format("YYYY年MM月DD日 HH:mm")}</Text>
+            <Text>{currentValue.format("YYYY年MM月DD日 HH:mm")}</Text>
             <Image className="arrow" src="../../assets/icons/right_arrow.png" />
           </View>
         </Picker>
