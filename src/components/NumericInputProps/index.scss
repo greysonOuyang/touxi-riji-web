@@ -1,0 +1,72 @@
+.numeric-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+
+    /* 显示区域 */
+    .numeric-display-container {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        margin-bottom: 20px;
+
+        .numeric-value-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            .numeric-value {
+                font-size: 36px; // 数值字体较大
+                color: #333; // 数值颜色深灰
+            }
+
+            .numeric-underline {
+                position: absolute;
+                bottom: -5px; // 下划线贴紧数值下方
+                height: 2px;
+                background-color: #1890ff; // 蓝色下划线
+                transition: width 0.2s ease; // 宽度动态变化时的过渡效果
+            }
+        }
+
+        .numeric-unit {
+            margin-left: 10px; // 单位与数字分开
+            font-size: 16px; // 单位字体较小
+            color: #1890ff; // 单位颜色蓝色
+        }
+    }
+
+    /* 键盘区域 */
+    .numeric-keyboard {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        max-width: 400px;
+
+        .numeric-key {
+            flex: 1 0 30%;
+            margin: 5px;
+            background-color: #fff; // 白色背景
+            border-radius: 8px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            color: #333; // 按钮字体深灰色
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .delete-key {
+            color: #007aff; // 删除按钮颜色蓝色
+            font-size: 14px;
+            // font-weight: bold;
+        }
+
+        .numeric-key:active {
+            background-color: #f0f0f0; // 点击时高亮
+        }
+    }
+}

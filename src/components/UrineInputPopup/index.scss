@@ -1,0 +1,90 @@
+.urine-input-popup {
+    // 移除 position: fixed 相关样式
+    background: #ffffff;
+    width: 100%; // 确保宽度填满父容器
+
+    .popup-header {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px;
+        border-bottom: 1px solid #f0f0f0;
+
+        .popup-title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .close-button {
+            font-size: 16px;
+            color: #666666;
+            background: none;
+            border: none;
+        }
+    }
+
+    .popup-content {
+        padding: 16px;
+
+        .label {
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .time-selector,
+        .input-area {
+            margin-bottom: 16px;
+
+            .time-display {
+                font-size: 16px;
+                color: #333;
+            }
+        }
+
+        .quick-tags {
+            display: flex;
+            justify-content: space-around;
+
+            .tag-button {
+                flex: 1;
+                margin: 0 4px;
+                padding: 8px;
+                font-size: 14px;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                background: #f9f9f9;
+
+                &.selected {
+                    border-color: #007aff;
+                    background: #007aff;
+                    color: #ffffff;
+                }
+            }
+        }
+    }
+
+    .popup-footer {
+        display: flex;
+        justify-content: space-between;
+        padding: 16px;
+
+        .cancel-button,
+        .confirm-button {
+            flex: 1;
+            margin: 0 8px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        .cancel-button {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .confirm-button {
+            background: #007aff;
+            color: #ffffff;
+        }
+    }
+}
