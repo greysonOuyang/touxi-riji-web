@@ -3,7 +3,8 @@
     background-color: #e8eefc;
     padding: 15px;
     border-radius: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 轻微且紧贴元素的阴影 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    /* 轻微且紧贴元素的阴影 */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -12,7 +13,7 @@
     position: relative; // 确保绝对定位是相对于卡片本身
 }
 
-  
+
 .weight-card-add-button {
     position: absolute;
     top: 0;
@@ -51,12 +52,13 @@
     position: relative;
     /* 设置相对定位，便于内部的绝对定位元素参考 */
     transform: translateY(5px);
+
     /* 将整个数值部分下移 */
     .weight-unit {
         font-weight: 600; // 加粗字体
         color: rgba(0, 0, 0, 0.45); // 使用较淡的颜色
         margin-left: 4px;
-      }
+    }
 }
 
 /* 整数部分的样式 */
@@ -118,8 +120,10 @@
 /* 容器样式 */
 .weight-change-container {
     position: relative;
-    left: -10px; /* 向左移动 */
-    top: 4px; /* 向下移动 */
+    left: -10px;
+    /* 向左移动 */
+    top: 4px;
+    /* 向下移动 */
     display: flex;
     flex-direction: column;
     /* 纵向排列子元素 */
@@ -176,14 +180,3 @@
     top: 15px;
     right: 15px;
 }
-
-.weight-error, .weight-empty {
-    padding: 40px 0;
-    text-align: center;
-    color: #999;
-    font-size: 28px;
-  }
-  
-  .weight-error {
-    color: #ff4d4f;
-  }

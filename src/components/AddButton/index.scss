@@ -1,50 +1,49 @@
 .add-button {
-    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: transform 0.1s, box-shadow 0.1s;
-    
-    // 默认样式
-    &:hover {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-  
-    &:active {
-      transform: scale(0.9);
-      box-shadow: none;
-    }
+  background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  // 默认样式
+  &:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
-  
-  .plus-icon {
-    width: 15px;
-    height: 15px;
-    position: relative;
+
+  &.active {
+    transform: scale(0.9); // 被激活时缩小
+    box-shadow: none;
   }
-  
-  .plus-icon::before,
-  .plus-icon::after {
-    content: "";
-    position: absolute;
-    background-color: #ffffff;
-    border-radius: 1px;
-  }
-  
-  .plus-icon::before {
-    width: 100%;
-    height: 1.875px;
-    top: 50%;
-    left: 0;
-    transform: translateY(-50%);
-  }
-  
-  .plus-icon::after {
-    width: 1.875px;
-    height: 100%;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-  }
-  
+}
+
+.plus-icon {
+  width: 15px;
+  height: 15px;
+  position: relative;
+}
+
+.plus-icon::before,
+.plus-icon::after {
+  content: "";
+  position: absolute;
+  background-color: #ffffff;
+  border-radius: 1px;
+}
+
+.plus-icon::before {
+  width: 100%;
+  height: 1.875px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+
+.plus-icon::after {
+  width: 1.875px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+}
