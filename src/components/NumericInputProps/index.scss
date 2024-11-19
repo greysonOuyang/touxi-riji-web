@@ -39,6 +39,7 @@
     }
 
     /* 键盘区域 */
+    /* 键盘区域 */
     .numeric-keyboard {
         display: flex;
         flex-wrap: wrap;
@@ -48,15 +49,16 @@
         .numeric-key {
             flex: 1 0 30%;
             margin: 5px;
-            background-color: #fff; // 白色背景
+            background-color: #ffffff; // 白色背景
             border-radius: 8px;
             height: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 20px;
-            color: #333; // 按钮字体深灰色
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            color: #333333; // 按钮字体深灰色
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); // 更柔和的阴影
+            transition: background-color 0.2s ease, transform 0.1s ease; // 添加过渡效果
         }
 
         .delete-key {
@@ -67,6 +69,7 @@
 
         .numeric-key:active {
             background-color: #f0f0f0; // 点击时高亮
+            transform: scale(0.95); // 点击时缩小效果
         }
     }
 }
