@@ -17,15 +17,19 @@
             align-items: center;
 
             .numeric-value {
-                font-size: 36px; // 数值字体较大
-                color: #333; // 数值颜色深灰
+                font-family: 'Archivo';
+                font-style: normal;
+                font-weight: 700;
+                font-size: 36px;
+                line-height: 62px;
+                color: #92A3FD;
             }
 
             .numeric-underline {
                 position: absolute;
                 bottom: -5px; // 下划线贴紧数值下方
                 height: 2px;
-                background-color: #1890ff; // 蓝色下划线
+                background-color: #95bbfc; // 蓝色下划线
                 transition: width 0.2s ease; // 宽度动态变化时的过渡效果
             }
         }
@@ -33,7 +37,8 @@
         .numeric-unit {
             margin-left: 10px; // 单位与数字分开
             font-size: 16px; // 单位字体较小
-            color: #1890ff; // 单位颜色蓝色
+            color: #95bbfc; // 单位颜色蓝色
+            font-weight: bold;
         }
     }
 
@@ -61,7 +66,7 @@
         }
 
         .delete-key {
-            color: #007aff; // 删除按钮颜色蓝色
+            color: #c28cf0; // 删除按钮颜色蓝色
             font-size: 14px;
             // font-weight: bold;
         }

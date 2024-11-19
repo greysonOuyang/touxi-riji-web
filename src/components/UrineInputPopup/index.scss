@@ -20,7 +20,8 @@
             cursor: pointer;
 
             &.active {
-                background: #007aff;
+                // background: #95bbfc;
+                background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
                 color: #fff;
                 box-shadow: none; // 激活状态不需要阴影
             }
