@@ -1,40 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, Image } from "@tarojs/components";
 import AddButton from "../AddButton";
 import UrineInputPopup from "../UrineInputPopup";
+import { getRecentUrineStats } from "../../api/urineApi";
+import { ApiResponse } from "../../utils/request";
+import Taro from "@tarojs/taro";
 import "./index.scss";
 
-interface UrineVolumeCardProps {
-  data: {
-    updateTime: string;
-    value: number;
-  };
-}
-
-const UrineVolumeCard: React.FC<UrineVolumeCardProps> = ({ data }) => {
-  // 弹窗控制状态
+const UrineVolumeCard: React.FC = () => {
+  const userId = Taro.getStorageSync("userId"); // Get userId from Taro storage
   const [isPopupVisible, setIsPopupVisible] = useState(false);
+  const [data, setData] = useState({
+    value: 0,
+    updateTime: "",
+  });
+  const [loading, setLoading] = useState(true);
 
-  // 添加按钮点击事件，打开弹窗
+  // Fetch the latest urine data
+  const fetchLatestUrineData = async () => {
+    try {
+      const response = await getRecentUrineStats(userId);
+      if (response.isSuccess()) {
+        setData({
+          value: response.data.totalVolume,
+          updateTime: response.data.latestUpdateTime,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching urine data", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch the latest data when the component mounts
+  useEffect(() => {
+    if (userId) {
+      fetchLatestUrineData();
+    } else {
+      Taro.showToast({
+        title: "用户未登录",
+        icon: "none",
+      });
+    }
+  }, [userId]);
+
+  // Handle button click to show the input popup
   const onAddClick = () => {
     setIsPopupVisible(true);
   };
 
-  // 弹窗关闭回调
+  // Close popup callback
   const handlePopupClose = () => {
     setIsPopupVisible(false);
   };
-  const handleAddSuccess = () => {};
 
-  // 弹窗确认回调
-  const handlePopupConfirm = (record: {
-    volume: number;
-    time: string;
-    tag: string;
-  }) => {
-    console.log("尿量记录提交：", record);
-    setIsPopupVisible(false);
-    // TODO: 在这里调用接口提交数据或更新显示
+  // Success callback for when a new urine record is added
+  const handleAddSuccess = () => {
+    // Re-fetch latest urine data after a successful record addition
+    fetchLatestUrineData();
   };
 
   return (
@@ -51,15 +75,19 @@ const UrineVolumeCard: React.FC<UrineVolumeCardProps> = ({ data }) => {
 
       {/* 卡片内容 */}
       <View className="content">
-        <View className="urine-value-container">
-          <Text className="global-value">{data.value}</Text>
-          <Text className="global-unit urine-unit">毫升</Text>
-        </View>
+        {loading ? (
+          <Text>加载中...</Text>
+        ) : (
+          <View className="urine-value-container">
+            <Text className="global-value">{data.value}</Text>
+            <Text className="global-unit urine-unit">毫升</Text>
+          </View>
+        )}
       </View>
 
       {/* 卡片底部 */}
       <View className="footer">
-        <Text className="update-time">{data.updateTime} 更新</Text>
+        <Text className="update-time">{data.updateTime}</Text>
         <Image
           src="../../assets/images/water_bottle.png"
           className="urine-icon"

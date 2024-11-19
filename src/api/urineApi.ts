@@ -11,7 +11,7 @@ export interface UrineRecordVO {
 export interface NewUrineRecord {
   userId: number; // 用户ID
   volume: number; // 尿量（单位：毫升）
-  recordedTime: string; // 记录时间（ISO格式）
+  recordedTime?: string; // 记录时间（ISO格式）
   notes?: string; // 备注（可选）
   tag?: string; // 时间段标签（可选）
 }
