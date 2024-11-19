@@ -1,5 +1,5 @@
 .urine-input-popup {
-    padding: 10px;
+    padding: 0 10px;
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -29,6 +29,6 @@
 
     .input-section {
         margin-top: auto; // 将输入区域固定在底部
-        padding-top: 16px;
+        padding-top: 10px;
     }
 }
