@@ -200,13 +200,14 @@ const BloodPressureInputPage: React.FC = () => {
               <Text className="error-text">{errors.heartRate}</Text>
             )}
           </View>
-
-          <TimeSelector
-            showLabel={false}
-            value={formData.measureDateTime}
-            onChange={handleDateTimeChange}
-            allowFuture={false}
-          />
+          <View className="time-item">
+            <TimeSelector
+              showLabel={false}
+              value={formData.measureDateTime}
+              onChange={handleDateTimeChange}
+              allowFuture={false}
+            />
+          </View>
         </View>
 
         <View className="note-section">

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text } from "@tarojs/components";
 import "./index.scss";
 
@@ -13,13 +13,42 @@ const NumericInput: React.FC<NumericInputProps> = ({
   onChange,
   unit,
 }) => {
+  const [longPressTimeout, setLongPressTimeout] =
+    useState<NodeJS.Timeout | null>(null); // Track long press timeout
+  const [isLongPressing, setIsLongPressing] = useState(false); // Track whether the user is long pressing
+
+  // Handle the long press delete action
+  const handleDeleteLongPress = () => {
+    // Set long press to true and start the timeout
+    setIsLongPressing(true);
+    const timeout = setTimeout(() => {
+      if (isLongPressing) {
+        onChange("0"); // Reset value to 0 after 1 second
+      }
+    }, 1000); // Trigger reset after 1 second
+    setLongPressTimeout(timeout);
+  };
+
+  const handleDeleteEnd = () => {
+    // Clear long press state and timeout
+    setIsLongPressing(false);
+    if (longPressTimeout) {
+      clearTimeout(longPressTimeout);
+      setLongPressTimeout(null); // Clean up timeout
+    }
+  };
+
   const handleInput = (key: string) => {
     if (key === "delete") {
+      // Regular delete: Backspace behavior
       const updatedValue = value.slice(0, -1) || "0";
       onChange(updatedValue);
     } else {
-      const newValue = value === "0" ? key : value + key;
-      onChange(newValue);
+      if (value.length < 5) {
+        // Allow only up to 5 digits
+        const newValue = value === "0" ? key : value + key;
+        onChange(newValue);
+      }
     }
   };
 
@@ -52,7 +81,9 @@ const NumericInput: React.FC<NumericInputProps> = ({
         ))}
         <View
           className="numeric-key delete-key"
-          onClick={() => handleInput("delete")}
+          onTouchStart={handleDeleteLongPress} // Start long press
+          onTouchEnd={handleDeleteEnd} // End long press
+          onClick={() => handleInput("delete")} // Regular delete action
         >
           删除
         </View>
