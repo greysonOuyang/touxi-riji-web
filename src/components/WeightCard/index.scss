@@ -1,9 +1,13 @@
 .weight-card {
-    margin-top: 15px;
-    background-color: #e8eefc;
-    padding: 15px;
+
+    background-color: #fff;
     border-radius: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+    // background-color: #e8eefc;
+    padding: 15px;
+    // border-radius: 16px;
+    // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     /* 轻微且紧贴元素的阴影 */
     display: flex;
     justify-content: space-between;
