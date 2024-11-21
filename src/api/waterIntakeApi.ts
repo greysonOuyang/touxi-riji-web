@@ -24,6 +24,7 @@ export interface WaterIntakeVO {
  * 喝水接口响应类型
  */
 export interface WaterIntakeResponse {
+  [x: string]: any;
   waterIntakeRecords: WaterIntakeVO[]; // 喝水记录列表
   maxAmount: number; // 今日最大喝水量
   totalAmount: number; // 今日总喝水量
