@@ -1,6 +1,5 @@
 .water-input-popup {
-    background-color: #fff; // Background color for the popup
-    // border-radius: 8px; // Rounded corners
+    background-color: #fff;
 
     .time-container {
         padding: 20px 15px;
@@ -30,66 +29,88 @@
     .tags-container {
         display: flex;
         flex-wrap: wrap;
-        // margin-bottom: 20px;
-        padding: 20px 15px;
+        padding: 12px 16px;
+        gap: 8px; // 标签间距适当调整为8px
+        justify-content: flex-start; // 从左开始排列
 
         .volume-tag {
-            padding: 0px 12px;
-            background-color: #007AFF;
+            background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
             color: white;
             border-radius: 20px;
-            margin: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 36px; // Ensures consistent height
+            height: 32px; // 调整高度以适应更大数字
+            font-size: 14px; // 字体稍微增大
+            padding: 4px 10px; // 左右留白稍小，适应4位数字
+            flex: 0 0 calc((100% - 24px) / 4); // 每行显示4个，减去3个间距
+            box-shadow: 0 2px 4px rgba(146, 163, 253, 0.2);
+            white-space: nowrap; // 防止文字换行
+            box-sizing: border-box;
+
+            &:active {
+                transform: scale(0.95);
+            }
         }
 
         .editing-tag-container {
-            display: flex;
-            align-items: center;
+            flex: 0 0 calc((100% - 24px) / 4); // 保持与其他标签相同宽度
+            height: 32px; // 与标签一致高度
 
             .editing-tag {
                 display: flex;
                 align-items: center;
-                background-color: rgba(0, 122, 255, 0.1);
+                background: rgba(146, 163, 253, 0.1);
                 border-radius: 20px;
-                padding: 4px 8px; // Smaller padding for a smaller tag
-                height: 36px; // Match height with other tags
+                // padding: 0 4px;
+                height: 100%;
+                width: 100%;
+                box-sizing: border-box;
 
                 .tag-input {
                     border: none;
                     background: transparent;
-                    color: #007AFF;
-                    font-size: 14px;
+                    color: #92a3fd;
+                    font-size: 14px; // 与其他标签一致字体大小
                     outline: none;
-                    width: 50px; // Adjust width for a smaller input
-                    text-align: center; // Center the value
+                    width: calc(100% - 34px); // 减去取消按钮的宽度
+                    text-align: center;
+                    padding: 0;
+                    margin: 0;
+
+
                 }
 
                 .tag-input-cancel {
                     color: #FF3B30;
-                    margin-left: 8px;
-                    cursor: pointer;
+                    font-size: 14px;
+                    padding-left: 2px;
+                    min-width: 28px; // 固定取消按钮宽度
+                    text-align: center;
                 }
             }
         }
 
         .add-tag-button {
-            padding: 6px 12px;
-            background-color: #007AFF;
+            background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
             border-radius: 20px;
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            height: 36px; // Ensure consistent height
+            height: 32px;
+            flex: 0 0 calc((100% - 24px) / 4); // 与其他标签保持相同宽度
+            box-shadow: 0 2px 4px rgba(146, 163, 253, 0.2);
+            padding: 0;
+
+            &:active {
+                transform: scale(0.95);
+            }
         }
     }
 
     .input-section {
-        margin-top: 20px; // Space above the numeric input
+        margin-top: 20px;
     }
 }

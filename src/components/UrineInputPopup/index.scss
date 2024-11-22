@@ -12,7 +12,7 @@
 
         .period-tag {
             flex: 1 1 calc(33.33% - 12px); // 每行放置3个标签，自动换行
-            padding: 4px 8px; // 调整内边距以适应更大的文字
+            padding: 4px 4px; // 调整内边距以适应更大的文字
             text-align: center;
             background: #f5f5f5;
             border-radius: 12px; // 保持圆角

@@ -46,7 +46,7 @@ export const saveWaterTags = async (
     userId,
     feature: "water_card",
     configKey: "tags",
-    value: tags, // 将数组转换为 JSON 字符串
+    value: tags,
   };
   return saveUserSetting(data);
 };

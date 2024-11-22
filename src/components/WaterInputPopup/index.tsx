@@ -16,6 +16,7 @@ interface WaterInputPopupProps {
 }
 
 const DEFAULT_VOLUME_TAGS = [100, 200, 300, 500];
+const MAX_TAG_COUNT = 8; // Maximum number of tags allowed
 
 const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
   isOpened,
@@ -41,20 +42,15 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
     const userId = Taro.getStorageSync("userId");
     try {
       const response = await fetchWaterTags(userId);
-      if (response?.isSuccess) {
-        const tags = response.data || [];
-        setUserTags(tags);
-        if (tags.length === 0) {
-          await saveWaterTags(userId, DEFAULT_VOLUME_TAGS.map(String));
-        }
+      if (response?.isSuccess && response.data?.length) {
+        setUserTags(response.data);
+      } else {
+        setUserTags(DEFAULT_VOLUME_TAGS.map(String)); // 使用默认标签
       }
     } catch (error) {
       console.error("加载标签失败", error);
+      setUserTags(DEFAULT_VOLUME_TAGS.map(String)); // 使用默认标签
     }
-  };
-
-  const getDisplayTags = () => {
-    return userTags.length > 0 ? userTags : DEFAULT_VOLUME_TAGS.map(String);
   };
 
   const handleVolumeTagClick = (volume: string) => {
@@ -70,7 +66,7 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
           const newTags = userTags.filter((t) => t !== tag);
           setUserTags(newTags);
           const userId = Taro.getStorageSync("userId");
-          await saveWaterTags(userId, newTags.join(",")); // Save updated tags
+          await saveWaterTags(userId, newTags.join(","));
           Taro.showToast({ title: "删除成功", icon: "success" });
         }
       },
@@ -83,18 +79,14 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
   };
 
   const handleTagInputChange = (e) => {
-    // Automatically trim leading zeros
-    const inputValue = e.target.value.replace(/^0+/, "");
+    const inputValue = e.target.value.replace(/^0+/, "").slice(0, 4);
     setNewTagValue(inputValue);
   };
 
   const handleTagInputConfirm = async () => {
     const numericTag = parseInt(newTagValue, 10);
     if (!numericTag || isNaN(numericTag)) {
-      Taro.showToast({
-        title: "请输入有效的整数",
-        icon: "none",
-      });
+      Taro.showToast({ title: "请输入有效的整数", icon: "none" });
       return;
     }
 
@@ -103,15 +95,20 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
       return;
     }
 
-    // Add the new tag without sorting
+    if (userTags.length >= MAX_TAG_COUNT) {
+      Taro.showToast({ title: "标签已达到最大数量", icon: "none" });
+      setIsEditingNewTag(false);
+      return;
+    }
+
     const updatedTags = [...userTags, numericTag.toString()];
     setUserTags(updatedTags);
 
     const userId = Taro.getStorageSync("userId");
     try {
       await saveWaterTags(userId, updatedTags.join(","));
-      setIsEditingNewTag(false);
       Taro.showToast({ title: "添加成功", icon: "success" });
+      setIsEditingNewTag(false);
     } catch (error) {
       Taro.showToast({ title: "添加失败", icon: "error" });
     }
@@ -119,7 +116,7 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
 
   const handleCancelNewTag = () => {
     setIsEditingNewTag(false);
-    setNewTagValue("0"); // Reset to default
+    setNewTagValue("0");
   };
 
   const handleConfirm = async () => {
@@ -138,31 +135,21 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
       const intakeTime = `${currentDate} ${selectedTime}:00`;
       const userId = Taro.getStorageSync("userId");
 
-      // Include default tags in the request
-      const allTags = [...DEFAULT_VOLUME_TAGS.map(String), ...userTags];
-
       const requestData = {
         userId,
         amount: numericValue,
         intakeTime,
-        tags: allTags.join(","), // Send all tags as a comma-separated string
       };
 
       await addWaterIntakeRecord(requestData);
 
-      Taro.showToast({
-        title: "添加成功",
-        icon: "success",
-      });
+      Taro.showToast({ title: "添加成功", icon: "success" });
       setLoading(false);
       onSuccess();
       onClose();
     } catch (error) {
       console.error("添加喝水记录失败", error);
-      Taro.showToast({
-        title: "添加失败",
-        icon: "error",
-      });
+      Taro.showToast({ title: "添加失败", icon: "error" });
       setLoading(false);
     }
   };
@@ -175,7 +162,7 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
     <CustomPopup
       isOpened={isOpened}
       onClose={() => {
-        handleCancelNewTag(); // Reset on close
+        handleCancelNewTag();
         onClose();
       }}
       onConfirm={handleConfirm}
@@ -195,14 +182,14 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
         </View>
 
         <View className="tags-container">
-          {getDisplayTags().map((volume) => (
+          {userTags.map((volume) => (
             <View
               key={volume}
               className="volume-tag"
               onClick={() => handleVolumeTagClick(volume)}
               onLongPress={() => handleLongPressTag(volume)}
             >
-              {volume}ml
+              {volume} ml
             </View>
           ))}
 
@@ -215,7 +202,6 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
                   value={newTagValue}
                   onChange={handleTagInputChange}
                   onBlur={handleTagInputConfirm}
-                  placeholder="输入数值"
                 />
                 <View className="tag-input-cancel" onClick={handleCancelNewTag}>
                   取消
@@ -224,7 +210,7 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
             </View>
           )}
 
-          {!isEditingNewTag && (
+          {!isEditingNewTag && userTags.length < MAX_TAG_COUNT && (
             <View className="add-tag-button" onClick={handleAddCustomTag}>
               ＋
             </View>
