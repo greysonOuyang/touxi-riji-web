@@ -112,12 +112,12 @@ const BloodPressureInputPage: React.FC = () => {
       Taro.hideLoading();
       clearTempFormData(FORM_TYPES.BLOOD_PRESSURE);
 
-      await Taro.showToast({
-        title: "添加成功",
-        icon: "success",
-        mask: true,
-        duration: 1000,
-      });
+      // await Taro.showToast({
+      //   title: "添加成功",
+      //   icon: "success",
+      //   mask: true,
+      //   duration: 1000,
+      // });
 
       setTimeout(() => {
         Taro.reLaunch({
