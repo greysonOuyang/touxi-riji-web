@@ -107,7 +107,6 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
     const userId = Taro.getStorageSync("userId");
     try {
       await saveWaterTags(userId, updatedTags.join(","));
-      Taro.showToast({ title: "添加成功", icon: "success" });
       setIsEditingNewTag(false);
     } catch (error) {
       Taro.showToast({ title: "添加失败", icon: "error" });
@@ -142,8 +141,6 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
       };
 
       await addWaterIntakeRecord(requestData);
-
-      Taro.showToast({ title: "添加成功", icon: "success" });
       setLoading(false);
       onSuccess();
       onClose();

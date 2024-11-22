@@ -3,7 +3,6 @@ import { View, Text, Image } from "@tarojs/components";
 import AddButton from "../AddButton";
 import UrineInputPopup from "../UrineInputPopup";
 import { getRecentUrineStats } from "../../api/urineApi";
-import { ApiResponse } from "../../utils/request";
 import Taro from "@tarojs/taro";
 import "./index.scss";
 
@@ -32,14 +31,7 @@ const UrineVolumeCard: React.FC = () => {
 
   // Fetch the latest data when the component mounts
   useEffect(() => {
-    if (userId) {
-      fetchLatestUrineData();
-    } else {
-      Taro.showToast({
-        title: "用户未登录",
-        icon: "none",
-      });
-    }
+    fetchLatestUrineData();
   }, [userId]);
 
   // Handle button click to show the input popup
@@ -56,6 +48,13 @@ const UrineVolumeCard: React.FC = () => {
   const handleAddSuccess = () => {
     // Re-fetch latest urine data after a successful record addition
     fetchLatestUrineData();
+
+    // Show simple text reminder using Taro.showToast
+    Taro.showToast({
+      title: "添加成功",
+      icon: "none",
+      duration: 2000, // The toast will be visible for 2 seconds
+    });
   };
 
   return (
@@ -72,7 +71,6 @@ const UrineVolumeCard: React.FC = () => {
 
       {/* 卡片内容 */}
       <View className="content">
-        {/* 直接显示数据或空白 */}
         {data.value ? (
           <View className="urine-value-container">
             <Text className="global-value">{data.value}</Text>

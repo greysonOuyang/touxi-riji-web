@@ -93,7 +93,7 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
 
       Taro.showToast({
         title: "添加成功",
-        icon: "success",
+        icon: "none",
       });
 
       setLoading(false);
