@@ -14,7 +14,6 @@ const UrineVolumeCard: React.FC = () => {
     value: 0,
     updateTime: "",
   });
-  const [loading, setLoading] = useState(true);
 
   // Fetch the latest urine data
   const fetchLatestUrineData = async () => {
@@ -28,8 +27,6 @@ const UrineVolumeCard: React.FC = () => {
       }
     } catch (error) {
       console.error("Error fetching urine data", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -75,14 +72,13 @@ const UrineVolumeCard: React.FC = () => {
 
       {/* 卡片内容 */}
       <View className="content">
-        {loading ? (
-          <Text>加载中...</Text>
-        ) : (
+        {/* 直接显示数据或空白 */}
+        {data.value ? (
           <View className="urine-value-container">
             <Text className="global-value">{data.value}</Text>
             <Text className="global-unit urine-unit">毫升</Text>
           </View>
-        )}
+        ) : null}
       </View>
 
       {/* 卡片底部 */}
