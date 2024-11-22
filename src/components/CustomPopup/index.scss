@@ -7,18 +7,17 @@
     left: 0;
     background-color: rgba(0, 0, 0, 0.6);
     z-index: 1000;
-    display: flex; // 改为flex布局
-    align-items: flex-end; // 底部对齐
+    display: flex;
+    align-items: flex-end;
   }
 
   &-content {
-    position: relative; // 改为relative
+    position: relative;
     width: 100%;
-    max-height: 90vh; // 设置最大高度
+    max-height: 90vh;
     background-color: #fff;
     border-radius: 16px 16px 0 0;
     overflow: hidden;
-    animation: slideUp 0.3s ease-out;
     display: flex;
     flex-direction: column;
   }
@@ -30,47 +29,44 @@
     font-size: 16px;
     color: #333;
     margin-bottom: 8px;
-    flex-shrink: 0; // 防止标题压缩
+    flex-shrink: 0;
   }
 
   &-body {
-    // padding: 0 16px 16px;
     overflow-y: auto;
-    flex: 1; // 自适应剩余空间
-    -webkit-overflow-scrolling: touch; // 增加弹性滚动
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
   }
 
   &-btn {
     position: absolute;
-    top: 12px;
-    padding: 6px 12px;
-    font-size: 14px;
+    top: 8px;
+    /* Reduced the top margin */
+    padding: 12px 24px;
+    font-size: 16px;
     border-radius: 4px;
+    text-align: center;
+    line-height: 20px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    /* Added smooth transition for scale and background color */
 
     &:active {
-      opacity: 0.8;
-      transform: scale(0.98);
-      transition: all 0.2s;
+      transform: scale(0.95);
+      /* Slight scale effect on click */
+      background-color: rgba(24, 144, 255, 0.1);
+      /* Light background change for visual feedback */
     }
   }
 
   &-cancel {
-    left: 16px;
+    left: 8px;
+    /* Reduced the left margin */
     color: #666;
   }
 
   &-confirm {
-    right: 16px;
+    right: 8px;
+    /* Reduced the right margin */
     color: #1890ff;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-
-  to {
-    transform: translateY(0);
   }
 }

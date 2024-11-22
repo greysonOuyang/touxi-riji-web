@@ -95,7 +95,7 @@ const WaterIntakeCard: React.FC = () => {
           ))}
         </View>
         <View className="drink-button" onClick={() => setIsPopupOpened(true)}>
-          喝水
+          喝一口
         </View>
       </View>
 

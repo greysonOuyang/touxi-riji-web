@@ -2,130 +2,149 @@
   background-color: #fff;
   padding: 20px;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* 轻微且紧贴元素的阴影 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  /* 轻微且紧贴元素的阴影 */
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   position: relative;
-  min-height: 0; /* 允许卡片根据父级容器自动调整高度 */
-  height: 100%; /* 左侧喝水卡片的高度为父容器的高度 */
+  min-height: 0;
+  /* 允许卡片根据父级容器自动调整高度 */
+  height: 100%;
+  /* 左侧喝水卡片的高度为父容器的高度 */
   display: flex;
-  flex-direction: column; /* 如果卡片内的布局垂直排列 */
+  flex-direction: column;
+  /* 如果卡片内的布局垂直排列 */
 }
 
-  
+
 .water-progress-container {
-  width: 20px; /* 缩小进度条宽度 */
+  width: 20px;
+  /* 缩小进度条宽度 */
   position: absolute;
-  left: 15px; /* 减少与左侧的距离 */
-  top: 15px; /* 减少顶部的距离 */
-  bottom: 15px; /* 减少底部的距离 */
+  left: 15px;
+  /* 减少与左侧的距离 */
+  top: 15px;
+  /* 减少顶部的距离 */
+  bottom: 15px;
+  /* 减少底部的距离 */
   background-color: #f0f0f0;
   border-radius: 30px;
   overflow: hidden;
 }
 
-  
-  .water-progress {
-    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    border-radius: 30px;
-  }
-  
-  .water-info-container {
-    top:20px;
-    display: flex;
-    flex-direction: column;
-    margin-left: 40px;
-    flex-grow: 1;
-  }
-  
-  .water-header {
-    text-align: center;
-    margin-bottom: 5px; /* 微调顶部间距 */
-  }
-  
-  .water-title {
-    font-family: 'Poppins';
-    font-weight: 600;
-    font-size: 14px;
-    color: #1D242A;
-    display: block;
-  }
-  
-  .water-tip {
-    font-family: 'Poppins';
-    font-weight: 600;
-    font-size: 12px;
-    color: #ADA4A5;
-    // white-space: nowrap; /* 禁止换行 */
-    overflow: hidden;
-    // text-overflow: ellipsis; /* 超出部分以省略号展示 */
-    display: block;
-  }
-  
-  .water-records {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  .water-record {
-    position: relative;
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 5px; /* 缩短记录之间的间距 */
-  }
-  
-  .water-record::after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 10px;
-    bottom: -100%;
-    width: 1px;
-    background: repeating-linear-gradient(to bottom, #ccc, #ccc 3px, transparent 3px, transparent 6px); /* 缩短虚线和间距 */
-  }
-  
-  .water-record-dot {
-    width: 8px; /* 缩小 dot 大小 */
-    height: 8px;
-    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
-    border-radius: 50%;
-  }
-  
-  .water-record-info {
-    margin-left: 10px;
-  }
-  
-  .water-record-time {
-    font-size: 12px;
-    color: #999;
-  }
-  
-  .water-record-amount {
-    font-size: 14px;
-    color: #92A3FD;
-  }
-  
-  .water-record:last-child::after {
-    display: none;
-  }
-  
-  .drink-button {
-    color: #fff;
-    font-size: 12px;
-    width: 70px;
-    height: 20px;
-    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
-    border-radius: 50px;
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 10px;
-  }
-  
+
+.water-progress {
+  background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  border-radius: 30px;
+}
+
+.water-info-container {
+  top: 20px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 40px;
+  flex-grow: 1;
+}
+
+.water-header {
+  text-align: center;
+  margin-bottom: 5px;
+  /* 微调顶部间距 */
+}
+
+.water-title {
+  font-family: 'Poppins';
+  font-weight: 600;
+  font-size: 14px;
+  color: #1D242A;
+  display: block;
+}
+
+.water-tip {
+  font-family: 'Poppins';
+  font-weight: 600;
+  font-size: 12px;
+  color: #ADA4A5;
+  // white-space: nowrap; /* 禁止换行 */
+  overflow: hidden;
+  // text-overflow: ellipsis; /* 超出部分以省略号展示 */
+  display: block;
+}
+
+.water-records {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.water-record {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 5px;
+  /* 缩短记录之间的间距 */
+}
+
+.water-record::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 10px;
+  bottom: -100%;
+  width: 1px;
+  background: repeating-linear-gradient(to bottom, #ccc, #ccc 3px, transparent 3px, transparent 6px);
+  /* 缩短虚线和间距 */
+}
+
+.water-record-dot {
+  width: 8px;
+  /* 缩小 dot 大小 */
+  height: 8px;
+  background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+  border-radius: 50%;
+}
+
+.water-record-info {
+  margin-left: 10px;
+}
+
+.water-record-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.water-record-amount {
+  font-size: 14px;
+  color: #92A3FD;
+}
+
+.water-record:last-child::after {
+  display: none;
+}
+
+.drink-button {
+  color: #fff;
+  font-size: 12px;
+  width: 70px;
+  height: 20px;
+  background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+  border-radius: 50px;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.drink-button:active {
+  transform: scale(0.95);
+  /* Scale down on click */
+  background-color: #7a96e5;
+  /* Optional: Change the color when clicked */
+}
