@@ -1,0 +1,91 @@
+.plan-form {
+    padding: 16px;
+
+    .step-one {
+        .form-group {
+            margin-bottom: 20px;
+
+            .label {
+                font-size: 16px;
+                margin-bottom: 8px;
+                color: #666;
+            }
+
+            .slider-container {
+                display: flex;
+                align-items: center;
+
+                .slider-value {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin-right: 10px;
+                }
+
+                .frequency-slider {
+                    flex: 1;
+                    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+                    height: 8px;
+                    border-radius: 4px;
+                }
+            }
+        }
+    }
+
+    .step-two {
+        .at-accordion__title {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .tab-content {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 10px;
+
+            .form-group {
+                margin-bottom: 20px;
+
+                .label {
+                    font-size: 14px;
+                    margin-bottom: 8px;
+                }
+
+                .picker {
+                    padding: 8px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    background-color: #f9f9f9;
+                }
+
+                input {
+                    padding: 8px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 6px;
+                    background-color: #f9f9f9;
+                }
+            }
+        }
+    }
+
+    .button-container {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+
+        .next-button,
+        .submit-button {
+            width: 80%;
+            padding: 12px 16px;
+            border-radius: 25px;
+            font-size: 16px;
+            text-align: center;
+            background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+            color: #fff;
+            cursor: pointer;
+        }
+    }
+}

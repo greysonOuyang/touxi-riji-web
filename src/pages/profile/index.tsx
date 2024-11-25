@@ -1,86 +1,121 @@
 import React, { useEffect, useState } from "react";
-import { Text, Image } from "@tarojs/components"; // Taro Text 和 Image 组件
-import Taro from "@tarojs/taro"; // 导入 Taro，用于获取缓存
-import { getUserProfile, UserProfileVO } from "../../api/profile"; // 导入 API 调用和 UserProfileVO 类型
+import { View, Text, Image, Button } from "@tarojs/components";
+import { getUserProfile } from "../../api/profile";
+import { getCurrentPdPlan } from "../../api/pdPlanApi"; // 导入获取腹透方案的API
+import Taro from "@tarojs/taro";
+import "./index.scss";
+
+const DEFAULT_AVATAR = "../../assets/images/face.png";
+const ICON_PROFILE = "../../assets/icons/icon-profile.png";
+const RIGHT_ARROW = "../../assets/icons/right_arrow.png";
 
 const Profile = () => {
-  const [userProfile, setUserProfile] = useState<UserProfileVO | null>(null); // 存储从API获取的用户信息
-  const [stats, setStats] = useState({
-    height: 0, // 身高
-    weight: 0, // 体重
-    age: 0, // 年龄
+  const [profile, setProfile] = useState({
+    username: "",
+    avatarUrl: DEFAULT_AVATAR,
+    name: "",
+    height: 0,
+    weight: 0,
+    age: 0,
   });
 
-  // 默认头像路径
-  const defaultAvatar = "../../assets/images/heart-rate-chart.png";
-
-  // 从缓存获取 userId
-  const userId = Taro.getStorageSync("userId");
-
   useEffect(() => {
-    // 确保 userId 存在
-    if (!userId) {
-      console.error("用户未登录，无法获取用户信息");
-      return;
-    }
-
-    // 调用 API 获取用户信息
-    getUserProfile(userId)
-      .then((response) => {
-        if (response.code === 200) {
-          const profileData = response.data;
-          setUserProfile(profileData);
-
-          // 设置身高、体重、年龄等状态数据
-          setStats({
-            height: profileData.height || 0, // 默认值为 0
-            weight: profileData.weight || 0, // 默认值为 0
-            age: profileData.age || 0, // 默认值为 0
+    const userId = Taro.getStorageSync("userId");
+    if (userId) {
+      getUserProfile(userId).then((response) => {
+        if (response.data) {
+          setProfile({
+            ...response.data,
+            avatarUrl: response.data.avatarUrl || DEFAULT_AVATAR,
           });
         }
-      })
-      .catch((error) => {
-        console.error("获取用户信息失败:", error);
       });
-  }, [userId]);
+    }
+  }, []);
 
-  // 渲染组件
+  const handlePdPlanClick = async () => {
+    const userId = Taro.getStorageSync("userId");
+    if (userId) {
+      try {
+        const response = await getCurrentPdPlan(userId);
+        if (response.code === 200) {
+          if (response.data === null) {
+            // 没有腹透方案，提示用户
+            Taro.showModal({
+              title: "提示",
+              content: "暂无腹透方案，是否前往添加？",
+              success: (res) => {
+                if (res.confirm) {
+                  // 用户点击确定，跳转到添加方案页面
+                  Taro.navigateTo({ url: "/pages/pdPlan/create/index" });
+                }
+              },
+            });
+          } else {
+            // 已存在腹透方案，跳转到方案列表页面
+            Taro.navigateTo({ url: "/pages/pdPlan/index" });
+          }
+        } else {
+          console.error(response.message);
+        }
+      } catch (error) {
+        console.error("获取腹透方案失败", error);
+        Taro.showToast({ title: "获取方案失败，请重试", icon: "none" });
+      }
+    }
+  };
+
   return (
-    <div className="profile">
-      {userProfile && (
-        <>
-          {/* 头像，若没有则使用默认头像 */}
-          <Image
-            className="avatar"
-            src={userProfile.avatarUrl || defaultAvatar}
-          />
+    <View className="profile-container">
+      {/* 个人信息 */}
+      <View className="profile-header">
+        <Image className="profile-avatar" src={profile.avatarUrl} />
+        <View className="profile-info">
+          <Text className="profile-username">{profile.username}</Text>
+          {profile.name && <Text className="profile-name">{profile.name}</Text>}
+        </View>
+        <Button className="edit-button">编辑</Button>
+      </View>
 
-          {/* 用户名 */}
-          <Text className="name">{userProfile.username || "未知用户"}</Text>
+      {/* 数据卡片 */}
+      <View className="profile-stats">
+        <View className="profile-stat-card">
+          <Text className="stat-value">{profile.height || 0}cm</Text>
+          <Text className="stat-label">身高</Text>
+        </View>
+        <View className="profile-stat-card">
+          <Text className="stat-value">{profile.weight || 0}kg</Text>
+          <Text className="stat-label">体重</Text>
+        </View>
+        <View className="profile-stat-card">
+          <Text className="stat-value">{profile.age || 0}岁</Text>
+          <Text className="stat-label">年龄</Text>
+        </View>
+      </View>
 
-          {/* 如果姓名不为空，展示姓名标签 */}
-          {userProfile.name && (
-            <Text className="program">{userProfile.name}</Text>
-          )}
+      {/* 个人设置 */}
+      <View className="profile-settings">
+        <Text className="settings-title">个人设置</Text>
+        <View className="settings-item" onClick={handlePdPlanClick}>
+          <View className="item-label">
+            <Image className="item-icon" src={ICON_PROFILE} />
+            <Text>腹透方案</Text>
+          </View>
+          <Image className="arrow" src={RIGHT_ARROW} />
+        </View>
+      </View>
 
-          {/* 用户的状态信息，身高、体重和年龄 */}
-          <div className="stats">
-            <div className="stat">
-              <Text className="stat-label">身高</Text>
-              <Text className="stat-value">{stats.height || 0} cm</Text>
-            </div>
-            <div className="stat">
-              <Text className="stat-label">体重</Text>
-              <Text className="stat-value">{stats.weight || 0} kg</Text>
-            </div>
-            <div className="stat">
-              <Text className="stat-label">年龄</Text>
-              <Text className="stat-value">{stats.age || 0} 岁</Text>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
+      <View className="profile-settings">
+        <Text className="settings-title">其他</Text>
+        <View className="settings-item" onClick={handlePdPlanClick}>
+          <View className="item-label">
+            <Image className="item-icon" src={ICON_PROFILE} />
+            <Text>意见反馈</Text>
+          </View>
+          <Image className="arrow" src={RIGHT_ARROW} />
+        </View>
+      </View>
+    </View>
   );
 };
 
