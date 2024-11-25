@@ -1,7 +1,8 @@
 .plan-form {
     padding: 16px;
 
-    .step-one {
+    .step-one,
+    .step-two {
         .form-group {
             margin-bottom: 20px;
 
@@ -10,75 +11,93 @@
                 margin-bottom: 8px;
                 color: #666;
             }
+        }
+    }
 
-            .slider-container {
-                display: flex;
-                align-items: center;
+    .capsule-container {
+        display: flex;
+        justify-content: space-between;
+        background-color: #f0f0f0;
+        border-radius: 25px;
+        overflow: hidden;
+        height: 40px;
 
-                .slider-value {
-                    font-size: 16px;
-                    font-weight: bold;
-                    margin-right: 10px;
-                }
+        .capsule-segment {
+            flex: 1;
+            text-align: center;
+            line-height: 40px;
+            font-size: 14px;
+            background-color: #e0e0e0;
+            color: #666;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
 
-                .frequency-slider {
-                    flex: 1;
-                    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
-                    height: 8px;
-                    border-radius: 4px;
-                }
+            &:first-child {
+                border-top-left-radius: 25px;
+                border-bottom-left-radius: 25px;
+            }
+
+            &:last-child {
+                border-top-right-radius: 25px;
+                border-bottom-right-radius: 25px;
+            }
+
+            &.active {
+                background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+                color: #fff;
+                font-weight: bold;
+            }
+
+            &:not(:last-child) {
+                border-right: 1px solid #f0f0f0;
             }
         }
     }
 
-    .step-two {
-        .at-accordion__title {
-            font-size: 16px;
-            font-weight: bold;
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
+    .tabs {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        gap: 10px;
+        margin-bottom: 10px;
 
-        .tab-content {
-            background: #fff;
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 10px;
+        .tab {
+            padding: 10px;
+            font-size: 14px;
+            text-align: center;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
 
-            .form-group {
-                margin-bottom: 20px;
-
-                .label {
-                    font-size: 14px;
-                    margin-bottom: 8px;
-                }
-
-                .picker {
-                    padding: 8px 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background-color: #f9f9f9;
-                }
-
-                input {
-                    padding: 8px 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 6px;
-                    background-color: #f9f9f9;
-                }
+            &.active-tab {
+                color: #000;
+                font-weight: bold;
+                border-bottom: 2px solid #92a3fd;
             }
+        }
+    }
+
+    .tab-content {
+        background: #fff;
+        border-radius: 8px;
+        padding: 16px;
+
+        .picker {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            cursor: pointer;
         }
     }
 
     .button-container {
         margin-top: 20px;
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
 
-        .next-button,
+        .back-button,
         .submit-button {
-            width: 80%;
+            width: 48%;
             padding: 12px 16px;
             border-radius: 25px;
             font-size: 16px;

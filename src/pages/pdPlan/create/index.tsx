@@ -1,42 +1,43 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, Picker, Input, Slider } from "@tarojs/components";
-import { AtAccordion } from "taro-ui";
-import TimeSelector from "@/components/TimeSelector"; // 用户自定义时间选择组件
+import React, { useState } from "react";
+import { View, Text, Picker, Input } from "@tarojs/components";
+import TimeSelector from "@/components/TimeSelector"; // 自定义时间组件
 import "./index.scss";
 
 interface Schedule {
   timeSlot: string;
   concentration: string;
   volume: number;
-  dwellTime: number;
 }
 
 const PlanForm: React.FC = () => {
   const [step, setStep] = useState(0); // 当前步骤：0=基础信息，1=填写计划
   const [dailyFrequency, setDailyFrequency] = useState<number>(4); // 默认4次
-  const [startDate, setStartDate] = useState<string>(""); // 开始日期
-  const [schedules, setSchedules] = useState<Schedule[]>([]); // 透析计划
-  const [openTab, setOpenTab] = useState<number>(0); // 当前展开的Tab索引
-
-  // 初始化透析计划
-  useEffect(() => {
-    const defaultSchedule: Schedule = {
+  const [startDate, setStartDate] = useState<string>(""); // 默认无值
+  const [schedules, setSchedules] = useState<Schedule[]>(
+    Array(4).fill({
       timeSlot: "",
       concentration: "1.5%",
       volume: 2000,
-      dwellTime: 240,
-    };
-    setSchedules(Array(dailyFrequency).fill(defaultSchedule));
-  }, [dailyFrequency]);
+    })
+  );
+  const [currentTab, setCurrentTab] = useState(0); // 当前Tab索引
+
+  // 更新透析次数后动态调整Tab数量
+  const updateFrequency = (frequency: number) => {
+    setDailyFrequency(frequency);
+    setSchedules(
+      Array(frequency).fill({
+        timeSlot: "",
+        concentration: "1.5%",
+        volume: 2000,
+      })
+    );
+  };
 
   // 更新单次透析计划
-  const handleScheduleChange = (
-    index: number,
-    field: keyof Schedule,
-    value: any
-  ) => {
+  const handleScheduleChange = (index: number, updatedSchedule: Schedule) => {
     const newSchedules = [...schedules];
-    newSchedules[index] = { ...newSchedules[index], [field]: value };
+    newSchedules[index] = updatedSchedule;
     setSchedules(newSchedules);
   };
 
@@ -50,6 +51,7 @@ const PlanForm: React.FC = () => {
       {step === 0 ? (
         // 第一步：填写基础信息
         <View className="step-one">
+          {/* 开始日期 */}
           <View className="form-group">
             <TimeSelector
               label="开始日期"
@@ -59,29 +61,30 @@ const PlanForm: React.FC = () => {
               allowFuture={false}
             />
           </View>
+
+          {/* 每日透析次数 */}
           <View className="form-group">
-            <Text className="label">每日透析次数: {dailyFrequency}</Text>
-            <View className="slider-container">
-              <View className="slider-value">{dailyFrequency}</View>
-              <Slider
-                step={1}
-                min={1}
-                max={6}
-                value={dailyFrequency}
-                onChange={(e) => setDailyFrequency(e.detail.value as number)}
-                className="frequency-slider"
-              />
+            <Text className="label">每日透析次数:</Text>
+            <View className="capsule-container">
+              {Array(6)
+                .fill(0)
+                .map((_, index) => (
+                  <View
+                    key={index}
+                    className={`capsule-segment ${
+                      dailyFrequency === index + 1 ? "active" : ""
+                    }`}
+                    onClick={() => updateFrequency(index + 1)}
+                  >
+                    {index + 1}
+                  </View>
+                ))}
             </View>
           </View>
+
+          {/* 下一步按钮 */}
           <View className="button-container">
-            <View
-              className="next-button"
-              onClick={() => setStep(1)}
-              style={{
-                opacity: startDate ? 1 : 0.5,
-                pointerEvents: startDate ? "auto" : "none",
-              }}
-            >
+            <View className="next-button" onClick={() => setStep(1)}>
               下一步
             </View>
           </View>
@@ -89,100 +92,85 @@ const PlanForm: React.FC = () => {
       ) : (
         // 第二步：填写透析计划
         <View className="step-two">
-          {Array(dailyFrequency)
-            .fill(0)
-            .map((_, index) => (
-              <AtAccordion
-                key={index}
-                open={openTab === index}
-                title={`第 ${index + 1} 次透析`}
-                onClick={() => setOpenTab(openTab === index ? -1 : index)}
+          {/* Tab 切换 */}
+          <View className="tabs">
+            {Array(dailyFrequency)
+              .fill(0)
+              .map((_, index) => (
+                <View
+                  key={index}
+                  className={`tab ${currentTab === index ? "active-tab" : ""}`}
+                  onClick={() => setCurrentTab(index)}
+                >
+                  {`计划 ${index + 1}`}
+                </View>
+              ))}
+          </View>
+
+          {/* Tab 内容 */}
+          <View className="tab-content">
+            <View className="form-group">
+              <Text className="label">透析时间:</Text>
+              <Picker
+                mode="time"
+                value={schedules[currentTab].timeSlot}
+                onChange={(e) =>
+                  handleScheduleChange(currentTab, {
+                    ...schedules[currentTab],
+                    timeSlot: e.detail.value,
+                  })
+                }
               >
-                {openTab === index && (
-                  <View className="tab-content">
-                    <View className="form-group">
-                      <Text className="label">透析时间</Text>
-                      <TimeSelector
-                        value={schedules[index].timeSlot}
-                        onChange={(value) =>
-                          handleScheduleChange(index, "timeSlot", value)
-                        }
-                      />
-                    </View>
-                    <View className="form-group">
-                      <Text className="label">浓度</Text>
-                      <Picker
-                        mode="selector"
-                        range={["1.5%", "2.5%", "4.25%"]}
-                        value={["1.5%", "2.5%", "4.25%"].indexOf(
-                          schedules[index].concentration
-                        )}
-                        onChange={(e) =>
-                          handleScheduleChange(
-                            index,
-                            "concentration",
-                            ["1.5%", "2.5%", "4.25%"][e.detail.value]
-                          )
-                        }
-                      >
-                        <View className="picker">
-                          {schedules[index].concentration || "请选择浓度"}
-                        </View>
-                      </Picker>
-                    </View>
-                    <View className="form-group">
-                      <Text className="label">透析液容量 (ml)</Text>
-                      <Input
-                        type="number"
-                        placeholder="请输入容量"
-                        value={String(schedules[index].volume || "")}
-                        onInput={(e) =>
-                          handleScheduleChange(
-                            index,
-                            "volume",
-                            Number(e.detail.value)
-                          )
-                        }
-                      />
-                    </View>
-                    <View className="form-group">
-                      <Text className="label">滞留时间 (分钟)</Text>
-                      <Input
-                        type="number"
-                        placeholder="请输入滞留时间"
-                        value={String(schedules[index].dwellTime || "")}
-                        onInput={(e) =>
-                          handleScheduleChange(
-                            index,
-                            "dwellTime",
-                            Number(e.detail.value)
-                          )
-                        }
-                      />
-                    </View>
+                <View className="picker">
+                  {schedules[currentTab].timeSlot || "请选择时间"}
+                </View>
+              </Picker>
+            </View>
+            <View className="form-group">
+              <Text className="label">浓度:</Text>
+              <View className="capsule-container">
+                {["1.5%", "2.5%", "4.25%"].map((option) => (
+                  <View
+                    key={option}
+                    className={`capsule-segment ${
+                      schedules[currentTab].concentration === option
+                        ? "active"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      handleScheduleChange(currentTab, {
+                        ...schedules[currentTab],
+                        concentration: option,
+                      })
+                    }
+                  >
+                    {option}
                   </View>
-                )}
-              </AtAccordion>
-            ))}
+                ))}
+              </View>
+            </View>
+            <View className="form-group">
+              <Text className="label">透析液容量 (ml):</Text>
+              <Input
+                type="number"
+                placeholder="输入容量"
+                value={String(schedules[currentTab].volume)}
+                onInput={(e) =>
+                  handleScheduleChange(currentTab, {
+                    ...schedules[currentTab],
+                    volume: Number(e.detail.value),
+                  })
+                }
+              />
+            </View>
+          </View>
+
+          {/* 按钮组 */}
           <View className="button-container">
-            <View
-              className="submit-button"
-              onClick={handleSubmit}
-              style={{
-                opacity: schedules.some(
-                  (s) =>
-                    !s.timeSlot || !s.concentration || !s.volume || !s.dwellTime
-                )
-                  ? 0.5
-                  : 1,
-                pointerEvents: schedules.some(
-                  (s) =>
-                    !s.timeSlot || !s.concentration || !s.volume || !s.dwellTime
-                )
-                  ? "none"
-                  : "auto",
-              }}
-            >
+            <View className="back-button" onClick={() => setStep(0)}>
+              返回
+            </View>
+            <View className="submit-button" onClick={handleSubmit}>
               提交方案
             </View>
           </View>
