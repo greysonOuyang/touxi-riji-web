@@ -1,63 +1,78 @@
 .plan-form {
     padding: 16px;
+    position: relative;
 
-    .step-one,
-    .step-two {
-        .form-group {
-            margin-bottom: 20px;
+    .form-group {
+        margin-bottom: 20px;
+
+        .label {
+            font-size: 16px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        &.row {
+            display: flex;
+            align-items: center; // 确保垂直居中
+            margin-bottom: 16px;
 
             .label {
-                font-size: 16px;
-                margin-bottom: 8px;
-                color: #666;
-            }
-        }
-    }
-
-    .capsule-container {
-        display: flex;
-        justify-content: space-between;
-        background-color: #f0f0f0;
-        border-radius: 25px;
-        overflow: hidden;
-        height: 40px;
-
-        .capsule-segment {
-            flex: 1;
-            text-align: center;
-            line-height: 40px;
-            font-size: 14px;
-            background-color: #e0e0e0;
-            color: #666;
-            cursor: pointer;
-            transition: background-color 0.3s, color 0.3s;
-
-            &:first-child {
-                border-top-left-radius: 25px;
-                border-bottom-left-radius: 25px;
+                flex-shrink: 0; // 标签固定宽度
+                margin-bottom: 0; // 清除默认 margin
+                margin-right: 8px; // 标签和内容之间的间距
+                height: 30px; // 确保高度一致
+                line-height: 30px; // 垂直居中对齐文字
             }
 
-            &:last-child {
-                border-top-right-radius: 25px;
-                border-bottom-right-radius: 25px;
-            }
+            .capsule-container {
+                flex-grow: 1; // 占据剩余空间
+                display: flex;
+                justify-content: space-between;
+                align-items: center; // 与标签保持垂直对齐
+                background-color: #f0f0f0;
+                border-radius: 25px;
+                overflow: hidden;
+                height: 30px; // 固定高度
 
-            &.active {
-                background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
-                color: #fff;
-                font-weight: bold;
-            }
+                .capsule-segment {
+                    flex: 1; // 每个胶囊均分
+                    text-align: center;
+                    height: 30px; // 与容器一致
+                    line-height: 30px; // 文字垂直居中
+                    font-size: 16px;
+                    background-color: #e0e0e0;
+                    color: #666;
+                    cursor: pointer;
+                    transition: background-color 0.3s, color 0.3s;
 
-            &:not(:last-child) {
-                border-right: 1px solid #f0f0f0;
+                    &:first-child {
+                        border-top-left-radius: 25px;
+                        border-bottom-left-radius: 25px;
+                    }
+
+                    &:last-child {
+                        border-top-right-radius: 25px;
+                        border-bottom-right-radius: 25px;
+                    }
+
+                    &.active {
+                        background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+                        color: #fff;
+                        font-weight: bold;
+                    }
+
+                    &:not(:last-child) {
+                        border-right: 1px solid #f0f0f0;
+                    }
+                }
             }
         }
     }
 
     .tabs {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-        gap: 10px;
+        display: flex;
+        overflow-x: auto;
         margin-bottom: 10px;
 
         .tab {
@@ -76,35 +91,63 @@
         }
     }
 
-    .tab-content {
-        background: #fff;
-        border-radius: 8px;
-        padding: 16px;
-
-        .picker {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background-color: #f9f9f9;
-            cursor: pointer;
-        }
-    }
-
     .button-container {
-        margin-top: 20px;
-        display: flex;
-        justify-content: space-between;
+        position: fixed;
+        bottom: 25px; // 距离屏幕底部的间距
+        left: 0;
+        right: 0;
+        padding: 0 16px; // 两侧间距
 
-        .back-button,
-        .submit-button {
-            width: 48%;
-            padding: 12px 16px;
+        .button-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &.vertical {
+                flex-direction: column; // 垂直排列
+                gap: 12px; // 按钮之间的间距
+            }
+        }
+
+        .primary-button,
+        .secondary-button {
+            width: 100%;
+            max-width: 300px; // 按钮宽度
+            height: 48px; // 按钮高度
             border-radius: 25px;
             font-size: 16px;
             text-align: center;
+            line-height: 48px; // 文本垂直居中
+            cursor: pointer;
+        }
+
+        .primary-button {
             background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
             color: #fff;
-            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .secondary-button {
+            background: #f0f0f0;
+            color: #666;
+        }
+    }
+
+    .step-one,
+    .step-two {
+        .form-group {
+            margin-bottom: 20px;
+
+            .label {
+                font-size: 16px;
+                color: #666;
+                margin-bottom: 8px;
+            }
+
+            .concentration {
+                display: flex;
+                align-items: center;
+            }
         }
     }
 }
