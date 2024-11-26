@@ -105,9 +105,9 @@ const PlanForm: React.FC = () => {
             <View className="form-group row">
               <View className="label">浓度:</View>
               <CapsuleSelector
-                options={["1.5%", "2.5%", "4.25%"]}
+                options={["1.5%", "2.5%", "4.25%"]} // 类型是 string[]
                 selected={schedules[currentTab].concentration}
-                onSelect={(option) =>
+                onSelect={(option: string) =>
                   handleScheduleChange(currentTab, {
                     ...schedules[currentTab],
                     concentration: option,

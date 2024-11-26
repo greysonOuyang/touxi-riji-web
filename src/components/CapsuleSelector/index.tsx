@@ -3,9 +3,9 @@ import { View } from "@tarojs/components";
 import "./index.scss";
 
 interface CapsuleSelectorProps {
-  options: Array<number | string>;
-  selected: number | string;
-  onSelect: (value: number | string) => void;
+  options: (string | number)[];
+  selected: string | number;
+  onSelect: (option: string | number) => void;
 }
 
 const CapsuleSelector: React.FC<CapsuleSelectorProps> = ({

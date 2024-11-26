@@ -3,23 +3,29 @@
     background-color: #f5f5f5;
     border-radius: 25px;
     overflow: hidden;
+    height: 25px; // 高度固定，和 PlanForm 的 label 匹配
 
     .capsule-item {
-        flex: 1;
+        flex: 1; // 平分宽度
         text-align: center;
-        padding: 8px 0;
-        font-size: 16px;
+        font-size: 14px;
         color: #666;
+        line-height: 25px; // 文本居中
         cursor: pointer;
+        transition: all 0.3s ease;
 
         &:not(:last-child) {
-            border-right: 1px solid #e0e0e0;
+            border-right: 1px solid #eee8e8; // 间隔线颜色
         }
 
         &.active {
             background: linear-gradient(90deg, #92a3fd, #9dceff);
-            color: white;
+            color: #fff;
             font-weight: bold;
+        }
+
+        &:hover {
+            background-color: #e6e6e6; // 鼠标悬停效果
         }
     }
 }
