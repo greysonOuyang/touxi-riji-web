@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View, Input } from "@tarojs/components";
 import TimeSelector from "@/components/TimeSelector";
 import TimePicker from "@/components/TimePicker";
@@ -23,6 +23,29 @@ const PlanForm: React.FC = () => {
     })
   );
   const [currentTab, setCurrentTab] = useState(0);
+
+  const tabsRef = useRef<HTMLDivElement>(null); // tabs容器ref
+  const tabRefs = useRef<(HTMLDivElement | null)[]>([]); // 单个tab的refs
+
+  const scrollToCenter = (index: number) => {
+    const tabsContainer = tabsRef.current;
+    const selectedTab = tabRefs.current[index];
+
+    if (tabsContainer && selectedTab) {
+      const containerWidth = tabsContainer.offsetWidth; // 容器宽度
+      const containerScrollLeft = tabsContainer.scrollLeft; // 当前滚动位置
+      const tabOffsetLeft = selectedTab.offsetLeft; // Tab相对容器左侧的偏移
+      const tabWidth = selectedTab.offsetWidth; // Tab自身宽度
+
+      // 计算滚动位置，将目标Tab定位到容器中央
+      const newScrollLeft = tabOffsetLeft - (containerWidth - tabWidth) / 2;
+
+      tabsContainer.scrollTo({
+        left: newScrollLeft,
+        behavior: "smooth", // 平滑滚动
+      });
+    }
+  };
 
   const updateFrequency = (frequency: number) => {
     setDailyFrequency(frequency);
@@ -73,16 +96,20 @@ const PlanForm: React.FC = () => {
       ) : (
         <View className="step-two">
           {/* Tab 切换 */}
-          <View className="tabs">
+          <View className="tabs" ref={tabsRef}>
             {Array(dailyFrequency)
               .fill(0)
               .map((_, index) => (
                 <View
                   key={index}
                   className={`tab ${currentTab === index ? "active-tab" : ""}`}
-                  onClick={() => setCurrentTab(index)}
+                  onClick={() => {
+                    setCurrentTab(index);
+                    scrollToCenter(index);
+                  }}
+                  ref={(el) => (tabRefs.current[index] = el)} // 记录每个Tab的ref
                 >
-                  {`计划 ${index + 1}`}
+                  {`第${index + 1}次`}
                 </View>
               ))}
           </View>
