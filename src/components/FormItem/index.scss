@@ -1,0 +1,47 @@
+.form-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 10px;
+    background-color: #f7f8f8;
+    border-radius: 16px;
+    margin: 10px;
+
+    .left {
+        display: flex;
+        align-items: center;
+        flex: 1; // 占据左侧区域
+        position: relative;
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        .input {
+            flex: 1; // 占据剩余空间
+            font-size: 16px;
+            color: #333;
+            border: none;
+            background-color: transparent; // 保持背景透明
+        }
+
+        .label {
+            position: absolute; // 定位到输入框下方
+            bottom: -20px;
+            left: 0;
+            font-size: 12px;
+            color: #999;
+        }
+    }
+
+    .right {
+        padding-left: 10px;
+
+        .unit {
+            font-size: 16px;
+            color: #333;
+        }
+    }
+}

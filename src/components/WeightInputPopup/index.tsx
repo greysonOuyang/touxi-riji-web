@@ -127,15 +127,17 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
       title="记录体重"
     >
       <View className="weight-input-popup">
-        <TimeSelector
-          value={formData.measurementDatetime}
-          onChange={(newValue) =>
-            setFormData((prev) => ({
-              ...prev,
-              measurementDatetime: newValue,
-            }))
-          }
-        />
+        <View className="weight-form-item">
+          <TimeSelector
+            value={formData.measurementDatetime}
+            onChange={(newValue) =>
+              setFormData((prev) => ({
+                ...prev,
+                measurementDatetime: newValue,
+              }))
+            }
+          />
+        </View>
 
         <View className="weight-form-item">
           <Text className="label">体重</Text>

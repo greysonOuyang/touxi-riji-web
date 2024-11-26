@@ -1,34 +1,56 @@
+// .time-selector {
+//     display: flex;
+//     align-items: center; // 确保文字和时间值在同一行垂直对齐
+//     // padding: 10px 10px; // 增加适当的内边距
+
+//     .label {
+//         font-size: 16px;
+//         color: #333;
+//         margin-right: 16px; // 与 `value-wrapper` 之间的间隔
+//         white-space: nowrap; // 确保标签不换行
+//     }
+
+//     .value-wrapper {
+//         flex: 1; // 占据剩余空间
+//         text-align: right; // 数值靠右对齐
+//         display: flex;
+//         align-items: center;
+//         justify-content: flex-end;
+
+//         .value {
+//             display: flex;
+//             align-items: center;
+//             font-size: 16px;
+//             color: #333;
+//         }
+//     }
+// }
+
 .time-selector {
     display: flex;
-    align-items: center; // 确保文字和时间值在同一行垂直对齐
-    // padding: 10px 10px; // 增加适当的内边距
+    align-items: center; // 确保 label 和 value 垂直对齐
+    width: 100%; // 确保容器充满父级
 
     .label {
         font-size: 16px;
         color: #333;
-        margin-right: 16px; // 与 `value-wrapper` 之间的间隔
-        white-space: nowrap; // 确保标签不换行
+        margin-right: 16px; // 确保 label 和 value-wrapper 有适当间距
+        white-space: nowrap; // 防止文字换行
+        flex-shrink: 0; // 防止 label 被压缩
     }
 
     .value-wrapper {
         flex: 1; // 占据剩余空间
-        text-align: right; // 数值靠右对齐
+        text-align: right; // 值靠右对齐
         display: flex;
         align-items: center;
         justify-content: flex-end;
 
         .value {
-            display: flex;
-            align-items: center;
             font-size: 16px;
             color: #333;
-
-            .arrow {
-                width: 15px;
-                height: 15px;
-                margin-left: 4px; // 箭头和文字之间的间距
-                object-fit: contain;
-            }
+            display: flex;
+            align-items: center;
         }
     }
 }
