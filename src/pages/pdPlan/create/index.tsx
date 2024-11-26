@@ -27,66 +27,45 @@ const PlanForm: React.FC = () => {
   const tabsRef = useRef<HTMLDivElement>(null); // tabs容器ref
   const tabRefs = useRef<(HTMLDivElement | null)[]>([]); // 单个tab的refs
 
-  const handleTransitionEnd = (index: number) => {
-    const tab = tabRefs.current[index];
-    if (tab) {
-      tab.classList.remove("tab-selected");
-    }
-  };
-
-  const scrollToCenter = (index: number) => {
-    const tabsContainer = tabsRef.current;
-    const selectedTab = tabRefs.current[index];
-
-    if (tabsContainer && selectedTab) {
-      const containerWidth = tabsContainer.offsetWidth;
-      const tabWidth = selectedTab.offsetWidth;
-      const scrollWidth = tabsContainer.scrollWidth;
-      const tabOffsetLeft = selectedTab.offsetLeft;
-
-      // 计算理想的滚动位置（将选中的tab居中）
-      let targetScrollLeft = tabOffsetLeft - (containerWidth - tabWidth) / 2;
-
-      // 确保不会出现空白（左边界处理）
-      targetScrollLeft = Math.max(0, targetScrollLeft);
-
-      // 确保不会出现空白（右边界处理）
-      const maxScrollLeft = scrollWidth - containerWidth;
-      targetScrollLeft = Math.min(targetScrollLeft, maxScrollLeft);
-
-      tabsContainer.scrollTo({
-        left: targetScrollLeft,
-        behavior: "smooth",
-      });
-    }
-  };
-
   // 添加滚动指示器
   const [showLeftIndicator, setShowLeftIndicator] = useState(false);
   const [showRightIndicator, setShowRightIndicator] = useState(false);
 
-  // 检查是否需要显示滚动指示器
+  const handleTabClick = (index: number) => {
+    setCurrentTab(index);
+
+    // 添加点击动画类
+    const tab = tabRefs.current[index];
+    if (tab) {
+      tab.classList.add("tab-selected");
+    }
+  };
+
   const checkScrollIndicators = () => {
     const tabsContainer = tabsRef.current;
     if (tabsContainer) {
       const { scrollLeft, scrollWidth, clientWidth } = tabsContainer;
+
+      // 左侧指示器：当 scrollLeft 大于 0 时显示
       setShowLeftIndicator(scrollLeft > 0);
+
+      // 右侧指示器：当右侧还有内容未显示时显示
       setShowRightIndicator(scrollLeft + clientWidth < scrollWidth);
     }
   };
 
-  // 监听滚动事件
   const handleScroll = () => {
     checkScrollIndicators();
   };
 
-  // 组件挂载和更新时检查滚动指示器
   useEffect(() => {
     checkScrollIndicators();
     const tabsContainer = tabsRef.current;
+
     if (tabsContainer) {
       tabsContainer.addEventListener("scroll", handleScroll);
     }
+
     return () => {
       if (tabsContainer) {
         tabsContainer.removeEventListener("scroll", handleScroll);
@@ -144,6 +123,9 @@ const PlanForm: React.FC = () => {
         <View className="step-two">
           {/* Tab 切换 */}
           <View className="tabs-wrapper">
+            {/* 左滚动指示器 */}
+            {showLeftIndicator && <View className="scroll-indicator left" />}
+
             <View className="tabs" ref={tabsRef}>
               {Array(dailyFrequency)
                 .fill(0)
@@ -153,17 +135,8 @@ const PlanForm: React.FC = () => {
                     className={`tab ${
                       currentTab === index ? "active-tab" : ""
                     }`}
-                    onClick={() => {
-                      setCurrentTab(index);
-                      scrollToCenter(index);
-                      // 添加点击动画类
-                      const tab = tabRefs.current[index];
-                      if (tab) {
-                        tab.classList.add("tab-selected");
-                      }
-                    }}
+                    onClick={() => handleTabClick(index)}
                     ref={(el) => (tabRefs.current[index] = el)}
-                    onTransitionEnd={() => handleTransitionEnd(index)}
                   >
                     <View className="tab-content">
                       <View className="tab-text">{`第${index + 1}次`}</View>
@@ -174,6 +147,9 @@ const PlanForm: React.FC = () => {
                   </View>
                 ))}
             </View>
+
+            {/* 右滚动指示器 */}
+            {showRightIndicator && <View className="scroll-indicator right" />}
           </View>
 
           {/* Tab 内容 */}
