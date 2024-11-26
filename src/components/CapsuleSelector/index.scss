@@ -1,0 +1,25 @@
+.capsule-selector {
+    display: flex;
+    background-color: #f5f5f5;
+    border-radius: 25px;
+    overflow: hidden;
+
+    .capsule-item {
+        flex: 1;
+        text-align: center;
+        padding: 8px 0;
+        font-size: 16px;
+        color: #666;
+        cursor: pointer;
+
+        &:not(:last-child) {
+            border-right: 1px solid #e0e0e0;
+        }
+
+        &.active {
+            background: linear-gradient(90deg, #92a3fd, #9dceff);
+            color: white;
+            font-weight: bold;
+        }
+    }
+}

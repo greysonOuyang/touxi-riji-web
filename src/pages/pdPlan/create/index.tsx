@@ -1,65 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Input } from "@tarojs/components";
 import TimeSelector from "@/components/TimeSelector";
 import TimePicker from "@/components/TimePicker";
+import CapsuleSelector from "@/components/CapsuleSelector";
+import "./index.scss";
 
-const CapsuleSelector = ({ options, selected, onSelect }) => (
-  <View className="capsule-selector">
-    {options.map((option, index) => (
-      <View
-        key={index}
-        className={`capsule-item ${selected === option ? "active" : ""}`}
-        onClick={() => onSelect(option)}
-      >
-        {option}
-      </View>
-    ))}
-  </View>
-);
+interface Schedule {
+  timeSlot: string;
+  concentration: string;
+  volume: number;
+}
 
-const PlanForm = ({
-  step,
-  setStep,
-  startDate,
-  setStartDate,
-  dailyFrequency,
-  updateFrequency,
-  currentTab,
-  setCurrentTab,
-  schedules,
-  handleScheduleChange,
-  handleSubmit,
-}) => {
+const PlanForm: React.FC = () => {
+  const [step, setStep] = useState(0); // 当前步骤：0=基础信息，1=填写计划
+  const [dailyFrequency, setDailyFrequency] = useState<number>(4);
+  const [startDate, setStartDate] = useState<string>("");
+  const [schedules, setSchedules] = useState<Schedule[]>(
+    Array(4).fill({
+      timeSlot: "",
+      concentration: "1.5%",
+      volume: 2000,
+    })
+  );
+  const [currentTab, setCurrentTab] = useState(0);
+
+  const updateFrequency = (frequency: number) => {
+    setDailyFrequency(frequency);
+    setSchedules(
+      Array(frequency).fill({
+        timeSlot: "",
+        concentration: "1.5%",
+        volume: 2000,
+      })
+    );
+  };
+
+  const handleScheduleChange = (index: number, updatedSchedule: Schedule) => {
+    const newSchedules = [...schedules];
+    newSchedules[index] = updatedSchedule;
+    setSchedules(newSchedules);
+  };
+
+  const handleSubmit = () => {
+    console.log("提交数据：", { dailyFrequency, startDate, schedules });
+  };
+
   return (
     <View className="plan-form">
       {step === 0 ? (
         <View className="step-one">
           {/* 开始日期 */}
-          <View className="form-row">
+          <View className="form-group">
             <TimeSelector
               label="开始日期"
               showLabel={true}
               value={startDate}
-              onChange={setStartDate}
+              onChange={(date) => setStartDate(date)}
               allowFuture={false}
             />
           </View>
 
           {/* 每日透析次数 */}
-          <View className="form-row">
-            <View className="form-label">每日透析次数:</View>
+          <View className="form-group row">
+            <View className="label">每日透析次数:</View>
             <CapsuleSelector
               options={[1, 2, 3, 4, 5, 6]}
               selected={dailyFrequency}
-              onSelect={updateFrequency}
+              onSelect={(option) => updateFrequency(option as number)}
             />
-          </View>
-
-          {/* 下一步按钮 */}
-          <View className="button-group">
-            <View className="button primary" onClick={() => setStep(1)}>
-              下一步
-            </View>
           </View>
         </View>
       ) : (
@@ -71,7 +79,7 @@ const PlanForm = ({
               .map((_, index) => (
                 <View
                   key={index}
-                  className={`tab ${currentTab === index ? "active" : ""}`}
+                  className={`tab ${currentTab === index ? "active-tab" : ""}`}
                   onClick={() => setCurrentTab(index)}
                 >
                   {`计划 ${index + 1}`}
@@ -81,7 +89,7 @@ const PlanForm = ({
 
           {/* Tab 内容 */}
           <View className="tab-content">
-            <View className="form-row">
+            <View className="form-group">
               <TimePicker
                 label="透析时间"
                 value={schedules[currentTab].timeSlot}
@@ -94,8 +102,8 @@ const PlanForm = ({
               />
             </View>
 
-            <View className="form-row">
-              <View className="form-label">浓度:</View>
+            <View className="form-group row">
+              <View className="label">浓度:</View>
               <CapsuleSelector
                 options={["1.5%", "2.5%", "4.25%"]}
                 selected={schedules[currentTab].concentration}
@@ -108,8 +116,8 @@ const PlanForm = ({
               />
             </View>
 
-            <View className="form-row">
-              <View className="form-label">透析液容量 (ml):</View>
+            <View className="form-group row">
+              <View className="label">透析液容量 (ml):</View>
               <Input
                 type="number"
                 placeholder="输入容量"
@@ -123,18 +131,26 @@ const PlanForm = ({
               />
             </View>
           </View>
-
-          {/* 按钮组 */}
-          <View className="button-group vertical">
-            <View className="button secondary" onClick={() => setStep(0)}>
-              返回
-            </View>
-            <View className="button primary" onClick={handleSubmit}>
-              提交方案
-            </View>
-          </View>
         </View>
       )}
+
+      {/* 按钮固定在底部 */}
+      <View className="button-container">
+        {step === 0 ? (
+          <View className="primary-button" onClick={() => setStep(1)}>
+            下一步
+          </View>
+        ) : (
+          <>
+            <View className="secondary-button" onClick={() => setStep(0)}>
+              返回
+            </View>
+            <View className="primary-button" onClick={handleSubmit}>
+              提交方案
+            </View>
+          </>
+        )}
+      </View>
     </View>
   );
 };

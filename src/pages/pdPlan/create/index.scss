@@ -14,37 +14,34 @@
 
         &.row {
             display: flex;
-            align-items: center; // 确保垂直居中
+            align-items: center;
             margin-bottom: 16px;
 
             .label {
-                flex-shrink: 0; // 标签固定宽度
-                margin-bottom: 0; // 清除默认 margin
-                margin-right: 8px; // 标签和内容之间的间距
-                height: 30px; // 确保高度一致
-                line-height: 30px; // 垂直居中对齐文字
+                flex-shrink: 0;
+                margin-right: 8px;
+                height: 30px;
+                line-height: 30px;
             }
 
             .capsule-container {
-                flex-grow: 1; // 占据剩余空间
+                flex-grow: 1;
                 display: flex;
                 justify-content: space-between;
-                align-items: center; // 与标签保持垂直对齐
                 background-color: #f0f0f0;
                 border-radius: 25px;
                 overflow: hidden;
-                height: 30px; // 固定高度
+                height: 40px;
 
                 .capsule-segment {
-                    flex: 1; // 每个胶囊均分
+                    flex: 1;
                     text-align: center;
-                    height: 30px; // 与容器一致
-                    line-height: 30px; // 文字垂直居中
+                    height: 40px;
+                    line-height: 40px;
                     font-size: 16px;
                     background-color: #e0e0e0;
                     color: #666;
                     cursor: pointer;
-                    transition: background-color 0.3s, color 0.3s;
 
                     &:first-child {
                         border-top-left-radius: 25px;
@@ -78,7 +75,6 @@
         .tab {
             padding: 10px;
             font-size: 14px;
-            text-align: center;
             color: #666;
             cursor: pointer;
             border-bottom: 2px solid transparent;
@@ -93,26 +89,20 @@
 
     .button-container {
         position: fixed;
-        bottom: 25px; // 距离屏幕底部的间距
+        bottom: 25px;
         left: 0;
         right: 0;
-        padding: 0 16px; // 两侧间距
-
-        .button-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            &.vertical {
-                flex-direction: column; // 垂直排列
-                gap: 12px; // 按钮之间的间距
-            }
-        }
+        display: flex;
+        flex-direction: column; // 垂直排列
+        justify-content: center;
+        align-items: center; // 水平居中
+        gap: 12px; // 按钮之间的间距
+        padding: 0 16px;
 
         .primary-button,
         .secondary-button {
             width: 100%;
-            max-width: 300px; // 按钮宽度
+            max-width: 300px;
             height: 48px; // 按钮高度
             border-radius: 25px;
             font-size: 16px;
@@ -130,24 +120,6 @@
         .secondary-button {
             background: #f0f0f0;
             color: #666;
-        }
-    }
-
-    .step-one,
-    .step-two {
-        .form-group {
-            margin-bottom: 20px;
-
-            .label {
-                font-size: 16px;
-                color: #666;
-                margin-bottom: 8px;
-            }
-
-            .concentration {
-                display: flex;
-                align-items: center;
-            }
         }
     }
 }
