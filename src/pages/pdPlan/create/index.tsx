@@ -4,6 +4,7 @@ import TimeSelector from "@/components/TimeSelector";
 import TimePicker from "@/components/TimePicker";
 import CapsuleSelector from "@/components/CapsuleSelector";
 import "./index.scss";
+import FormItem from "@/components/FormItem";
 
 interface Schedule {
   timeSlot: string;
@@ -181,7 +182,7 @@ const PlanForm: React.FC = () => {
               />
             </View>
 
-            <View className="form-group input">
+            {/* <View className="form-group input">
               <Input
                 type="number"
                 placeholder="透析液容量"
@@ -195,7 +196,18 @@ const PlanForm: React.FC = () => {
                 className="input-box"
               />
               <View className="unit-box">ml</View>
-            </View>
+            </View> */}
+            <FormItem
+              label="透析液容量"
+              value={String(schedules[currentTab].volume)}
+              unit="ml"
+              onChange={(newValue) =>
+                handleScheduleChange(currentTab, {
+                  ...schedules[currentTab],
+                  volume: Number(newValue),
+                })
+              }
+            />
           </View>
         </View>
       )}

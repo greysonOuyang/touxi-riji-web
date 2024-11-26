@@ -1,47 +1,65 @@
 .form-item {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    padding: 15px 10px;
-    background-color: #f7f8f8;
-    border-radius: 16px;
-    margin: 10px;
+    align-items: center;
+    padding: 10px 15px;
+    margin: 10px 0;
 
-    .left {
+    .left-section {
         display: flex;
         align-items: center;
-        flex: 1; // 占据左侧区域
-        position: relative;
+        flex: 1; // 左侧区域占满可用空间
+        background-color: #f7f8f8; // 左侧背景覆盖
+        padding: 10px 10px;
+        margin-right: 8px;
+        margin-right: 12px; // 与输入框间距
+        border-radius: 14px;
+
+
+
 
         .icon {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-        }
-
-        .input {
-            flex: 1; // 占据剩余空间
-            font-size: 16px;
-            color: #333;
-            border: none;
-            background-color: transparent; // 保持背景透明
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
         }
 
         .label {
-            position: absolute; // 定位到输入框下方
-            bottom: -20px;
-            left: 0;
+            color: #333;
+            font-family: 'Poppins';
+            font-style: normal;
+            font-weight: 400;
             font-size: 12px;
-            color: #999;
+            line-height: 18px;
+            color: #ADA4A5;
+        }
+
+        .input-box {
+            flex: 1; // 输入框占满剩余空间
+            height: 30px;
+            // padding: 0 10px;
+            font-size: 14px;
+            text-align: right;
+            border: none; // 去掉边框
+            border-radius: 14px; // 圆角一致
+            background-color: transparent; // 与背景一致
+            outline: none; // 去掉选中时的外框
+            margin-right: 4px;
         }
     }
 
-    .right {
-        padding-left: 10px;
-
-        .unit {
-            font-size: 16px;
-            color: #333;
-        }
+    .right-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px; // 控制单位框宽度
+        height: 50px; // 保持与输入框一致
+        padding: 0 12px;
+        border-radius: 14px; // 圆角
+        background: linear-gradient(274.42deg, #c58bf2 0%, #eea4ce 124.45%);
+        color: #fff;
+        font-size: 14px;
+        font-weight: bold;
+        text-align: center;
     }
 }
