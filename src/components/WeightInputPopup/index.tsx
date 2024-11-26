@@ -10,6 +10,7 @@ import {
 } from "../../api/weightApi";
 import TimeSelector from "../TimeSelector"; // 引入 TimeSelector 组件
 import "./index.scss";
+import ArrowRight from "../ArrowRight";
 
 interface WeightInputPopupProps {
   isOpen: boolean;
@@ -147,10 +148,7 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
             >
               <View className="value">
                 <Text>{formData.weight}公斤</Text>
-                <Image
-                  className="arrow"
-                  src="../../assets/icons/right_arrow.png"
-                />
+                <ArrowRight />
               </View>
             </Picker>
           </View>

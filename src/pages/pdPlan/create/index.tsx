@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Input } from "@tarojs/components";
+import { View, Input, Image } from "@tarojs/components";
 import TimeSelector from "@/components/TimeSelector";
 import TimePicker from "@/components/TimePicker";
 import CapsuleSelector from "@/components/CapsuleSelector";
@@ -19,7 +19,7 @@ const PlanForm: React.FC = () => {
     Array(4).fill({
       timeSlot: "",
       concentration: "1.5%",
-      volume: 2000,
+      volume: 0,
     })
   );
   const [currentTab, setCurrentTab] = useState(0);
@@ -181,11 +181,10 @@ const PlanForm: React.FC = () => {
               />
             </View>
 
-            <View className="form-group row">
-              <View className="label">透析液容量 (ml):</View>
+            <View className="form-group input">
               <Input
                 type="number"
-                placeholder="输入容量"
+                placeholder="透析液容量"
                 value={String(schedules[currentTab].volume)}
                 onInput={(e) =>
                   handleScheduleChange(currentTab, {
@@ -193,7 +192,9 @@ const PlanForm: React.FC = () => {
                     volume: Number(e.detail.value),
                   })
                 }
+                className="input-box"
               />
+              <View className="unit-box">ml</View>
             </View>
           </View>
         </View>

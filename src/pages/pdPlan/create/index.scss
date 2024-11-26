@@ -25,6 +25,41 @@
                 flex-grow: 1; // 填满右侧剩余空间
             }
         }
+
+        &.input {
+            display: flex;
+            position: relative;
+            align-items: center;
+
+            .input-box {
+                flex: 1;
+                height: 40px;
+                padding: 0 16px; // 左右内边距
+                font-size: 16px;
+                border: 1px solid #ddd;
+                border-radius: 20px;
+                outline: none;
+                box-sizing: border-box;
+
+                // 占位文本样式
+                &::placeholder {
+                    color: #aaa;
+                }
+            }
+
+            .unit-box {
+                margin-left: -40px; // 左移，贴近输入框
+                height: 40px;
+                line-height: 40px;
+                padding: 0 12px;
+                font-size: 14px;
+                font-weight: bold;
+                background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+                color: #fff;
+                border-radius: 20px;
+                text-align: center;
+            }
+        }
     }
 
     .tabs-wrapper {

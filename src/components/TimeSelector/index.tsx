@@ -2,6 +2,7 @@ import React from "react";
 import { View, Text, Picker, Image } from "@tarojs/components";
 import dayjs from "dayjs";
 import "./index.scss";
+import ArrowRight from "../ArrowRight";
 
 interface TimeSelectorProps {
   label?: string;
@@ -79,7 +80,7 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
         >
           <View className="value">
             <Text>{currentValue.format("YYYY年MM月DD日 HH:mm")}</Text>
-            <Image className="arrow" src="../../assets/icons/right_arrow.png" />
+            <ArrowRight />
           </View>
         </Picker>
       </View>

@@ -1,5 +1,5 @@
 .weight-input-popup {
-  padding: 15px 20px;
+  padding: 15px 30px;
 
   .weight-form-item {
     display: flex;
@@ -22,13 +22,6 @@
         justify-content: flex-end;
         color: #333;
         font-size: 16px;
-
-        .arrow {
-          width: 15px;
-          height: 15px;
-          margin-left: 2px;
-          object-fit: contain;
-        }
       }
     }
   }

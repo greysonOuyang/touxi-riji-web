@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Picker, Image } from "@tarojs/components";
 import dayjs from "dayjs";
 import "./index.scss";
+import ArrowRight from "../ArrowRight";
 
 interface TimePickerProps {
   value?: string; // 当前选中的时间（外部传入）
@@ -50,13 +51,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
             />
           )}
           <Text>{selectedTime}</Text>
-          {showArrowIcon && (
-            <Image
-              className="arrow-icon"
-              src="../../assets/icons/right_arrow.png"
-              mode="aspectFit"
-            />
-          )}
+          {showArrowIcon && <ArrowRight />}
         </View>
       </Picker>
     </View>

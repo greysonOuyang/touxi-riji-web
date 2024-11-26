@@ -4,10 +4,10 @@ import { getUserProfile } from "../../api/profile";
 import { getCurrentPdPlan } from "../../api/pdPlanApi"; // 导入获取腹透方案的API
 import Taro from "@tarojs/taro";
 import "./index.scss";
+import ArrowRight from "@/components/ArrowRight";
 
 const DEFAULT_AVATAR = "../../assets/images/face.png";
 const ICON_PROFILE = "../../assets/icons/icon-profile.png";
-const RIGHT_ARROW = "../../assets/icons/right_arrow.png";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -56,7 +56,7 @@ const Profile = () => {
             Taro.navigateTo({ url: "/pages/pdPlan/index" });
           }
         } else {
-          console.error(response.message);
+          console.error(response.msg);
         }
       } catch (error) {
         console.error("获取腹透方案失败", error);
@@ -101,7 +101,7 @@ const Profile = () => {
             <Image className="item-icon" src={ICON_PROFILE} />
             <Text>腹透方案</Text>
           </View>
-          <Image className="arrow" src={RIGHT_ARROW} />
+          <ArrowRight />
         </View>
       </View>
 
@@ -112,7 +112,7 @@ const Profile = () => {
             <Image className="item-icon" src={ICON_PROFILE} />
             <Text>意见反馈</Text>
           </View>
-          <Image className="arrow" src={RIGHT_ARROW} />
+          <ArrowRight />
         </View>
       </View>
     </View>

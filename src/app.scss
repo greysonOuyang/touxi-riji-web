@@ -45,6 +45,16 @@ page {
 
 .global-unit {
   font-size: 14px;
-    color: #999;
-    line-height: 1.5;
+  color: #999;
+  line-height: 1.5;
+}
+
+:global {
+  .arrow {
+    margin-left: 8px;
+    width: 16px;
+    height: 16px;
+    background-size: cover;
+    background-position: center;
+  }
 }
