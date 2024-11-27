@@ -4,14 +4,14 @@
     // background-color: #ffffff;
     border-radius: 25px;
     overflow: hidden;
-    height: 25px; // 高度固定，和 PlanForm 的 label 匹配
+    height: 20px; // 高度固定，和 PlanForm 的 label 匹配
 
     .capsule-item {
         flex: 1; // 平分宽度
         text-align: center;
         font-size: 14px;
         color: #666;
-        line-height: 25px; // 文本居中
+        line-height: 20px; // 文本居中
         cursor: pointer;
         transition: all 0.3s ease;
 

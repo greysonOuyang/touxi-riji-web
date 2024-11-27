@@ -101,7 +101,7 @@ const PlanForm: React.FC = () => {
         <View className="step-one">
           {/* 每日透析次数 */}
           <View className="form-group row">
-            <View className="label">每日透析次数:</View>
+            <View className="label">每日透析次数</View>
             <CapsuleSelector
               options={[1, 2, 3, 4, 5, 6]}
               selected={dailyFrequency}
@@ -112,6 +112,7 @@ const PlanForm: React.FC = () => {
           {/* 开始日期 */}
           <View className="form-group">
             <TimeSelector
+              mode="date"
               label="开始日期"
               showLabel={true}
               value={startDate}
@@ -156,7 +157,7 @@ const PlanForm: React.FC = () => {
           {/* Tab 内容 */}
           <View className="tab-content">
             <View className="form-group row">
-              <View className="label">浓度:</View>
+              <View className="label">浓度</View>
               <CapsuleSelector
                 options={["1.5%", "2.5%", "4.25%"]} // 类型是 string[]
                 selected={schedules[currentTab].concentration}
