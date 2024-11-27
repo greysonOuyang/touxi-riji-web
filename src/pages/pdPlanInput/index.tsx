@@ -99,6 +99,16 @@ const PlanForm: React.FC = () => {
     <View className="plan-form">
       {step === 0 ? (
         <View className="step-one">
+          {/* 每日透析次数 */}
+          <View className="form-group row">
+            <View className="label">每日透析次数:</View>
+            <CapsuleSelector
+              options={[1, 2, 3, 4, 5, 6]}
+              selected={dailyFrequency}
+              onSelect={(option) => updateFrequency(option as number)}
+            />
+          </View>
+
           {/* 开始日期 */}
           <View className="form-group">
             <TimeSelector
@@ -107,16 +117,6 @@ const PlanForm: React.FC = () => {
               value={startDate}
               onChange={(date) => setStartDate(date)}
               allowFuture={false}
-            />
-          </View>
-
-          {/* 每日透析次数 */}
-          <View className="form-group row">
-            <View className="label">每日透析次数:</View>
-            <CapsuleSelector
-              options={[1, 2, 3, 4, 5, 6]}
-              selected={dailyFrequency}
-              onSelect={(option) => updateFrequency(option as number)}
             />
           </View>
         </View>
@@ -155,19 +155,6 @@ const PlanForm: React.FC = () => {
 
           {/* Tab 内容 */}
           <View className="tab-content">
-            <View className="form-group">
-              <TimePicker
-                label="透析时间"
-                value={schedules[currentTab].timeSlot}
-                onChange={(time) =>
-                  handleScheduleChange(currentTab, {
-                    ...schedules[currentTab],
-                    timeSlot: time,
-                  })
-                }
-              />
-            </View>
-
             <View className="form-group row">
               <View className="label">浓度:</View>
               <CapsuleSelector
@@ -177,6 +164,21 @@ const PlanForm: React.FC = () => {
                   handleScheduleChange(currentTab, {
                     ...schedules[currentTab],
                     concentration: option,
+                  })
+                }
+              />
+            </View>
+
+            <View className="form-group row">
+              <TimePicker
+                label="透析时间"
+                value={schedules[currentTab].timeSlot}
+                showClockIcon={false}
+                showArrowIcon={true}
+                onChange={(time) =>
+                  handleScheduleChange(currentTab, {
+                    ...schedules[currentTab],
+                    timeSlot: time,
                   })
                 }
               />

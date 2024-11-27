@@ -1,9 +1,76 @@
 .plan-form {
     padding: 16px;
     position: relative;
+    min-height: 100vh;
+    // background: #F8F9FA;
+
+    // .step-one {
+    //     background: #FFFFFF;
+    //     border-radius: 12px;
+    //     padding: 16px;
+    //     margin-bottom: 24px;
+    // }
+
+    // .row {
+    //     display: flex;
+    //     align-items: center; // 水平对齐
+    //     // margin-bottom: 16px;
+    //     padding: 16px 10px;
+    //     // margin: 10px;
+
+    //     .capsule-selector {
+    //         flex-grow: 1; // 填满右侧剩余空间
+    //     }
+    // }
+
+    // .weight-form-item {
+    //     display: flex;
+    //     justify-content: space-between;
+    //     align-items: center;
+    //     padding: 15px 10px;
+    //     background-color: #f7f8f8;
+    //     border-radius: 14px;
+    //     margin: 10px;
+
+    //     .label {
+    //       color: #333;
+    //       font-size: 16px;
+    //     }
+
+    //     .weight-value-wrapper {
+    //       flex: 1;
+    //       text-align: right;
+
+    //       .value {
+    //         display: flex;
+    //         align-items: center;
+    //         justify-content: flex-end;
+    //         color: #333;
+    //         font-size: 16px;
+    //       }
+    //     }
+    //   }
+
+    // .label {
+    //     font-size: 16px;
+    //     color: #666;
+    //     display: flex;
+    //     align-items: center;
+    //     flex-shrink: 0; // 标签宽度不压缩
+    //     margin-right: 8px;
+    //     // height: 40px; // 和胶囊高度一致
+    //     // line-height: 40px; // 垂直居中
+    // }
 
     .form-group {
-        margin-bottom: 20px;
+        // margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 10px;
+        background-color: #f7f8f8;
+        border-radius: 14px;
+        margin: 10px;
 
         .label {
             font-size: 16px;
@@ -12,14 +79,14 @@
             align-items: center;
             flex-shrink: 0; // 标签宽度不压缩
             margin-right: 8px;
-            height: 40px; // 和胶囊高度一致
-            line-height: 40px; // 垂直居中
+            // height: 40px; // 和胶囊高度一致
+            // line-height: 40px; // 垂直居中
         }
 
         &.row {
             display: flex;
             align-items: center; // 水平对齐
-            margin-bottom: 16px;
+            // margin-bottom: 16px;
 
             .capsule-selector {
                 flex-grow: 1; // 填满右侧剩余空间

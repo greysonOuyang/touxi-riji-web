@@ -5,7 +5,7 @@ export default {
     "pages/profile/index",
     "pages/login/index",
     "pages/BloodPressureInputPage/index",
-    "pages/pdPlan/create/index",
+    "pages/pdPlanInput/index",
   ],
   window: {
     backgroundTextStyle: "light",

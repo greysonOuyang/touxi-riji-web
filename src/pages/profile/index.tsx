@@ -47,7 +47,7 @@ const Profile = () => {
               success: (res) => {
                 if (res.confirm) {
                   // 用户点击确定，跳转到添加方案页面
-                  Taro.navigateTo({ url: "/pages/pdPlan/create/index" });
+                  Taro.navigateTo({ url: "/pages/pdPlanInput/index" });
                 }
               },
             });

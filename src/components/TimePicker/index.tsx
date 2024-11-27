@@ -42,16 +42,11 @@ const TimePicker: React.FC<TimePickerProps> = ({
     <View className="time-picker">
       {showLabel && <Text className="label">{label}</Text>}
       <Picker mode="time" value={selectedTime} onChange={handleTimeChange}>
-        <View className="picker-wrapper">
-          {showClockIcon && (
-            <Image
-              className="clock-icon"
-              src="/assets/icons/clock.png"
-              mode="aspectFit"
-            />
-          )}
-          <Text>{selectedTime}</Text>
-          {showArrowIcon && <ArrowRight />}
+        <View className="value-wrapper">
+          <View className="value">
+            <Text>{selectedTime}</Text>
+            {showArrowIcon && <ArrowRight />}
+          </View>
         </View>
       </Picker>
     </View>
