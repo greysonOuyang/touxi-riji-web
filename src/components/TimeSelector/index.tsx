@@ -10,7 +10,8 @@ interface TimeSelectorProps {
   onChange: (value: string) => void;
   allowFuture?: boolean; // 是否允许选择未来时间
   showLabel?: boolean; // 显示标签
-  mode?: "datetime" | "date"; // 选择模式（包括年月日和时分秒的完整模式，或仅选择年月日）
+  mode?: "datetime" | "date"; // 选择模式
+  defaultToCurrent?: boolean; // 新增参数
 }
 
 const TimeSelector: React.FC<TimeSelectorProps> = ({
@@ -18,53 +19,42 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
   value,
   onChange,
   allowFuture = false,
-  showLabel = true, // 默认值为 true
-  mode = "datetime", // 默认使用 datetime 模式
+  showLabel = true,
+  mode = "datetime",
+  defaultToCurrent = false, // 默认值为 false
 }) => {
   const currentDate = dayjs();
 
-  // 获取每个月的天数
   const getDaysInMonth = (year: number, month: number) => {
-    return dayjs(new Date(year, month)).daysInMonth(); // 获取某月的天数
+    return dayjs(new Date(year, month)).daysInMonth();
   };
 
-  // 根据 mode 生成不同的选项
   const generateDateTimeOptions = () => {
+    const years: string[] = [];
     const months: string[] = [];
     const days: string[] = [];
     const hours: string[] = [];
     const minutes: string[] = [];
-
     const currentYear = currentDate.year();
-    const currentMonth = currentDate.month();
 
-    // 年份范围处理
-    const years: string[] = [];
     if (allowFuture) {
-      // 允许选择未来年份：当前年份到未来5年
       for (let i = currentYear; i <= currentYear + 5; i++) {
         years.push(`${i}年`);
       }
     } else {
-      // 不允许选择未来年份：仅允许当前年份及过去年份
       for (let i = currentYear - 10; i <= currentYear; i++) {
         years.push(`${i}年`);
       }
     }
 
-    // 生成月份列
-    const monthsList: string[] = [];
     for (let i = 1; i <= 12; i++) {
-      monthsList.push(`${i}月`);
+      months.push(`${i}月`);
     }
 
-    // 固定生成31天的日期列
-    const daysList: string[] = [];
     for (let i = 1; i <= 31; i++) {
-      daysList.push(`${i}日`);
+      days.push(`${i}日`);
     }
 
-    // 生成时分选项（如果是 datetime 模式）
     if (mode === "datetime") {
       for (let i = 0; i < 24; i++) {
         hours.push(`${i.toString().padStart(2, "0")}时`);
@@ -74,58 +64,25 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
       }
     }
 
-    return {
-      years,
-      months: monthsList,
-      days: daysList,
-      hours,
-      minutes,
-    };
+    return { years, months, days, hours, minutes };
   };
 
-  // 在组件加载时，检查 value 是否为空
   useEffect(() => {
-    if (!value) {
-      // 如果没有传入 value，使用当前时间
-      onChange(currentDate.format("YYYY-MM-DD HH:mm:ss"));
+    if (!value && defaultToCurrent) {
+      onChange(
+        currentDate.format(
+          mode === "datetime" ? "YYYY-MM-DD HH:mm:ss" : "YYYY-MM-DD"
+        )
+      );
     }
-  }, [value, onChange, currentDate]);
+  }, [value, onChange, currentDate, defaultToCurrent, mode]);
 
-  const handleChange = (e) => {
-    const [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex] =
-      e.detail.value;
-    const { years, months, days, hours, minutes } = generateDateTimeOptions();
-
-    let selectedDate = dayjs()
-      .year(parseInt(years[yearIndex].replace("年", ""))) // 根据选择的年份
-      .month(monthIndex) // 根据选择的月份
-      .date(parseInt(days[dayIndex].replace("日", ""))); // 根据选择的日期
-
-    if (mode === "datetime") {
-      selectedDate = selectedDate
-        .hour(Number(hours[hourIndex].replace("时", ""))) // 根据选择的小时
-        .minute(Number(minutes[minuteIndex].replace("分", ""))); // 根据选择的分钟
-    }
-
-    // 校验日期是否有效，若无效则修正日期
-    const daysInSelectedMonth = getDaysInMonth(
-      selectedDate.year(),
-      selectedDate.month()
-    );
-    if (parseInt(days[dayIndex].replace("日", "")) > daysInSelectedMonth) {
-      selectedDate = selectedDate.date(daysInSelectedMonth); // 将日期修正为该月的最后一天
-    }
-
-    onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss"));
-  };
-
+  const currentValue = value ? dayjs(value) : currentDate;
   const { years, months, days, hours, minutes } = generateDateTimeOptions();
-  const currentValue = value ? dayjs(value) : dayjs();
 
   return (
     <View className="time-selector">
-      {showLabel && <Text className="label">{label}</Text>}{" "}
-      {/* 根据 showLabel 控制显示 */}
+      {showLabel && <Text className="label">{label}</Text>}
       <View className="value-wrapper">
         <Picker
           mode="multiSelector"
@@ -133,21 +90,68 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
             mode === "datetime"
               ? [years, months, days, hours, minutes]
               : [years, months, days]
-          } // 根据 mode 选择范围
-          value={[
-            years.findIndex((item) => item === currentValue.format("YYYY年")), // 年份
-            months.findIndex((item) => item === currentValue.format("M月")), // 月份
-            days.findIndex((item) => item === currentValue.format("D日")), // 日期
-            mode === "datetime" ? currentValue.hour() : 0, // 在 date 模式下不显示小时
-            mode === "datetime" ? currentValue.minute() : 0, // 在 date 模式下不显示分钟
-          ]}
-          onChange={handleChange}
+          }
+          value={
+            value
+              ? [
+                  years.findIndex(
+                    (item) => item === currentValue.format("YYYY年")
+                  ),
+                  months.findIndex(
+                    (item) => item === currentValue.format("M月")
+                  ),
+                  days.findIndex((item) => item === currentValue.format("D日")),
+                  mode === "datetime" ? currentValue.hour() : 0,
+                  mode === "datetime" ? currentValue.minute() : 0,
+                ]
+              : [
+                  years.findIndex(
+                    (item) => item === currentDate.format("YYYY年")
+                  ),
+                  months.findIndex(
+                    (item) => item === currentDate.format("M月")
+                  ),
+                  days.findIndex((item) => item === currentDate.format("D日")),
+                  mode === "datetime" ? currentDate.hour() : 0,
+                  mode === "datetime" ? currentDate.minute() : 0,
+                ]
+          }
+          onChange={(e) => {
+            const [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex] =
+              e.detail.value;
+            let selectedDate = dayjs()
+              .year(parseInt(years[yearIndex].replace("年", "")))
+              .month(monthIndex)
+              .date(parseInt(days[dayIndex].replace("日", "")));
+
+            if (mode === "datetime") {
+              selectedDate = selectedDate
+                .hour(parseInt(hours[hourIndex].replace("时", "")))
+                .minute(parseInt(minutes[minuteIndex].replace("分", "")));
+            }
+
+            const daysInSelectedMonth = getDaysInMonth(
+              selectedDate.year(),
+              selectedDate.month()
+            );
+            if (
+              parseInt(days[dayIndex].replace("日", "")) > daysInSelectedMonth
+            ) {
+              selectedDate = selectedDate.date(daysInSelectedMonth);
+            }
+
+            onChange(selectedDate.format("YYYY-MM-DD HH:mm:ss"));
+          }}
         >
           <View className="value">
             <Text>
-              {currentValue.format(
-                mode === "datetime" ? "YYYY年MM月DD日 HH:mm" : "YYYY年MM月DD日"
-              )}
+              {value
+                ? currentValue.format(
+                    mode === "datetime"
+                      ? "YYYY年MM月DD日 HH:mm"
+                      : "YYYY年MM月DD日"
+                  )
+                : "请选择"}
             </Text>
             <ArrowRight />
           </View>

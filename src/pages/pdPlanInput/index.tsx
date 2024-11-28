@@ -153,6 +153,7 @@ const PlanForm: React.FC = () => {
               value={startDate}
               onChange={(date) => setStartDate(date)}
               allowFuture={false}
+              defaultToCurrent={false}
             />
           </View>
         </View>
