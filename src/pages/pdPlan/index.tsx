@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Taro from "@tarojs/taro";
 import dayjs from "dayjs";
 import { createPdPlan, getCurrentPdPlan } from "@/api/pdPlanApi"; // 导入API方法
-import PlanForm from "@/pages/pdPlan/create";
+import PlanForm from "@/pages/pdPlanInput";
 import PlanOverview from "@/components/PlanOverview";
 import { PdPlanDTO, PdPlanVO } from "@/api/pdPlanApi"; // 导入类型定义
 import "./index.scss";

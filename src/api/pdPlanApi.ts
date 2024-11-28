@@ -7,7 +7,6 @@ export interface PdDailySchedule {
   timeSlot: string;
   concentration: string;
   volume: number;
-  dwellTime: number;
 }
 
 // 透析方案详情
@@ -32,7 +31,6 @@ export interface PdPlanDTO {
     timeSlot: string;
     concentration: string;
     volume: number;
-    dwellTime: number;
   }[];
 }
 

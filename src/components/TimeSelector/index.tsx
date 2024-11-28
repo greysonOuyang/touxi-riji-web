@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Picker } from "@tarojs/components";
 import dayjs from "dayjs";
 import "./index.scss";
@@ -82,6 +82,14 @@ const TimeSelector: React.FC<TimeSelectorProps> = ({
       minutes,
     };
   };
+
+  // 在组件加载时，检查 value 是否为空
+  useEffect(() => {
+    if (!value) {
+      // 如果没有传入 value，使用当前时间
+      onChange(currentDate.format("YYYY-MM-DD HH:mm:ss"));
+    }
+  }, [value, onChange, currentDate]);
 
   const handleChange = (e) => {
     const [yearIndex, monthIndex, dayIndex, hourIndex, minuteIndex] =

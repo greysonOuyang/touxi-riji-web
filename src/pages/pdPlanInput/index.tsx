@@ -5,6 +5,9 @@ import TimePicker from "@/components/TimePicker";
 import CapsuleSelector from "@/components/CapsuleSelector";
 import "./index.scss";
 import FormItem from "@/components/FormItem";
+import Taro from "@tarojs/taro";
+import { createPdPlan } from "@/api/pdPlanApi"; // 导入API方法
+import dayjs from "dayjs"; // 确保引入 dayjs
 
 interface Schedule {
   timeSlot: string;
@@ -91,8 +94,40 @@ const PlanForm: React.FC = () => {
     setSchedules(newSchedules);
   };
 
-  const handleSubmit = () => {
-    console.log("提交数据：", { dailyFrequency, startDate, schedules });
+  const handleSubmit = async () => {
+    // 格式化 startDate 为 "YYYY-MM-DD"
+    const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
+    // 构建请求参数
+    const planData = {
+      userId: Taro.getStorageSync("useraId"), // 根据实际情况获取用户ID
+      dailyFrequency,
+      startDate: formattedStartDate,
+      schedules: schedules.map((schedule, index) => ({
+        sequence: index + 1, // 序列号从1开始
+        timeSlot: schedule.timeSlot,
+        concentration: schedule.concentration,
+        volume: schedule.volume,
+      })),
+    };
+
+    try {
+      const response = await createPdPlan(planData);
+      console.log("方案创建成功，方案ID：", response.data); // 处理成功逻辑
+      // 可以在此处添加成功提示或重定向逻辑
+      Taro.showToast({
+        title: "成功",
+        icon: "none",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("提交方案失败：", error);
+      Taro.showToast({
+        title: "失败",
+        icon: "none",
+        duration: 2000,
+      });
+      // 处理错误逻辑，比如提示用户
+    }
   };
 
   return (
