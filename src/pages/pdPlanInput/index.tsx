@@ -6,8 +6,8 @@ import CapsuleSelector from "@/components/CapsuleSelector";
 import "./index.scss";
 import FormItem from "@/components/FormItem";
 import Taro from "@tarojs/taro";
-import { createPdPlan } from "@/api/pdPlanApi"; // 导入API方法
-import dayjs from "dayjs"; // 确保引入 dayjs
+import { createPdPlan } from "@/api/pdPlanApi";
+import dayjs from "dayjs";
 
 interface Schedule {
   timeSlot: string;
@@ -16,7 +16,7 @@ interface Schedule {
 }
 
 const PlanForm: React.FC = () => {
-  const [step, setStep] = useState(0); // 当前步骤：0=基础信息，1=填写计划
+  const [step, setStep] = useState(0);
   const [dailyFrequency, setDailyFrequency] = useState<number>(4);
   const [startDate, setStartDate] = useState<string>("");
   const [schedules, setSchedules] = useState<Schedule[]>(
@@ -27,18 +27,14 @@ const PlanForm: React.FC = () => {
     })
   );
   const [currentTab, setCurrentTab] = useState(0);
-
-  const tabsRef = useRef<HTMLDivElement>(null); // tabs容器ref
-  const tabRefs = useRef<(HTMLDivElement | null)[]>([]); // 单个tab的refs
-
-  // 添加滚动指示器
   const [showLeftIndicator, setShowLeftIndicator] = useState(false);
   const [showRightIndicator, setShowRightIndicator] = useState(false);
 
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const handleTabClick = (index: number) => {
     setCurrentTab(index);
-
-    // 添加点击动画类
     const tab = tabRefs.current[index];
     if (tab) {
       tab.classList.add("tab-selected");
@@ -49,11 +45,7 @@ const PlanForm: React.FC = () => {
     const tabsContainer = tabsRef.current;
     if (tabsContainer) {
       const { scrollLeft, scrollWidth, clientWidth } = tabsContainer;
-
-      // 左侧指示器：当 scrollLeft 大于 0 时显示
       setShowLeftIndicator(scrollLeft > 0);
-
-      // 右侧指示器：当右侧还有内容未显示时显示
       setShowRightIndicator(scrollLeft + clientWidth < scrollWidth);
     }
   };
@@ -65,11 +57,9 @@ const PlanForm: React.FC = () => {
   useEffect(() => {
     checkScrollIndicators();
     const tabsContainer = tabsRef.current;
-
     if (tabsContainer) {
       tabsContainer.addEventListener("scroll", handleScroll);
     }
-
     return () => {
       if (tabsContainer) {
         tabsContainer.removeEventListener("scroll", handleScroll);
@@ -94,16 +84,51 @@ const PlanForm: React.FC = () => {
     setSchedules(newSchedules);
   };
 
+  const validateForm = () => {
+    if (!startDate) {
+      Taro.showToast({
+        title: "请选择开始日期",
+        icon: "none",
+        duration: 2000,
+      });
+      return false;
+    }
+
+    for (let i = 0; i < schedules.length; i++) {
+      const schedule = schedules[i];
+      if (!schedule.volume) {
+        Taro.showToast({
+          title: `请填写第${i + 1}次透析的容量`,
+          icon: "none",
+          duration: 2000,
+        });
+        return false;
+      }
+      if (!schedule.concentration) {
+        Taro.showToast({
+          title: `请选择第${i + 1}次透析的浓度`,
+          icon: "none",
+          duration: 2000,
+        });
+        return false;
+      }
+    }
+
+    return true;
+  };
+
   const handleSubmit = async () => {
-    // 格式化 startDate 为 "YYYY-MM-DD"
+    if (!validateForm()) {
+      return;
+    }
+
     const formattedStartDate = dayjs(startDate).format("YYYY-MM-DD");
-    // 构建请求参数
     const planData = {
-      userId: Taro.getStorageSync("useraId"), // 根据实际情况获取用户ID
+      userId: Taro.getStorageSync("userId"),
       dailyFrequency,
       startDate: formattedStartDate,
       schedules: schedules.map((schedule, index) => ({
-        sequence: index + 1, // 序列号从1开始
+        sequence: index + 1,
         timeSlot: schedule.timeSlot,
         concentration: schedule.concentration,
         volume: schedule.volume,
@@ -112,29 +137,38 @@ const PlanForm: React.FC = () => {
 
     try {
       const response = await createPdPlan(planData);
-      console.log("方案创建成功，方案ID：", response.data); // 处理成功逻辑
-      // 可以在此处添加成功提示或重定向逻辑
+      console.log("方案创建成功，方案ID：", response.data);
       Taro.showToast({
-        title: "成功",
-        icon: "none",
+        title: "方案创建成功",
+        icon: "success",
         duration: 2000,
       });
     } catch (error) {
       console.error("提交方案失败：", error);
       Taro.showToast({
-        title: "失败",
+        title: "提交方案失败，请重试",
         icon: "none",
         duration: 2000,
       });
-      // 处理错误逻辑，比如提示用户
     }
+  };
+
+  const handleNextStep = () => {
+    if (!startDate) {
+      Taro.showToast({
+        title: "请选择开始日期",
+        icon: "none",
+        duration: 2000,
+      });
+      return;
+    }
+    setStep(1);
   };
 
   return (
     <View className="plan-form">
       {step === 0 ? (
         <View className="step-one">
-          {/* 每日透析次数 */}
           <View className="form-group row">
             <View className="label">每日透析次数</View>
             <CapsuleSelector
@@ -144,7 +178,6 @@ const PlanForm: React.FC = () => {
             />
           </View>
 
-          {/* 开始日期 */}
           <View className="form-group">
             <TimeSelector
               mode="date"
@@ -159,9 +192,7 @@ const PlanForm: React.FC = () => {
         </View>
       ) : (
         <View className="step-two">
-          {/* Tab 切换 */}
           <View className="tabs-wrapper">
-            {/* 左滚动指示器 */}
             {showLeftIndicator && <View className="scroll-indicator left" />}
 
             <View className="tabs" ref={tabsRef}>
@@ -186,16 +217,14 @@ const PlanForm: React.FC = () => {
                 ))}
             </View>
 
-            {/* 右滚动指示器 */}
             {showRightIndicator && <View className="scroll-indicator right" />}
           </View>
 
-          {/* Tab 内容 */}
           <View className="tab-content">
             <View className="form-group row">
               <View className="label">浓度</View>
               <CapsuleSelector
-                options={["1.5%", "2.5%", "4.25%"]} // 类型是 string[]
+                options={["1.5%", "2.5%", "4.25%"]}
                 selected={schedules[currentTab].concentration}
                 onSelect={(option: string) =>
                   handleScheduleChange(currentTab, {
@@ -235,10 +264,9 @@ const PlanForm: React.FC = () => {
         </View>
       )}
 
-      {/* 按钮固定在底部 */}
       <View className="button-container">
         {step === 0 ? (
-          <View className="primary-button" onClick={() => setStep(1)}>
+          <View className="primary-button" onClick={handleNextStep}>
             下一步
           </View>
         ) : (

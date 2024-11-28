@@ -38,7 +38,8 @@ const Profile = () => {
     if (userId) {
       try {
         const response = await getCurrentPdPlan(userId);
-        if (response.code === 200) {
+        console.log("腹透响应", response);
+        if (response.isSuccess()) {
           if (response.data === null) {
             // 没有腹透方案，提示用户
             Taro.showModal({

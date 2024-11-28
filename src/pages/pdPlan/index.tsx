@@ -1,114 +1,133 @@
-// src/pages/CreatePlan.tsx
 import React, { useEffect, useState } from "react";
+import { View, Text, Switch, Button } from "@tarojs/components";
+import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
 import Taro from "@tarojs/taro";
-import dayjs from "dayjs";
-import { createPdPlan, getCurrentPdPlan } from "@/api/pdPlanApi"; // 导入API方法
-import PlanForm from "@/pages/pdPlanInput";
-import PlanOverview from "@/components/PlanOverview";
-import { PdPlanDTO, PdPlanVO } from "@/api/pdPlanApi"; // 导入类型定义
 import "./index.scss";
-import { View } from "@tarojs/components";
 
-const CreatePlan: React.FC = () => {
-  const [userId, setUserId] = useState<string>("");
-  const [hasPlan, setHasPlan] = useState<boolean>(false);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [dailyFrequency, setDailyFrequency] = useState<number>(4);
-  const [startDate, setStartDate] = useState<string>(
-    dayjs().format("YYYY-MM-DD")
-  );
-  const [schedules, setSchedules] = useState<any[]>([]);
+const PDPlanDisplay: React.FC = () => {
+  const [pdPlan, setPdPlan] = useState<PdPlanVO | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setUserId(Taro.getStorageSync("userId"));
+    fetchPdPlan();
+  }, []);
 
-      // 获取当前透析方案
-      if (userId) {
-        try {
-          const response = await getCurrentPdPlan(userId);
-          if (response.code === 200 && response.data) {
-            const plan: PdPlanVO = response.data;
-            setHasPlan(true);
-            setDailyFrequency(plan.dailyFrequency);
-            setStartDate(plan.startDate);
-            setSchedules(plan.schedules);
-          } else {
-            console.error(response.msg);
-          }
-        } catch (error) {
-          console.error("获取透析方案失败", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, [userId]);
-
-  const handleFrequencyChange = (frequency: number) => {
-    const newSchedules = Array(frequency).fill({
-      timeSlot: "",
-      concentration: "1.5%",
-      volume: 2000,
-      dwellTime: 240,
-    });
-    setSchedules(newSchedules);
-    setDailyFrequency(frequency);
-  };
-
-  const handleScheduleChange = (index: number, newSchedule: any) => {
-    const newSchedules = [...schedules];
-    newSchedules[index] = newSchedule;
-    setSchedules(newSchedules);
-  };
-
-  const handleSubmit = async () => {
-    const planData: PdPlanDTO = {
-      userId,
-      dailyFrequency,
-      startDate,
-      schedules,
-    };
-
+  const fetchPdPlan = async () => {
+    setIsLoading(true);
     try {
-      if (hasPlan) {
-        // 更新方案
-        // await updatePdPlan(userId, planData); // 假设有 planId
-        Taro.showToast({ title: "方案已更新", icon: "success" });
-      } else {
-        // 创建新方案
-        await createPdPlan(planData);
-        Taro.showToast({ title: "方案已创建", icon: "success" });
+      const userId = Taro.getStorageSync("userId");
+      const response = await getCurrentPdPlan(userId);
+      if (response.data) {
+        setPdPlan(response.data);
       }
-      setHasPlan(true);
-      setIsEditing(false);
     } catch (error) {
-      Taro.showToast({ title: "保存失败，请重试", icon: "none" });
-      console.error("保存透析方案失败", error);
+      console.error("Failed to fetch PD plan:", error);
+      Taro.showToast({
+        title: "获取方案失败",
+        icon: "none",
+        duration: 2000,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleStatusChange = async (newStatus: boolean) => {
+    if (!pdPlan) return;
+
+    try {
+      // Here you would typically call an API to update the plan status
+      // For now, we'll just update the local state
+      setPdPlan({ ...pdPlan, status: newStatus ? 1 : 0 });
+      Taro.showToast({
+        title: newStatus ? "方案已启用" : "方案已停用",
+        icon: "success",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error("Failed to update plan status:", error);
+      Taro.showToast({
+        title: "更新状态失败",
+        icon: "none",
+        duration: 2000,
+      });
+    }
+  };
+
+  const handleAddPlan = () => {
+    Taro.navigateTo({ url: "/pages/pdPlanInput/index" });
+  };
+
+  const handleLongPress = (planId: number) => {
+    Taro.showModal({
+      title: "编辑方案",
+      content: "是否要编辑此腹透方案？",
+      confirmText: "编辑",
+      cancelText: "取消",
+      success: (res) => {
+        if (res.confirm) {
+          Taro.navigateTo({ url: `/pages/pdPlanInput/index?planId=${planId}` });
+        }
+      },
+    });
+  };
+
+  const getStatusColor = (status: number) => {
+    return status === 1 ? "bg-green" : "bg-gray";
+  };
+
+  if (isLoading) {
+    return <View className="loading">加载中...</View>;
+  }
+
+  if (!pdPlan) {
+    return (
+      <View className="no-plan">
+        <Text>暂无腹透方案</Text>
+        <Button className="add-plan-btn" onClick={handleAddPlan}>
+          新增方案
+        </Button>
+      </View>
+    );
+  }
+
   return (
-    <View className="pd-plan-container">
-      {hasPlan && !isEditing ? (
-        <PlanOverview
-          dailyFrequency={dailyFrequency}
-          startDate={startDate}
-          onEdit={() => setIsEditing(true)}
-        />
-      ) : (
-        <PlanForm
-          dailyFrequency={dailyFrequency}
-          startDate={startDate}
-          schedules={schedules}
-          onFrequencyChange={handleFrequencyChange}
-          onStartDateChange={setStartDate}
-          onScheduleChange={handleScheduleChange}
-          onSubmit={handleSubmit}
-        />
-      )}
+    <View className="pd-plan-display">
+      <View
+        className={`plan-card ${getStatusColor(pdPlan.status)}`}
+        onLongPress={() => handleLongPress(pdPlan.id)}
+      >
+        <View className="card-header">
+          <Text className="plan-title">腹透方案 #{pdPlan.id}</Text>
+          <Switch
+            checked={pdPlan.status === 1}
+            onChange={(e) => handleStatusChange(e.detail.value)}
+            className="status-switch"
+          />
+        </View>
+        <View className="card-content">
+          <Text className="info-item">开始日期: {pdPlan.startDate}</Text>
+          <Text className="info-item">每日频次: {pdPlan.dailyFrequency}次</Text>
+          <View className="schedules">
+            {pdPlan.schedules.map((schedule) => (
+              <View key={schedule.sequence} className="schedule-item">
+                <Text className="schedule-title">第{schedule.sequence}次</Text>
+                <Text className="schedule-detail">
+                  时间: {schedule.timeSlot}
+                </Text>
+                <Text className="schedule-detail">
+                  浓度: {schedule.concentration}
+                </Text>
+                <Text className="schedule-detail">
+                  容量: {schedule.volume}ml
+                </Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
 
-export default CreatePlan;
+export default PDPlanDisplay;
