@@ -184,21 +184,6 @@ const PlanForm: React.FC = () => {
               />
             </View>
 
-            {/* <View className="form-group input">
-              <Input
-                type="number"
-                placeholder="透析液容量"
-                value={String(schedules[currentTab].volume)}
-                onInput={(e) =>
-                  handleScheduleChange(currentTab, {
-                    ...schedules[currentTab],
-                    volume: Number(e.detail.value),
-                  })
-                }
-                className="input-box"
-              />
-              <View className="unit-box">ml</View>
-            </View> */}
             <FormItem
               label="透析液容量"
               value={String(schedules[currentTab].volume)}

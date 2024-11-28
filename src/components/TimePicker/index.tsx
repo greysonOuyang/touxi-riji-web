@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, Picker } from "@tarojs/components";
 import dayjs from "dayjs";
-import "./index.scss"; // 引入样式
+import "./index.scss";
 import ArrowRight from "../ArrowRight";
 
 interface TimePickerProps {
-  value?: string; // 当前选中的时间（外部传入）
-  label?: string; // 自定义的 label 名称
-  showLabel?: boolean; // 是否显示 label
-  showArrowIcon?: boolean; // 是否显示箭头图标
-  onChange?: (value: string) => void; // 时间变化的回调
+  value?: string;
+  label?: string;
+  showLabel?: boolean;
+  showArrowIcon?: boolean;
+  onChange?: (value: string) => void;
 }
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -38,18 +38,14 @@ const TimePicker: React.FC<TimePickerProps> = ({
   return (
     <View className="time-picker">
       {showLabel && <Text className="label">{label}</Text>}
-
-      <View className="value-wrapper">
-        <Picker
-          mode="time"
-          value={selectedTime}
-          onChange={handleTimeChange}
-        ></Picker>
-        <View className="value">
-          <Text>{selectedTime}</Text>
-          {showArrowIcon && <ArrowRight />}
+      <Picker mode="time" value={selectedTime} onChange={handleTimeChange}>
+        <View className="value-wrapper">
+          <View className="value">
+            <Text>{selectedTime}</Text>
+            {showArrowIcon && <ArrowRight />}
+          </View>
         </View>
-      </View>
+      </Picker>
     </View>
   );
 };

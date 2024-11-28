@@ -41,13 +41,14 @@
             border-radius: 14px; // 圆角一致
             background-color: transparent; // 与背景一致
             outline: none; // 去掉选中时的外框
-            margin-right: 4px;
+            margin-right: 10px;
             color: #ADA4A5;
 
         }
     }
 
     .right-section {
+        margin-right: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
