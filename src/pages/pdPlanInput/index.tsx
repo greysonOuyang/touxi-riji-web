@@ -174,7 +174,6 @@ const PlanForm: React.FC = () => {
               <TimePicker
                 label="透析时间"
                 value={schedules[currentTab].timeSlot}
-                showClockIcon={false}
                 showArrowIcon={true}
                 onChange={(time) =>
                   handleScheduleChange(currentTab, {

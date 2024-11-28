@@ -11,8 +11,14 @@
     margin: 10px;
 
     .label {
-      color: #333;
+      // color: #333;
+      // font-size: 16px;
       font-size: 16px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      font-weight: 400;
+      line-height: 18px;
     }
 
     .weight-value-wrapper {
@@ -23,7 +29,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        color: #333;
+        color: #666;
         font-size: 16px;
       }
     }

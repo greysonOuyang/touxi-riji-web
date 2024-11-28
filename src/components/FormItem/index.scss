@@ -1,21 +1,19 @@
 .form-item {
+
+
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 15px;
-    margin: 10px 0;
+
 
     .left-section {
         display: flex;
         align-items: center;
         flex: 1; // 左侧区域占满可用空间
         background-color: #f7f8f8; // 左侧背景覆盖
-        padding: 10px 10px;
-        margin-right: 8px;
-        margin-right: 12px; // 与输入框间距
+        padding: 15px 10px;
+        margin: 10px;
         border-radius: 14px;
-
-
 
 
         .icon {
@@ -25,26 +23,27 @@
         }
 
         .label {
-            color: #333;
-            font-family: 'Poppins';
-            font-style: normal;
-            font-weight: 400;
-            font-size: 12px;
-            line-height: 18px;
-            color: #ADA4A5;
+            font-size: 16px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0; // 标签宽度不压缩
+            margin-right: 8px;
         }
 
         .input-box {
             flex: 1; // 输入框占满剩余空间
-            height: 30px;
+            // height: 30px;
             // padding: 0 10px;
-            font-size: 14px;
+            font-size: 16px;
             text-align: right;
             border: none; // 去掉边框
             border-radius: 14px; // 圆角一致
             background-color: transparent; // 与背景一致
             outline: none; // 去掉选中时的外框
             margin-right: 4px;
+            color: #ADA4A5;
+
         }
     }
 

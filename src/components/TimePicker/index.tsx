@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Picker, Image } from "@tarojs/components";
+import { View, Text, Picker } from "@tarojs/components";
 import dayjs from "dayjs";
-import "./index.scss";
+import "./index.scss"; // 引入样式
 import ArrowRight from "../ArrowRight";
 
 interface TimePickerProps {
   value?: string; // 当前选中的时间（外部传入）
   label?: string; // 自定义的 label 名称
   showLabel?: boolean; // 是否显示 label
-  showClockIcon?: boolean; // 是否显示时钟图标
   showArrowIcon?: boolean; // 是否显示箭头图标
   onChange?: (value: string) => void; // 时间变化的回调
 }
@@ -17,7 +16,6 @@ const TimePicker: React.FC<TimePickerProps> = ({
   value,
   label = "时间",
   showLabel = true,
-  showClockIcon = true,
   showArrowIcon = true,
   onChange,
 }) => {
@@ -26,7 +24,6 @@ const TimePicker: React.FC<TimePickerProps> = ({
   );
 
   useEffect(() => {
-    // 如果外部传入的 value 改变，更新组件内部的 selectedTime
     if (value) {
       setSelectedTime(value);
     }
@@ -35,20 +32,24 @@ const TimePicker: React.FC<TimePickerProps> = ({
   const handleTimeChange = (e) => {
     const time = e.detail.value;
     setSelectedTime(time);
-    onChange?.(time); // 调用父组件传入的回调
+    onChange?.(time);
   };
 
   return (
     <View className="time-picker">
       {showLabel && <Text className="label">{label}</Text>}
-      <Picker mode="time" value={selectedTime} onChange={handleTimeChange}>
-        <View className="value-wrapper">
-          <View className="value">
-            <Text>{selectedTime}</Text>
-            {showArrowIcon && <ArrowRight />}
-          </View>
+
+      <View className="value-wrapper">
+        <Picker
+          mode="time"
+          value={selectedTime}
+          onChange={handleTimeChange}
+        ></Picker>
+        <View className="value">
+          <Text>{selectedTime}</Text>
+          {showArrowIcon && <ArrowRight />}
         </View>
-      </Picker>
+      </View>
     </View>
   );
 };

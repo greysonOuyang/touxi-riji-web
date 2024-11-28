@@ -1,33 +1,28 @@
 .time-picker {
   display: flex;
-  align-items: center; // 确保 label 和时间值垂直对齐
-  width: 100%; // 撑满父容器
-
+  align-items: center; // 确保 label 和 value 垂直对齐
+  width: 100%; // 确保容器充满父级
 
   .label {
     font-size: 16px;
-    color: #333;
+    color: #666;
     margin-right: 16px; // 确保 label 和 value-wrapper 有适当间距
     white-space: nowrap; // 防止文字换行
     flex-shrink: 0; // 防止 label 被压缩
   }
-
-
 
   .value-wrapper {
     flex: 1; // 占据剩余空间
     text-align: right; // 值靠右对齐
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-end; // 确保内容在右侧对齐
 
     .value {
       font-size: 16px;
-      color: #333;
+      color: #666;
       display: flex;
       align-items: center;
     }
-
-
   }
 }

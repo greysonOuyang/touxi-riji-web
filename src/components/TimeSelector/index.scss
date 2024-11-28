@@ -5,7 +5,7 @@
 
     .label {
         font-size: 16px;
-        color: #333;
+        color: #666;
         margin-right: 16px; // 确保 label 和 value-wrapper 有适当间距
         white-space: nowrap; // 防止文字换行
         flex-shrink: 0; // 防止 label 被压缩
@@ -20,7 +20,7 @@
 
         .value {
             font-size: 16px;
-            color: #333;
+            color: #666;
             display: flex;
             align-items: center;
         }
