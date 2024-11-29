@@ -34,36 +34,37 @@ const Profile = () => {
   }, []);
 
   const handlePdPlanClick = async () => {
-    const userId = Taro.getStorageSync("userId");
-    if (userId) {
-      try {
-        const response = await getCurrentPdPlan(userId);
-        console.log("腹透响应", response);
-        if (response.isSuccess()) {
-          if (response.data === null) {
-            // 没有腹透方案，提示用户
-            Taro.showModal({
-              title: "提示",
-              content: "暂无腹透方案，是否前往添加？",
-              success: (res) => {
-                if (res.confirm) {
-                  // 用户点击确定，跳转到添加方案页面
-                  Taro.navigateTo({ url: "/pages/pdPlanInput/index" });
-                }
-              },
-            });
-          } else {
-            // 已存在腹透方案，跳转到方案列表页面
-            Taro.navigateTo({ url: "/pages/pdPlan/index" });
-          }
-        } else {
-          console.error(response.msg);
-        }
-      } catch (error) {
-        console.error("获取腹透方案失败", error);
-        Taro.showToast({ title: "获取方案失败，请重试", icon: "none" });
-      }
-    }
+    Taro.navigateTo({ url: "/pages/pdPlan/index" });
+    // const userId = Taro.getStorageSync("userId");
+    // if (userId) {
+    //   try {
+    //     const response = await getCurrentPdPlan(userId);
+    //     console.log("腹透响应", response);
+    //     if (response.isSuccess()) {
+    //       if (response.data === null) {
+    //         // 没有腹透方案，提示用户
+    //         Taro.showModal({
+    //           title: "提示",
+    //           content: "暂无腹透方案，是否前往添加？",
+    //           success: (res) => {
+    //             if (res.confirm) {
+    //               // 用户点击确定，跳转到添加方案页面
+    //               Taro.navigateTo({ url: "/pages/pdPlanInput/index" });
+    //             }
+    //           },
+    //         });
+    //       } else {
+    //         // 已存在腹透方案，跳转到方案列表页面
+    //         Taro.navigateTo({ url: "/pages/pdPlan/index" });
+    //       }
+    //     } else {
+    //       console.error(response.msg);
+    //     }
+    //   } catch (error) {
+    //     console.error("获取腹透方案失败", error);
+    //     Taro.showToast({ title: "获取方案失败，请重试", icon: "none" });
+    //   }
+    // }
   };
 
   return (

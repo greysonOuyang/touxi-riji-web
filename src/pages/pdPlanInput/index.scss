@@ -2,68 +2,8 @@
     padding: 16px;
     position: relative;
     min-height: 100vh;
-    // background: #F8F9FA;
-
-    // .step-one {
-    //     background: #FFFFFF;
-    //     border-radius: 12px;
-    //     padding: 16px;
-    //     margin-bottom: 24px;
-    // }
-
-    // .row {
-    //     display: flex;
-    //     align-items: center; // 水平对齐
-    //     // margin-bottom: 16px;
-    //     padding: 16px 10px;
-    //     // margin: 10px;
-
-    //     .capsule-selector {
-    //         flex-grow: 1; // 填满右侧剩余空间
-    //     }
-    // }
-
-    // .weight-form-item {
-    //     display: flex;
-    //     justify-content: space-between;
-    //     align-items: center;
-    //     padding: 15px 10px;
-    //     background-color: #f7f8f8;
-    //     border-radius: 14px;
-    //     margin: 10px;
-
-    //     .label {
-    //       color: #333;
-    //       font-size: 16px;
-    //     }
-
-    //     .weight-value-wrapper {
-    //       flex: 1;
-    //       text-align: right;
-
-    //       .value {
-    //         display: flex;
-    //         align-items: center;
-    //         justify-content: flex-end;
-    //         color: #333;
-    //         font-size: 16px;
-    //       }
-    //     }
-    //   }
-
-    // .label {
-    //     font-size: 16px;
-    //     color: #666;
-    //     display: flex;
-    //     align-items: center;
-    //     flex-shrink: 0; // 标签宽度不压缩
-    //     margin-right: 8px;
-    //     // height: 40px; // 和胶囊高度一致
-    //     // line-height: 40px; // 垂直居中
-    // }
 
     .form-group {
-        // margin-bottom: 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -77,19 +17,16 @@
             color: #666;
             display: flex;
             align-items: center;
-            flex-shrink: 0; // 标签宽度不压缩
+            flex-shrink: 0;
             margin-right: 8px;
-            // height: 40px; // 和胶囊高度一致
-            // line-height: 40px; // 垂直居中
         }
 
         &.row {
             display: flex;
-            align-items: center; // 水平对齐
-            // margin-bottom: 16px;
+            align-items: center;
 
             .capsule-selector {
-                flex-grow: 1; // 填满右侧剩余空间
+                flex-grow: 1;
             }
         }
 
@@ -101,21 +38,20 @@
             .input-box {
                 flex: 1;
                 height: 40px;
-                padding: 0 16px; // 左右内边距
+                padding: 0 16px;
                 font-size: 16px;
                 border: 1px solid #ddd;
                 border-radius: 20px;
                 outline: none;
                 box-sizing: border-box;
 
-                // 占位文本样式
                 &::placeholder {
                     color: #aaa;
                 }
             }
 
             .unit-box {
-                margin-left: -40px; // 左移，贴近输入框
+                margin-left: -40px;
                 height: 40px;
                 line-height: 40px;
                 padding: 0 12px;
@@ -210,21 +146,21 @@
         left: 0;
         right: 0;
         display: flex;
-        flex-direction: column; // 垂直排列
+        flex-direction: column;
         justify-content: center;
-        align-items: center; // 水平居中
-        gap: 12px; // 按钮之间的间距
+        align-items: center;
+        gap: 12px;
         padding: 0 16px;
 
         .primary-button,
         .secondary-button {
             width: 100%;
             max-width: 300px;
-            height: 48px; // 按钮高度
+            height: 48px;
             border-radius: 25px;
             font-size: 16px;
             text-align: center;
-            line-height: 48px; // 文本垂直居中
+            line-height: 48px;
             cursor: pointer;
         }
 
@@ -237,6 +173,62 @@
         .secondary-button {
             background: #f0f0f0;
             color: #666;
+        }
+    }
+}
+
+.no-plan {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+
+    .add-plan-btn {
+        margin-top: 20px;
+        background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+        color: #fff;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+}
+
+.scroll-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1;
+
+    &.left {
+        left: 0;
+    }
+
+    &.right {
+        right: 0;
+    }
+}
+
+.button-container {
+    &.edit-mode {
+        flex-direction: row;
+        justify-content: space-between;
+
+        .primary-button,
+        .secondary-button {
+            width: 48%;
+            max-width: none;
         }
     }
 }

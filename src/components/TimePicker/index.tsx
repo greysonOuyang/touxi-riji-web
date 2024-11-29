@@ -10,7 +10,7 @@ interface TimePickerProps {
   showLabel?: boolean;
   showArrowIcon?: boolean;
   onChange?: (value: string) => void;
-  useCurrentTime?: boolean; // 新增参数
+  useCurrentTime?: boolean;
 }
 
 const TimePicker: React.FC<TimePickerProps> = ({
@@ -19,15 +19,18 @@ const TimePicker: React.FC<TimePickerProps> = ({
   showLabel = true,
   showArrowIcon = true,
   onChange,
-  useCurrentTime = false, // 默认值为 false
+  useCurrentTime = false,
 }) => {
   const currentTime = dayjs().format("HH:mm");
-  const [selectedTime, setSelectedTime] = useState<string>(
-    value || (useCurrentTime ? currentTime : "")
-  );
+  const [selectedTime, setSelectedTime] = useState<string>(() => {
+    if (value && value.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
+      return value;
+    }
+    return useCurrentTime ? currentTime : "";
+  });
 
   useEffect(() => {
-    if (value) {
+    if (value && value.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
       setSelectedTime(value);
     }
   }, [value]);
@@ -38,7 +41,7 @@ const TimePicker: React.FC<TimePickerProps> = ({
     onChange?.(time);
   };
 
-  const pickerValue = selectedTime || currentTime; // 如果没有选择时间，使用当前时间作为默认值
+  const pickerValue = selectedTime || currentTime;
 
   return (
     <View className="time-picker">

@@ -1,0 +1,150 @@
+.pd-plan-display {
+    padding: 16px;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.no-plan {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+
+    .no-plan-text {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 20px;
+    }
+}
+
+.plan-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+
+    .card-header {
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+    }
+
+    .card-content {
+        padding: 20px;
+    }
+
+    .plan-title {
+        font-size: 20px;
+        font-weight: bold;
+        color: #ffffff;
+    }
+
+    .edit-icon {
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
+    }
+
+    .plan-info {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+    }
+
+    .schedules {
+        .schedule-item {
+            background-color: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .schedule-header {
+            margin-bottom: 12px;
+        }
+
+        .schedule-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .schedule-details {
+            .schedule-detail {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+
+                &:last-child {
+                    margin-bottom: 0;
+                }
+
+                .detail-label {
+                    font-size: 14px;
+                    color: #666;
+                }
+
+                .detail-value {
+                    font-size: 16px;
+                    color: #333;
+                    font-weight: 500;
+                }
+            }
+        }
+    }
+}
+
+.button-container {
+    position: fixed;
+    bottom: 40px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+
+    .primary-button {
+        width: 100%;
+        max-width: 300px;
+        height: 48px;
+        border-radius: 24px;
+        font-size: 16px;
+        text-align: center;
+        line-height: 48px;
+        cursor: pointer;
+        background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+        color: #fff;
+        font-weight: bold;
+    }
+}
