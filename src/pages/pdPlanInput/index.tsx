@@ -45,7 +45,7 @@ const PlanForm: React.FC = () => {
 
   useEffect(() => {
     const eventChannel =
-      Taro.getCurrentInstance().page?.getOpenerEventChannel();
+      Taro.getCurrentInstance()?.page?.getOpenerEventChannel?.();
 
     if (eventChannel) {
       eventChannel.on(
