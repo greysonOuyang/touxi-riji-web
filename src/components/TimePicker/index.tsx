@@ -22,23 +22,28 @@ const TimePicker: React.FC<TimePickerProps> = ({
   useCurrentTime = false,
 }) => {
   const currentTime = dayjs().format("HH:mm");
-  const [selectedTime, setSelectedTime] = useState<string>(() => {
-    if (value && value.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
-      return value;
+
+  // 校验时间格式并初始化选中的时间
+  const getValidTime = (time: string | undefined) => {
+    if (time && time.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
+      return time; // 返回有效的时间
     }
-    return useCurrentTime ? currentTime : "";
-  });
+    return useCurrentTime ? currentTime : ""; // 如果不符合格式，返回当前时间或者空
+  };
+
+  const [selectedTime, setSelectedTime] = useState<string>(() =>
+    getValidTime(value)
+  );
 
   useEffect(() => {
-    if (value && value.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
-      setSelectedTime(value);
-    }
+    // 如果 value 变化，更新 selectedTime，确保状态一致
+    setSelectedTime(getValidTime(value));
   }, [value]);
 
   const handleTimeChange = (e) => {
     const time = e.detail.value;
     setSelectedTime(time);
-    onChange?.(time);
+    onChange?.(time); // 传递选中的时间给父组件
   };
 
   const pickerValue = selectedTime || currentTime;

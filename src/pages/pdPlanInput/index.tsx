@@ -97,9 +97,11 @@ const PlanForm: React.FC = () => {
     index: number,
     updatedSchedule: Partial<Schedule>
   ) => {
-    const newSchedules = [...schedules];
-    newSchedules[index] = { ...newSchedules[index], ...updatedSchedule };
-    setSchedules(newSchedules);
+    // 创建新的 schedules 数组，避免引用共享
+    const newSchedules = [...schedules]; // 使用浅拷贝
+    newSchedules[index] = { ...newSchedules[index], ...updatedSchedule }; // 只修改指定索引项
+
+    setSchedules(newSchedules); // 更新状态
   };
 
   const validateForm = () => {
