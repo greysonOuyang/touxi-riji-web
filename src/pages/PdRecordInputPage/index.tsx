@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { View, Text } from "@tarojs/components";
 import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
 import { addPdRecord, NewPdRecord } from "@/api/pdRecordApi";
-import Taro from "@tarojs/taro";
+import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 
 const PdRecordInputPage: React.FC = () => {
@@ -19,6 +19,10 @@ const PdRecordInputPage: React.FC = () => {
       title: "记录腹透数据",
     });
   }, []);
+
+  useDidShow(() => {
+    fetchPdPlan();
+  });
 
   const fetchPdPlan = async () => {
     try {
@@ -88,6 +92,7 @@ const PdRecordInputPage: React.FC = () => {
       const response = await addPdRecord(newRecord);
       if (response.isSuccess()) {
         Taro.showToast({ title: "记录添加成功", icon: "success" });
+        Taro.setStorageSync("refreshUltrafiltrationView", true);
         Taro.navigateBack();
       } else {
         Taro.showToast({ title: "添加记录失败", icon: "none" });
@@ -102,13 +107,24 @@ const PdRecordInputPage: React.FC = () => {
     setIsDrainageKg(!isDrainageKg);
     if (drainageVolume) {
       if (isDrainageKg) {
-        // Converting from kg to ml
         setDrainageVolume((parseFloat(drainageVolume) * 1000).toFixed(0));
       } else {
-        // Converting from ml to kg
         setDrainageVolume((parseFloat(drainageVolume) / 1000).toFixed(2));
       }
     }
+  };
+
+  const handleDrainageVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (isDrainageKg) {
+      setDrainageVolume(value.replace(/[^\d.]/g, ""));
+    } else {
+      setDrainageVolume(value.replace(/\D/g, ""));
+    }
+  };
+
+  const handleInfusionVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInfusionVolume(e.target.value.replace(/\D/g, ""));
   };
 
   return (
@@ -137,12 +153,16 @@ const PdRecordInputPage: React.FC = () => {
           <View className="input-row">
             <Text className="label">引入量</Text>
             <View className="input-wrapper">
-              <input
-                type="number"
-                className="input"
-                value={infusionVolume}
-                onInput={(e) => setInfusionVolume(e.detail.value)}
-              />
+              <View className="input-field">
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  className="input"
+                  value={infusionVolume}
+                  onChange={handleInfusionVolumeChange}
+                  placeholder="点击输入"
+                />
+              </View>
               <Text className="unit">ml</Text>
             </View>
           </View>
@@ -152,12 +172,16 @@ const PdRecordInputPage: React.FC = () => {
           <View className="input-row">
             <Text className="label">引流量</Text>
             <View className="input-wrapper">
-              <input
-                type="number"
-                className="input"
-                value={drainageVolume}
-                onInput={(e) => setDrainageVolume(e.detail.value)}
-              />
+              <View className="input-field">
+                <input
+                  type="text"
+                  inputMode={isDrainageKg ? "decimal" : "numeric"}
+                  className="input"
+                  value={drainageVolume}
+                  onChange={handleDrainageVolumeChange}
+                  placeholder="点击输入"
+                />
+              </View>
               <View className="unit-switch" onClick={toggleDrainageUnit}>
                 {isDrainageKg ? "kg" : "ml"}
               </View>

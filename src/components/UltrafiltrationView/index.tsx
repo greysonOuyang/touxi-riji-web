@@ -6,7 +6,7 @@ import { checkLogin } from "@/utils/auth";
 import { getLatestPdRecord, LatestPdRecordDTO } from "@/api/pdRecordApi";
 import "./index.scss";
 import "../../app.scss";
-import Taro from "@tarojs/taro";
+import Taro, { useDidShow } from "@tarojs/taro";
 
 const defaultRecord: LatestPdRecordDTO = {
   totalUltrafiltration: 0,
@@ -24,6 +24,14 @@ const UltrafiltrationView: React.FC = () => {
   useEffect(() => {
     fetchLatestRecord();
   }, []);
+
+  useDidShow(() => {
+    const shouldRefresh = Taro.getStorageSync("refreshUltrafiltrationView");
+    if (shouldRefresh) {
+      fetchLatestRecord();
+      Taro.removeStorageSync("refreshUltrafiltrationView");
+    }
+  });
 
   const fetchLatestRecord = async () => {
     try {
