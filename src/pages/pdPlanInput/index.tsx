@@ -161,7 +161,7 @@ const PlanForm: React.FC = () => {
 
       // 触发刷新事件
       const eventChannel =
-        Taro.getCurrentInstance().page?.getOpenerEventChannel();
+        Taro.getCurrentInstance()?.page?.getOpenerEventChannel?.();
       eventChannel?.emit("refreshPlanData");
 
       Taro.navigateBack();
