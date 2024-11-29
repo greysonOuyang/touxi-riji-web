@@ -21,8 +21,21 @@ interface Schedule {
   volume: number;
 }
 
-const formatTimeToHHMM = (time: string) => {
-  return time.substring(0, 5); // This will return just HH:mm
+const formatTimeToHHMM = (time: string | null) => {
+  console.log("原始时间", time);
+
+  // 如果 time 是 null 或空字符串，返回空字符串
+  if (!time) {
+    console.log("返回空字符串");
+    return "";
+  }
+
+  // 使用 substring 截取时间字符串
+  // 确保时间格式为 "HH:mm:ss" 或者其为空
+  const formattedTime = time.length >= 5 ? time.substring(0, 5) : "";
+
+  console.log("格式化时间", formattedTime);
+  return formattedTime; // 返回 HH:mm 格式的时间
 };
 
 const PlanForm: React.FC = () => {
@@ -46,26 +59,24 @@ const PlanForm: React.FC = () => {
   useEffect(() => {
     const eventChannel =
       Taro.getCurrentInstance()?.page?.getOpenerEventChannel?.();
-
-    if (eventChannel) {
-      eventChannel.on(
-        "acceptDataFromOpenerPage",
-        (data: { plan?: PdPlanVO }) => {
-          if (data.plan) {
-            setIsEditing(true);
-            setPlanId(data.plan.id);
-            setDailyFrequency(data.plan.dailyFrequency);
-            setStartDate(data.plan.startDate);
-            setSchedules(
-              data.plan.schedules.map((schedule) => ({
-                ...schedule,
-                timeSlot: formatTimeToHHMM(schedule.timeSlot),
-              }))
-            );
-          }
+    eventChannel?.on(
+      "acceptDataFromOpenerPage",
+      (data: { plan?: PdPlanVO }) => {
+        if (data.plan) {
+          console.log("接受父组件值：", data);
+          setIsEditing(true);
+          setPlanId(data.plan.id);
+          setDailyFrequency(data.plan.dailyFrequency);
+          setStartDate(data.plan.startDate);
+          setSchedules(
+            data.plan.schedules.map((schedule) => ({
+              ...schedule,
+              timeSlot: formatTimeToHHMM(schedule.timeSlot),
+            }))
+          );
         }
-      );
-    }
+      }
+    );
   }, []);
 
   const updateFrequency = (frequency: number) => {
@@ -144,19 +155,37 @@ const PlanForm: React.FC = () => {
 
     try {
       if (isEditing && planId) {
-        await updatePdPlan(planId, planData);
-        Taro.showToast({
-          title: "方案更新成功",
-          icon: "success",
-          duration: 2000,
-        });
+        console.log("更新方案");
+        const result = await updatePdPlan(planId, planData);
+        console.log("更新结果", result);
+        if (result.isSuccess()) {
+          Taro.showToast({
+            title: "方案更新成功",
+            icon: "success",
+            duration: 2000,
+          });
+        } else {
+          Taro.showToast({
+            title: "更新失败",
+            icon: "none",
+            duration: 2000,
+          });
+        }
       } else {
-        await createPdPlan(planData);
-        Taro.showToast({
-          title: "方案创建成功",
-          icon: "success",
-          duration: 2000,
-        });
+        const result = await createPdPlan(planData);
+        if (result.isSuccess()) {
+          Taro.showToast({
+            title: "方案创建成功",
+            icon: "success",
+            duration: 2000,
+          });
+        } else {
+          Taro.showToast({
+            title: "创建失败",
+            icon: "none",
+            duration: 2000,
+          });
+        }
       }
 
       // 触发刷新事件
