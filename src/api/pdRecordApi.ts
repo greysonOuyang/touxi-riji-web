@@ -40,3 +40,14 @@ export const getLatestPdRecord = (
 export const addPdRecord = (data: NewPdRecord): Promise<ApiResponse<null>> => {
   return post<null>("/api/pd-record/add", data);
 };
+
+/**
+ * 检查用户是否是第一次使用（没有腹透记录）
+ * @param userId 用户ID
+ * @returns Promise<ApiResponse<boolean>>
+ */
+export const isFirstTimeUser = (
+  userId: number
+): Promise<ApiResponse<boolean>> => {
+  return get<boolean>(`/api/pd-record/is-first-time/${userId}`);
+};

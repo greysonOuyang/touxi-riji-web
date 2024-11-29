@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { View, Text } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
 import AddButton from "@/components/AddButton";
-import { checkLogin } from "@/utils/auth";
 import { getLatestPdRecord, LatestPdRecordDTO } from "@/api/pdRecordApi";
 import "./index.scss";
 import "../../app.scss";
