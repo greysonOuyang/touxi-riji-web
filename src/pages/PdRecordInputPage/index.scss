@@ -1,43 +1,117 @@
-.pd-record-input {
+.pd-record-page {
+    height: 100vh; // 改为固定高度
+    background-color: #ffffff;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; // 添加这行以确保padding不会增加总高度
+}
 
-    .title {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
+.form-container {
+    flex: 0 1 auto; // 改为这个，允许它收缩但不会伸展
+}
 
-    .form-item {
-        margin-bottom: 20px;
+.form-group {
+    margin-bottom: 16px;
+
+    .input-row {
+        display: flex;
+        align-items: center;
+        background-color: #F7F8F8;
+        border-radius: 14px;
+        padding: 12px;
 
         .label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 16px;
+            color: #1D1617;
+            flex: 1;
         }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
 
-        .picker {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
+            .input {
+                width: 100px;
+                border: none;
+                background: transparent;
+                text-align: right;
+                font-size: 16px;
+                color: #1D1617;
+                padding: 0;
+
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            .unit,
+            .unit-switch {
+                font-size: 14px;
+                color: #7B6F72;
+                background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+                padding: 6px 12px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+            }
+
+            .unit-switch {
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    opacity: 0.9;
+                }
+            }
         }
     }
 
+    .concentration-selector {
+        display: flex;
+        gap: 8px;
+
+        .option {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #7B6F72;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &.selected {
+                background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+                color: white;
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+.button-container {
+    margin-top: auto; // 这会将按钮推到底部
+    padding-bottom: 20px;
+
     .submit-button {
-        background-color: #007aff;
-        color: #fff;
-        padding: 12px;
+        background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+        color: white;
+        font-size: 16px;
+        font-weight: 600;
         text-align: center;
-        border-radius: 5px;
-        font-weight: bold;
+        padding: 14px;
+        border-radius: 30px;
+        box-shadow: 0 10px 20px rgba(146, 163, 253, 0.2);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 24px rgba(146, 163, 253, 0.3);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
     }
 }

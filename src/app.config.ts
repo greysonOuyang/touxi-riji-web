@@ -7,6 +7,7 @@ export default {
     "pages/BloodPressureInputPage/index",
     "pages/pdPlanInput/index",
     "pages/pdPlan/index",
+    "pages/PdRecordInputPage/index",
   ],
   window: {
     backgroundTextStyle: "light",

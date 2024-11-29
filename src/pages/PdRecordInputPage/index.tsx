@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, Input, Picker } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
 import { addPdRecord, NewPdRecord } from "@/api/pdRecordApi";
 import Taro from "@tarojs/taro";
@@ -8,13 +8,16 @@ import "./index.scss";
 const PdRecordInputPage: React.FC = () => {
   const [plan, setPlan] = useState<PdPlanVO | null>(null);
   const [sequenceNumber, setSequenceNumber] = useState(1);
-  const [concentration, setConcentration] = useState("");
-  const [infusionVolume, setInfusionVolume] = useState("");
+  const [concentration, setConcentration] = useState("1.5%");
+  const [infusionVolume, setInfusionVolume] = useState("2000");
   const [drainageVolume, setDrainageVolume] = useState("");
-  const [recordTime, setRecordTime] = useState("");
+  const [isDrainageKg, setIsDrainageKg] = useState(false);
 
   useEffect(() => {
     fetchPdPlan();
+    Taro.setNavigationBarTitle({
+      title: "记录腹透数据",
+    });
   }, []);
 
   const fetchPdPlan = async () => {
@@ -27,14 +30,13 @@ const PdRecordInputPage: React.FC = () => {
         const currentHour = currentTime.getHours();
         const currentMinute = currentTime.getMinutes();
 
-        // Find the matching schedule based on current time
         const matchingSchedule = response.data.schedules.find(
           (schedule, index) => {
             const [scheduleHour, scheduleMinute] = schedule.timeSlot
               .split(":")
               .map(Number);
             if (index === response.data.schedules.length - 1) {
-              return true; // Last schedule of the day
+              return true;
             }
             const nextSchedule = response.data.schedules[index + 1];
             const [nextHour, nextMinute] = nextSchedule.timeSlot
@@ -55,12 +57,6 @@ const PdRecordInputPage: React.FC = () => {
           setConcentration(matchingSchedule.concentration);
           setInfusionVolume(matchingSchedule.volume.toString());
         }
-
-        setRecordTime(
-          `${currentHour.toString().padStart(2, "0")}:${currentMinute
-            .toString()
-            .padStart(2, "0")}`
-        );
       } else {
         Taro.showToast({ title: "获取腹透计划失败", icon: "none" });
       }
@@ -71,24 +67,21 @@ const PdRecordInputPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    if (
-      !plan ||
-      !concentration ||
-      !infusionVolume ||
-      !drainageVolume ||
-      !recordTime
-    ) {
+    if (!plan || !concentration || !infusionVolume || !drainageVolume) {
       Taro.showToast({ title: "请填写所有必填字段", icon: "none" });
       return;
     }
 
+    const now = new Date();
     const newRecord: NewPdRecord = {
       userId: Taro.getStorageSync("userId"),
-      recordDate: new Date().toISOString().split("T")[0],
-      recordTime,
+      recordDate: now.toISOString().split("T")[0],
+      recordTime: now.toTimeString().split(" ")[0],
       dialysateType: concentration,
       infusionVolume: parseInt(infusionVolume),
-      drainageVolume: parseInt(drainageVolume),
+      drainageVolume: isDrainageKg
+        ? Math.round(parseFloat(drainageVolume) * 1000)
+        : parseInt(drainageVolume),
     };
 
     try {
@@ -105,50 +98,78 @@ const PdRecordInputPage: React.FC = () => {
     }
   };
 
+  const toggleDrainageUnit = () => {
+    setIsDrainageKg(!isDrainageKg);
+    if (drainageVolume) {
+      if (isDrainageKg) {
+        // Converting from kg to ml
+        setDrainageVolume((parseFloat(drainageVolume) * 1000).toFixed(0));
+      } else {
+        // Converting from ml to kg
+        setDrainageVolume((parseFloat(drainageVolume) / 1000).toFixed(2));
+      }
+    }
+  };
+
   return (
-    <View className="pd-record-input">
-      <Text className="title">记录腹透数据</Text>
-      <View className="form-item">
-        <Text className="label">第 {sequenceNumber} 次</Text>
+    <View className="pd-record-page">
+      <View className="form-container">
+        <View className="form-group">
+          <View className="input-row">
+            <Text className="label">浓度</Text>
+            <View className="concentration-selector">
+              {["1.5%", "2.5%", "4.25%"].map((option) => (
+                <View
+                  key={option}
+                  className={`option ${
+                    concentration === option ? "selected" : ""
+                  }`}
+                  onClick={() => setConcentration(option)}
+                >
+                  {option}
+                </View>
+              ))}
+            </View>
+          </View>
+        </View>
+
+        <View className="form-group">
+          <View className="input-row">
+            <Text className="label">引入量</Text>
+            <View className="input-wrapper">
+              <input
+                type="number"
+                className="input"
+                value={infusionVolume}
+                onInput={(e) => setInfusionVolume(e.detail.value)}
+              />
+              <Text className="unit">ml</Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="form-group">
+          <View className="input-row">
+            <Text className="label">引流量</Text>
+            <View className="input-wrapper">
+              <input
+                type="number"
+                className="input"
+                value={drainageVolume}
+                onInput={(e) => setDrainageVolume(e.detail.value)}
+              />
+              <View className="unit-switch" onClick={toggleDrainageUnit}>
+                {isDrainageKg ? "kg" : "ml"}
+              </View>
+            </View>
+          </View>
+        </View>
       </View>
-      <View className="form-item">
-        <Text className="label">浓度</Text>
-        <Picker
-          mode="selector"
-          range={["1.5%", "2.5%", "4.25%"]}
-          onChange={(e) => setConcentration(e.detail.value)}
-        >
-          <View className="picker">{concentration || "请选择"}</View>
-        </Picker>
-      </View>
-      <View className="form-item">
-        <Text className="label">进入量 (ml)</Text>
-        <Input
-          type="number"
-          value={infusionVolume}
-          onInput={(e) => setInfusionVolume(e.detail.value)}
-        />
-      </View>
-      <View className="form-item">
-        <Text className="label">引流量 (ml)</Text>
-        <Input
-          type="number"
-          value={drainageVolume}
-          onInput={(e) => setDrainageVolume(e.detail.value)}
-        />
-      </View>
-      <View className="form-item">
-        <Text className="label">记录时间</Text>
-        <Picker
-          mode="time"
-          value={recordTime}
-          onChange={(e) => setRecordTime(e.detail.value)}
-        >
-          <View className="picker">{recordTime || "请选择"}</View>
-        </Picker>
-      </View>
-      <View className="submit-button" onClick={handleSubmit}>
-        提交
+
+      <View className="button-container">
+        <View className="submit-button" onClick={handleSubmit}>
+          确认
+        </View>
       </View>
     </View>
   );

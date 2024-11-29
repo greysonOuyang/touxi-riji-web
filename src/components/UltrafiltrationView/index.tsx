@@ -40,11 +40,9 @@ const UltrafiltrationView: React.FC = () => {
   };
 
   const onAddClick = async () => {
-    const isLoggedIn = await checkLogin();
-    if (!isLoggedIn) return;
-
-    // 用户已登录的逻辑
-    console.log("onAddClick");
+    Taro.navigateTo({
+      url: "/pages/PdRecordInputPage/index",
+    });
   };
 
   const onViewClick = () => {
@@ -65,7 +63,7 @@ const UltrafiltrationView: React.FC = () => {
         <View className="ball">
           <UltrafiltrationBall
             value={latestRecord.totalUltrafiltration}
-            maxValue={1000} // 这里可能需要根据实际情况设置一个合适的最大值
+            maxValue={1000}
             animate={animate}
           />
         </View>
