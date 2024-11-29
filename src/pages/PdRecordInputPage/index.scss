@@ -1,0 +1,43 @@
+.pd-record-input {
+    padding: 20px;
+
+    .title {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .form-item {
+        margin-bottom: 20px;
+
+        .label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .picker {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+    }
+
+    .submit-button {
+        background-color: #007aff;
+        color: #fff;
+        padding: 12px;
+        text-align: center;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+}
