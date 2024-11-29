@@ -1,238 +1,233 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
-import { View, Text } from "@tarojs/components";
-import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
-import { addPdRecord, NewPdRecord, isFirstTimeUser } from "@/api/pdRecordApi";
-import Taro, { useDidShow } from "@tarojs/taro";
+import React, { useState, useEffect } from "react";
+import Taro from "@tarojs/taro";
+import { View, Form, Input, Text, Textarea } from "@tarojs/components";
+import { addBloodPressureRecord } from "@/api/bloodPressureApi";
+import {
+  FORM_TYPES,
+  saveTempFormData,
+  getTempFormData,
+  clearTempFormData,
+} from "@/utils/tempFormStorage";
+import TimeSelector from "@/components/TimeSelector";
 import "./index.scss";
+import CustomTimePicker from "@/components/CustomTimePicker";
 
-const PdRecordInputPage: React.FC = () => {
-  const [plan, setPlan] = useState<PdPlanVO | null>(null);
-  const [sequenceNumber, setSequenceNumber] = useState(1);
-  const [concentration, setConcentration] = useState("1.5%");
-  const [infusionVolume, setInfusionVolume] = useState("2000");
-  const [drainageVolume, setDrainageVolume] = useState("");
-  const [isDrainageKg, setIsDrainageKg] = useState(false);
-  const [isFirstTime, setIsFirstTime] = useState(false);
+interface BloodPressureData {
+  systolic: string | number;
+  diastolic: string | number;
+  heartRate: string | number;
+  measureDateTime: string;
+  note: string;
+}
 
-  console.log("PdRecordInputPage rendering");
-
-  useEffect(() => {
-    console.log("useEffect hook triggered");
-    fetchPdPlan();
-    checkFirstTimeUser();
-    Taro.setNavigationBarTitle({
-      title: "记录腹透数据",
-    });
-  }, []);
-
-  useDidShow(() => {
-    console.log("useDidShow hook triggered");
-    fetchPdPlan();
-  });
-
-  const checkFirstTimeUser = async () => {
-    console.log("Checking if user is first time user");
-    try {
-      const userId = Taro.getStorageSync("userId");
-      console.log("User ID:", userId);
-      const response = await isFirstTimeUser(userId);
-      console.log("First time user response:", response);
-      if (response.isSuccess()) {
-        setIsFirstTime(response.data);
-        console.log("Is first time user:", response.data);
-      } else {
-        console.error("Failed to check if user is first time:", response.msg);
-      }
-    } catch (error) {
-      console.error("Error checking if user is first time:", error);
-    }
+const BloodPressureInputPage: React.FC = () => {
+  const initFormData = () => {
+    const now = new Date();
+    return {
+      systolic: "",
+      diastolic: "",
+      heartRate: "",
+      measureDateTime: now.toISOString(),
+      note: "",
+    };
   };
 
-  const fetchPdPlan = async () => {
-    console.log("Fetching PD plan");
-    try {
-      const userId = Taro.getStorageSync("userId");
-      const response = await getCurrentPdPlan(userId);
-      if (response.isSuccess()) {
-        setPlan(response.data);
-        const currentTime = new Date();
-        const currentHour = currentTime.getHours();
-        const currentMinute = currentTime.getMinutes();
+  const [formData, setFormData] = useState<BloodPressureData>(initFormData());
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof BloodPressureData, string>>
+  >({});
 
-        const matchingSchedule = response.data.schedules.find(
-          (schedule, index) => {
-            const [scheduleHour, scheduleMinute] = schedule.timeSlot
-              .split(":")
-              .map(Number);
-            if (index === response.data.schedules.length - 1) {
-              return true;
-            }
-            const nextSchedule = response.data.schedules[index + 1];
-            const [nextHour, nextMinute] = nextSchedule.timeSlot
-              .split(":")
-              .map(Number);
-            return (
-              (currentHour > scheduleHour ||
-                (currentHour === scheduleHour &&
-                  currentMinute >= scheduleMinute)) &&
-              (currentHour < nextHour ||
-                (currentHour === nextHour && currentMinute < nextMinute))
-            );
-          }
-        );
-
-        if (matchingSchedule) {
-          setSequenceNumber(matchingSchedule.sequence);
-          setConcentration(matchingSchedule.concentration);
-          setInfusionVolume(matchingSchedule.volume.toString());
-        }
-      } else {
-        console.error("Failed to fetch PD plan:", response.msg);
-        Taro.showToast({ title: "获取腹透计划失败", icon: "none" });
-      }
-    } catch (error) {
-      console.error("Error fetching PD plan:", error);
-      Taro.showToast({ title: "获取腹透计划失败", icon: "none" });
+  useEffect(() => {
+    const tempData = getTempFormData(FORM_TYPES.BLOOD_PRESSURE);
+    if (tempData) {
+      setFormData(tempData);
+      clearTempFormData(FORM_TYPES.BLOOD_PRESSURE);
     }
+  }, []);
+
+  const handleInputChange = (field: keyof BloodPressureData, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleDateTimeChange = (value: string) => {
+    handleInputChange("measureDateTime", value);
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<Record<keyof BloodPressureData, string>> = {};
+
+    if (!formData.systolic) {
+      newErrors.systolic = "请输入收缩压";
+    } else if (
+      Number(formData.systolic) < 60 ||
+      Number(formData.systolic) > 250
+    ) {
+      newErrors.systolic = "收缩压数值异常";
+    }
+
+    if (!formData.diastolic) {
+      newErrors.diastolic = "请输入舒张压";
+    } else if (
+      Number(formData.diastolic) < 40 ||
+      Number(formData.diastolic) > 150
+    ) {
+      newErrors.diastolic = "舒张压数值异常";
+    }
+
+    if (
+      formData.heartRate &&
+      (Number(formData.heartRate) < 40 || Number(formData.heartRate) > 200)
+    ) {
+      newErrors.heartRate = "心率数值异常";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
-    if (
-      !plan ||
-      !concentration ||
-      !infusionVolume ||
-      (!isFirstTime && !drainageVolume)
-    ) {
-      Taro.showToast({ title: "请填写所有必填字段", icon: "none" });
+    if (!validateForm()) {
       return;
     }
 
-    const now = new Date();
-    const newRecord: NewPdRecord = {
-      userId: Taro.getStorageSync("userId"),
-      recordDate: now.toISOString().split("T")[0],
-      recordTime: now.toTimeString().split(" ")[0],
-      dialysateType: concentration,
-      infusionVolume: parseInt(infusionVolume),
-      drainageVolume: isFirstTime
-        ? 0
-        : isDrainageKg
-        ? Math.round(parseFloat(drainageVolume) * 1000)
-        : parseInt(drainageVolume),
-    };
-
     try {
-      const response = await addPdRecord(newRecord);
-      if (response.isSuccess()) {
-        Taro.showToast({ title: "记录添加成功", icon: "success" });
-        Taro.setStorageSync("refreshUltrafiltrationView", true);
-        Taro.navigateBack();
-      } else {
-        console.error("Failed to add PD record:", response.msg);
-        Taro.showToast({ title: "添加记录失败", icon: "none" });
-      }
+      Taro.showLoading({
+        title: "提交中...",
+        mask: true,
+      });
+
+      const submitData = {
+        ...formData,
+        systolic: Number(formData.systolic),
+        diastolic: Number(formData.diastolic),
+        heartRate: formData.heartRate ? Number(formData.heartRate) : undefined,
+        measureTime: formData.measureDateTime,
+        userId: Taro.getStorageSync("userId"),
+      };
+
+      await addBloodPressureRecord(submitData);
+      Taro.hideLoading();
+      clearTempFormData(FORM_TYPES.BLOOD_PRESSURE);
+
+      await Taro.showToast({
+        title: "添加成功",
+        icon: "none",
+        mask: true,
+        duration: 1000,
+      });
+
+      setTimeout(() => {
+        Taro.reLaunch({
+          url: "/pages/health/index",
+          fail: (error) => {
+            console.error("跳转失败:", error);
+            Taro.redirectTo({
+              url: "/pages/health/index",
+            });
+          },
+        });
+      }, 1000);
     } catch (error) {
-      console.error("Error adding PD record:", error);
-      Taro.showToast({ title: "添加记录失败", icon: "none" });
+      Taro.hideLoading();
+      console.error("提交失败:", error);
+      Taro.showToast({
+        title: "提交失败",
+        icon: "none",
+        duration: 2000,
+      });
     }
   };
 
-  const toggleDrainageUnit = () => {
-    setIsDrainageKg(!isDrainageKg);
-    if (drainageVolume) {
-      if (isDrainageKg) {
-        setDrainageVolume((parseFloat(drainageVolume) * 1000).toFixed(0));
-      } else {
-        setDrainageVolume((parseFloat(drainageVolume) / 1000).toFixed(2));
-      }
-    }
-  };
-
-  const handleDrainageVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isDrainageKg) {
-      setDrainageVolume(value.replace(/[^\d.]/g, ""));
-    } else {
-      setDrainageVolume(value.replace(/\D/g, ""));
-    }
-  };
-
-  const handleInfusionVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInfusionVolume(e.target.value.replace(/\D/g, ""));
-  };
-
+  // BloodPressureInputPage 组件的 return 部分修改
   return (
-    <View className="pd-record-page">
-      <View className="form-container">
-        <View className="form-group">
-          <View className="input-row">
-            <Text className="label">浓度</Text>
-            <View className="concentration-selector">
-              {["1.5%", "2.5%", "4.25%"].map((option) => (
-                <View
-                  key={option}
-                  className={`option ${
-                    concentration === option ? "selected" : ""
-                  }`}
-                  onClick={() => setConcentration(option)}
-                >
-                  {option}
-                </View>
-              ))}
-            </View>
-          </View>
-        </View>
-
-        <View className="form-group">
-          <View className="input-row">
-            <Text className="label">引入量</Text>
+    <View className="blood-pressure-input-page">
+      <Form onSubmit={handleSubmit}>
+        <View className="input-section">
+          <View className="form-item">
+            <Text className="label">
+              收缩压<Text className="required">*</Text>
+            </Text>
             <View className="input-wrapper">
-              <View className="input-field">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="input"
-                  value={infusionVolume}
-                  onChange={handleInfusionVolumeChange}
-                  placeholder="点击输入"
-                />
-              </View>
-              <Text className="unit">ml</Text>
+              <Input
+                type="number"
+                className="input"
+                value={formData.systolic as string}
+                onInput={(e) => handleInputChange("systolic", e.detail.value)}
+                placeholder="请输入收缩压"
+              />
+              <Text className="unit">mmHg</Text>
             </View>
+            {errors.systolic && (
+              <Text className="error-text">{errors.systolic}</Text>
+            )}
+          </View>
+
+          <View className="form-item">
+            <Text className="label">
+              舒张压<Text className="required">*</Text>
+            </Text>
+            <View className="input-wrapper">
+              <Input
+                type="number"
+                className="input"
+                value={formData.diastolic as string}
+                onInput={(e) => handleInputChange("diastolic", e.detail.value)}
+                placeholder="请输入舒张压"
+              />
+              <Text className="unit">mmHg</Text>
+            </View>
+            {errors.diastolic && (
+              <Text className="error-text">{errors.diastolic}</Text>
+            )}
+          </View>
+
+          <View className="form-item">
+            <Text className="label">心率</Text>
+            <View className="input-wrapper">
+              <Input
+                type="number"
+                className="input"
+                value={formData.heartRate as string}
+                onInput={(e) => handleInputChange("heartRate", e.detail.value)}
+                placeholder="请输入心率"
+              />
+              <Text className="unit">次/分</Text>
+            </View>
+            {errors.heartRate && (
+              <Text className="error-text">{errors.heartRate}</Text>
+            )}
+          </View>
+          <View className="time-item">
+            <TimeSelector
+              showLabel={false}
+              value={formData.measureDateTime}
+              onChange={handleDateTimeChange}
+              allowFuture={false}
+            />
           </View>
         </View>
 
-        {!isFirstTime && (
-          <View className="form-group">
-            <View className="input-row">
-              <Text className="label">引流量</Text>
-              <View className="input-wrapper">
-                <View className="input-field">
-                  <input
-                    type="text"
-                    inputMode={isDrainageKg ? "decimal" : "numeric"}
-                    className="input"
-                    value={drainageVolume}
-                    onChange={handleDrainageVolumeChange}
-                    placeholder="点击输入"
-                  />
-                </View>
-                <View className="unit-switch" onClick={toggleDrainageUnit}>
-                  {isDrainageKg ? "kg" : "ml"}
-                </View>
-              </View>
-            </View>
+        <View className="note-section">
+          <Text className="label">备注</Text>
+          <View className="textarea-wrapper">
+            <Textarea
+              className="textarea"
+              value={formData.note}
+              onInput={(e) => handleInputChange("note", e.detail.value)}
+              placeholder="请输入备注信息"
+            />
           </View>
-        )}
-      </View>
-
-      <View className="button-container">
-        <View className="submit-button" onClick={handleSubmit}>
-          确认
         </View>
-      </View>
+
+        <View className="confirm-button" onClick={handleSubmit}>
+          保存
+        </View>
+      </Form>
     </View>
   );
 };
 
-export default PdRecordInputPage;
+export default BloodPressureInputPage;

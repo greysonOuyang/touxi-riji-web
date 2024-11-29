@@ -1,7 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { View, Text } from "@tarojs/components";
 import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
-import { addPdRecord, NewPdRecord } from "@/api/pdRecordApi";
+import { addPdRecord, NewPdRecord, isFirstTimeUser } from "@/api/pdRecordApi";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 
@@ -12,19 +12,44 @@ const PdRecordInputPage: React.FC = () => {
   const [infusionVolume, setInfusionVolume] = useState("2000");
   const [drainageVolume, setDrainageVolume] = useState("");
   const [isDrainageKg, setIsDrainageKg] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState(false);
+
+  console.log("PdRecordInputPage rendering");
 
   useEffect(() => {
+    console.log("useEffect hook triggered");
     fetchPdPlan();
+    checkFirstTimeUser();
     Taro.setNavigationBarTitle({
       title: "记录腹透数据",
     });
   }, []);
 
   useDidShow(() => {
+    console.log("useDidShow hook triggered");
     fetchPdPlan();
   });
 
+  const checkFirstTimeUser = async () => {
+    console.log("Checking if user is first time user");
+    try {
+      const userId = Taro.getStorageSync("userId");
+      console.log("User ID:", userId);
+      const response = await isFirstTimeUser(userId);
+      console.log("First time user response:", response);
+      if (response.isSuccess()) {
+        setIsFirstTime(response.data);
+        console.log("Is first time user:", response.data);
+      } else {
+        console.error("Failed to check if user is first time:", response.msg);
+      }
+    } catch (error) {
+      console.error("Error checking if user is first time:", error);
+    }
+  };
+
   const fetchPdPlan = async () => {
+    console.log("Fetching PD plan");
     try {
       const userId = Taro.getStorageSync("userId");
       const response = await getCurrentPdPlan(userId);
@@ -62,16 +87,22 @@ const PdRecordInputPage: React.FC = () => {
           setInfusionVolume(matchingSchedule.volume.toString());
         }
       } else {
+        console.error("Failed to fetch PD plan:", response.msg);
         Taro.showToast({ title: "获取腹透计划失败", icon: "none" });
       }
     } catch (error) {
-      console.error("获取腹透计划时发生错误:", error);
+      console.error("Error fetching PD plan:", error);
       Taro.showToast({ title: "获取腹透计划失败", icon: "none" });
     }
   };
 
   const handleSubmit = async () => {
-    if (!plan || !concentration || !infusionVolume || !drainageVolume) {
+    if (
+      !plan ||
+      !concentration ||
+      !infusionVolume ||
+      (!isFirstTime && !drainageVolume)
+    ) {
       Taro.showToast({ title: "请填写所有必填字段", icon: "none" });
       return;
     }
@@ -83,7 +114,9 @@ const PdRecordInputPage: React.FC = () => {
       recordTime: now.toTimeString().split(" ")[0],
       dialysateType: concentration,
       infusionVolume: parseInt(infusionVolume),
-      drainageVolume: isDrainageKg
+      drainageVolume: isFirstTime
+        ? 0
+        : isDrainageKg
         ? Math.round(parseFloat(drainageVolume) * 1000)
         : parseInt(drainageVolume),
     };
@@ -95,10 +128,11 @@ const PdRecordInputPage: React.FC = () => {
         Taro.setStorageSync("refreshUltrafiltrationView", true);
         Taro.navigateBack();
       } else {
+        console.error("Failed to add PD record:", response.msg);
         Taro.showToast({ title: "添加记录失败", icon: "none" });
       }
     } catch (error) {
-      console.error("添加记录时发生错误:", error);
+      console.error("Error adding PD record:", error);
       Taro.showToast({ title: "添加记录失败", icon: "none" });
     }
   };
@@ -168,26 +202,28 @@ const PdRecordInputPage: React.FC = () => {
           </View>
         </View>
 
-        <View className="form-group">
-          <View className="input-row">
-            <Text className="label">引流量</Text>
-            <View className="input-wrapper">
-              <View className="input-field">
-                <input
-                  type="text"
-                  inputMode={isDrainageKg ? "decimal" : "numeric"}
-                  className="input"
-                  value={drainageVolume}
-                  onChange={handleDrainageVolumeChange}
-                  placeholder="点击输入"
-                />
-              </View>
-              <View className="unit-switch" onClick={toggleDrainageUnit}>
-                {isDrainageKg ? "kg" : "ml"}
+        {!isFirstTime && (
+          <View className="form-group">
+            <View className="input-row">
+              <Text className="label">引流量</Text>
+              <View className="input-wrapper">
+                <View className="input-field">
+                  <input
+                    type="text"
+                    inputMode={isDrainageKg ? "decimal" : "numeric"}
+                    className="input"
+                    value={drainageVolume}
+                    onChange={handleDrainageVolumeChange}
+                    placeholder="点击输入"
+                  />
+                </View>
+                <View className="unit-switch" onClick={toggleDrainageUnit}>
+                  {isDrainageKg ? "kg" : "ml"}
+                </View>
               </View>
             </View>
           </View>
-        </View>
+        )}
       </View>
 
       <View className="button-container">
