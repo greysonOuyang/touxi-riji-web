@@ -1,8 +1,10 @@
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text } from "@tarojs/components";
 import { getCurrentPdPlan, PdPlanVO } from "@/api/pdPlanApi";
 import { addPdRecord, NewPdRecord, isFirstTimeUser } from "@/api/pdRecordApi";
 import Taro, { useDidShow } from "@tarojs/taro";
+import FormItem from "@/components/FormItem";
+import CapsuleSelector from "@/components/CapsuleSelector";
 import "./index.scss";
 
 const PdRecordInputPage: React.FC = () => {
@@ -11,7 +13,7 @@ const PdRecordInputPage: React.FC = () => {
   const [concentration, setConcentration] = useState("1.5%");
   const [infusionVolume, setInfusionVolume] = useState("2000");
   const [drainageVolume, setDrainageVolume] = useState("");
-  const [isDrainageKg, setIsDrainageKg] = useState(false);
+  const [drainageUnit, setDrainageUnit] = useState("ml");
   const [isFirstTime, setIsFirstTime] = useState(false);
 
   console.log("PdRecordInputPage rendering");
@@ -116,7 +118,7 @@ const PdRecordInputPage: React.FC = () => {
       infusionVolume: parseInt(infusionVolume),
       drainageVolume: isFirstTime
         ? 0
-        : isDrainageKg
+        : drainageUnit === "kg"
         ? Math.round(parseFloat(drainageVolume) * 1000)
         : parseInt(drainageVolume),
     };
@@ -137,92 +139,57 @@ const PdRecordInputPage: React.FC = () => {
     }
   };
 
-  const toggleDrainageUnit = () => {
-    setIsDrainageKg(!isDrainageKg);
-    if (drainageVolume) {
-      if (isDrainageKg) {
-        setDrainageVolume((parseFloat(drainageVolume) * 1000).toFixed(0));
-      } else {
-        setDrainageVolume((parseFloat(drainageVolume) / 1000).toFixed(2));
-      }
-    }
+  const handleInfusionVolumeChange = (value: string) => {
+    setInfusionVolume(value.replace(/\D/g, ""));
   };
 
-  const handleDrainageVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isDrainageKg) {
-      setDrainageVolume(value.replace(/[^\d.]/g, ""));
+  const handleDrainageVolumeChange = (value: string) => {
+    setDrainageVolume(value);
+  };
+
+  const handleDrainageUnitChange = (value: string, unit: string) => {
+    setDrainageUnit(unit);
+    if (!value) return "";
+
+    const numValue = parseFloat(value);
+    if (isNaN(numValue)) return "";
+
+    if (unit === "kg") {
+      return (numValue / 1000).toFixed(2);
     } else {
-      setDrainageVolume(value.replace(/\D/g, ""));
+      return Math.round(numValue * 1000).toString();
     }
-  };
-
-  const handleInfusionVolumeChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setInfusionVolume(e.target.value.replace(/\D/g, ""));
   };
 
   return (
     <View className="pd-record-page">
       <View className="form-container">
-        <View className="form-group">
-          <View className="input-row">
-            <Text className="label">浓度</Text>
-            <View className="concentration-selector">
-              {["1.5%", "2.5%", "4.25%"].map((option) => (
-                <View
-                  key={option}
-                  className={`option ${
-                    concentration === option ? "selected" : ""
-                  }`}
-                  onClick={() => setConcentration(option)}
-                >
-                  {option}
-                </View>
-              ))}
-            </View>
-          </View>
+        <View className="form-group concentration-group">
+          <Text className="label">浓度</Text>
+          <CapsuleSelector
+            options={["1.5%", "2.5%", "4.25%"]}
+            selected={concentration}
+            onSelect={(option) => setConcentration(option as string)}
+          />
         </View>
 
-        <View className="form-group">
-          <View className="input-row">
-            <Text className="label">引入量</Text>
-            <View className="input-wrapper">
-              <View className="input-field">
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  className="input"
-                  value={infusionVolume}
-                  onChange={handleInfusionVolumeChange}
-                  placeholder="点击输入"
-                />
-              </View>
-              <Text className="unit">ml</Text>
-            </View>
-          </View>
-        </View>
+        <FormItem
+          label="引入量"
+          value={infusionVolume}
+          units={["ml"]}
+          onChange={handleInfusionVolumeChange}
+          placeholder="点击输入"
+        />
 
         {!isFirstTime && (
-          <View className="form-group">
-            <View className="input-row">
-              <Text className="label">引流量</Text>
-              <View className="input-wrapper">
-                <View className="input-field">
-                  <input
-                    type="text"
-                    inputMode={isDrainageKg ? "decimal" : "numeric"}
-                    className="input"
-                    value={drainageVolume}
-                    onChange={handleDrainageVolumeChange}
-                    placeholder="点击输入"
-                  />
-                </View>
-                <View className="unit-switch" onClick={toggleDrainageUnit}>
-                  {isDrainageKg ? "kg" : "ml"}
-                </View>
-              </View>
-            </View>
-          </View>
+          <FormItem
+            label="引流量"
+            value={drainageVolume}
+            units={["ml", "kg"]}
+            onChange={handleDrainageVolumeChange}
+            onUnitChange={handleDrainageUnitChange}
+            placeholder="点击输入"
+          />
         )}
       </View>
 

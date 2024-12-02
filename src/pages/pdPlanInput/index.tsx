@@ -273,10 +273,19 @@ const PlanForm: React.FC = () => {
               />
             </View>
 
-            <FormItem
+            {/* <FormItem
               label="透析液容量"
               value={String(schedules[currentTab].volume)}
               unit="ml"
+              onChange={(newValue) =>
+                handleScheduleChange(currentTab, { volume: Number(newValue) })
+              }
+            /> */}
+
+            <FormItem
+              label="透析液规格"
+              value={String(schedules[currentTab].volume)}
+              units={["ml"]}
               onChange={(newValue) =>
                 handleScheduleChange(currentTab, { volume: Number(newValue) })
               }

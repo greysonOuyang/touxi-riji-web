@@ -36,10 +36,12 @@
             border: none;
             background-color: transparent;
             outline: none;
-            color: #1D1617;
+            color: #7B6F72;
 
             &::placeholder {
                 color: #ADA4A5;
+                margin-right: 4px;
+                font-size: 12px;
             }
         }
 
@@ -47,10 +49,16 @@
             margin-left: 8px;
             padding: 6px 12px;
             border-radius: 8px;
-            background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+            background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
             color: #fff;
             font-size: 14px;
             font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.3s ease;
+
+            &:hover {
+                opacity: 0.9;
+            }
         }
     }
 }
