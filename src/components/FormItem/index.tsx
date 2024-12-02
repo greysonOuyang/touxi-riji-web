@@ -3,12 +3,12 @@ import { View, Text, Input, Image } from "@tarojs/components";
 import "./index.scss";
 
 interface FormItemProps {
-  icon?: string; // 可选的图标
-  label: string; // 标签文字
-  placeholder?: string; // 输入框占位符
-  value?: number | string; // 输入框值
-  unit?: string; // 单位文字
-  onChange?: (value: string) => void; // 值变更事件
+  icon?: string;
+  label: string;
+  placeholder?: string;
+  value?: string | number | null;
+  unit?: string;
+  onChange?: (value: string) => void;
 }
 
 const FormItem: React.FC<FormItemProps> = ({
@@ -23,15 +23,15 @@ const FormItem: React.FC<FormItemProps> = ({
     <View className="left-section">
       {icon && <Image className="icon" src={icon} />}
       <Text className="label">{label}</Text>
+    </View>
+    <View className="right-section">
       <Input
-        type="number"
+        type="text"
         className="input-box"
         placeholder={placeholder || ""}
         value={value === undefined || value === null ? "" : String(value)}
         onInput={(e) => onChange && onChange(e.detail.value)}
       />
-    </View>
-    <View className="right-section">
       {unit && <View className="unit-box">{unit}</View>}
     </View>
   </View>

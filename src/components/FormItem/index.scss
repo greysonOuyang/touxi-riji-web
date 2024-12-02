@@ -1,20 +1,15 @@
 .form-item {
-
-
     display: flex;
     justify-content: space-between;
     align-items: center;
-
+    background-color: #F7F8F8;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 16px;
 
     .left-section {
         display: flex;
         align-items: center;
-        flex: 1; // 左侧区域占满可用空间
-        background-color: #f7f8f8; // 左侧背景覆盖
-        padding: 15px 10px;
-        margin: 10px;
-        border-radius: 14px;
-
 
         .icon {
             width: 24px;
@@ -24,42 +19,38 @@
 
         .label {
             font-size: 16px;
-            color: #666;
-            display: flex;
-            align-items: center;
-            flex-shrink: 0; // 标签宽度不压缩
-            margin-right: 8px;
-        }
-
-        .input-box {
-            flex: 1; // 输入框占满剩余空间
-            // height: 30px;
-            // padding: 0 10px;
-            font-size: 16px;
-            text-align: right;
-            border: none; // 去掉边框
-            border-radius: 14px; // 圆角一致
-            background-color: transparent; // 与背景一致
-            outline: none; // 去掉选中时的外框
-            margin-right: 10px;
-            color: #ADA4A5;
-
+            color: #1D1617;
+            margin-right: 12px;
         }
     }
 
     .right-section {
-        margin-right: 10px;
         display: flex;
         align-items: center;
-        justify-content: center;
-        min-width: 40px; // 控制单位框宽度
-        height: 50px; // 保持与输入框一致
-        padding: 0 12px;
-        border-radius: 14px; // 圆角
-        background: linear-gradient(274.42deg, #c58bf2 0%, #eea4ce 124.45%);
-        color: #fff;
-        font-size: 14px;
-        font-weight: bold;
-        text-align: center;
+        flex: 1;
+
+        .input-box {
+            flex: 1;
+            font-size: 16px;
+            text-align: right;
+            border: none;
+            background-color: transparent;
+            outline: none;
+            color: #1D1617;
+
+            &::placeholder {
+                color: #ADA4A5;
+            }
+        }
+
+        .unit-box {
+            margin-left: 8px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+        }
     }
 }

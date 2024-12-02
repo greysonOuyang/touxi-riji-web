@@ -211,7 +211,7 @@ const PlanForm: React.FC = () => {
       {step === 0 ? (
         <View className="step-one">
           <View className="form-group row">
-            <View className="label">每日透析次数</View>
+            <View className="label">透析次数</View>
             <CapsuleSelector
               options={[1, 2, 3, 4, 5, 6]}
               selected={dailyFrequency}
@@ -222,7 +222,7 @@ const PlanForm: React.FC = () => {
           <View className="form-group">
             <TimeSelector
               mode="date"
-              label="开始日期"
+              label="确诊日期"
               showLabel={true}
               value={startDate}
               onChange={(date) => setStartDate(date)}

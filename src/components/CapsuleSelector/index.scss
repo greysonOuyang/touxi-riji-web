@@ -1,32 +1,25 @@
 .capsule-selector {
     display: flex;
-    background-color: #f2f2f2;
-    // background-color: #ffffff;
-    border-radius: 25px;
-    overflow: hidden;
-    height: 20px; // 高度固定，和 PlanForm 的 label 匹配
+    flex-wrap: nowrap;
+    gap: 8px;
 
     .capsule-item {
-        flex: 1; // 平分宽度
-        text-align: center;
+        padding: 6px 12px;
+        border-radius: 8px;
         font-size: 14px;
-        color: #666;
-        line-height: 20px; // 文本居中
+        color: #7B6F72;
         cursor: pointer;
         transition: all 0.3s ease;
-
-        &:not(:last-child) {
-            border-right: 1px solid #eee8e8; // 间隔线颜色
-        }
+        background-color: #FFFFFF;
 
         &.active {
-            background: linear-gradient(90deg, #92a3fd, #9dceff);
-            color: #fff;
-            font-weight: bold;
+            background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+            color: white;
+            font-weight: 600;
         }
 
         &:hover {
-            background-color: #e6e6e6; // 鼠标悬停效果
+            opacity: 0.9;
         }
     }
 }
