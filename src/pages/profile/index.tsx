@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Button } from "@tarojs/components";
+import { View, Text, Image } from "@tarojs/components";
 import { getUserProfile } from "../../api/profile";
-import { getCurrentPdPlan } from "../../api/pdPlanApi"; // 导入获取腹透方案的API
 import Taro from "@tarojs/taro";
 import "./index.scss";
 import ArrowRight from "@/components/ArrowRight";
 
 const DEFAULT_AVATAR = "../../assets/images/face.png";
-const ICON_PROFILE = "../../assets/icons/icon-profile.png";
+const ICON_PROFILE = "../../assets/images/icon-profile.png";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -17,6 +16,8 @@ const Profile = () => {
     height: 0,
     weight: 0,
     age: 0,
+    gender: "",
+    pdDays: 0,
   });
 
   useEffect(() => {
@@ -33,54 +34,33 @@ const Profile = () => {
     }
   }, []);
 
-  const handlePdPlanClick = async () => {
+  const handleEditProfile = () => {
+    Taro.navigateTo({ url: "/pages/editProfile/index" });
+  };
+
+  const handlePdPlanClick = () => {
     Taro.navigateTo({ url: "/pages/pdPlan/index" });
-    // const userId = Taro.getStorageSync("userId");
-    // if (userId) {
-    //   try {
-    //     const response = await getCurrentPdPlan(userId);
-    //     console.log("腹透响应", response);
-    //     if (response.isSuccess()) {
-    //       if (response.data === null) {
-    //         // 没有腹透方案，提示用户
-    //         Taro.showModal({
-    //           title: "提示",
-    //           content: "暂无腹透方案，是否前往添加？",
-    //           success: (res) => {
-    //             if (res.confirm) {
-    //               // 用户点击确定，跳转到添加方案页面
-    //               Taro.navigateTo({ url: "/pages/pdPlanInput/index" });
-    //             }
-    //           },
-    //         });
-    //       } else {
-    //         // 已存在腹透方案，跳转到方案列表页面
-    //         Taro.navigateTo({ url: "/pages/pdPlan/index" });
-    //       }
-    //     } else {
-    //       console.error(response.msg);
-    //     }
-    //   } catch (error) {
-    //     console.error("获取腹透方案失败", error);
-    //     Taro.showToast({ title: "获取方案失败，请重试", icon: "none" });
-    //   }
-    // }
   };
 
   return (
     <View className="profile-container">
       {/* 个人信息 */}
-      <View className="profile-header">
+      <View className="profile-header" onClick={handleEditProfile}>
         <Image className="profile-avatar" src={profile.avatarUrl} />
         <View className="profile-info">
-          <Text className="profile-username">{profile.username}</Text>
-          {profile.name && <Text className="profile-name">{profile.name}</Text>}
+          <Text className="profile-name">{profile.username}</Text>
+          <Text className="profile-details">
+            {profile.gender} · {profile.age}岁
+          </Text>
         </View>
-        <Button className="edit-button">编辑</Button>
+        <View className="profile-link">
+          <Text className="link-text">个人主页</Text>
+          <ArrowRight />
+        </View>
       </View>
 
       {/* 数据卡片 */}
-      <View className="profile-stats">
+      <View className="profile-stats" onClick={handleEditProfile}>
         <View className="profile-stat-card">
           <Text className="stat-value">{profile.height || 0}cm</Text>
           <Text className="stat-label">身高</Text>
@@ -90,8 +70,8 @@ const Profile = () => {
           <Text className="stat-label">体重</Text>
         </View>
         <View className="profile-stat-card">
-          <Text className="stat-value">{profile.age || 0}岁</Text>
-          <Text className="stat-label">年龄</Text>
+          <Text className="stat-value">{profile.pdDays || 0}天</Text>
+          <Text className="stat-label">腹透</Text>
         </View>
       </View>
 

@@ -223,7 +223,7 @@ const BloodPressureInputPage: React.FC = () => {
         </View>
 
         <View className="confirm-button" onClick={handleSubmit}>
-          保存
+          确认
         </View>
       </Form>
     </View>

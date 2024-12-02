@@ -8,6 +8,7 @@ export default {
     "pages/pdPlanInput/index",
     "pages/pdPlan/index",
     "pages/PdRecordInputPage/index",
+    "pages/editProfile/index",
   ],
   window: {
     backgroundTextStyle: "light",
