@@ -1,15 +1,13 @@
 .numeric-input {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     width: 100%;
 
-    /* 显示区域 */
     .numeric-display-container {
         display: flex;
-        align-items: baseline;
+        align-items: center;
         justify-content: center;
-        margin-bottom: 20px;
+        padding: 20px 0 30px;
+        width: 100%;
+        position: relative;
 
         .numeric-value-container {
             position: relative;
@@ -17,63 +15,98 @@
             align-items: center;
 
             .numeric-value {
-                font-family: 'Archivo';
-                font-style: normal;
-                font-weight: 700;
-                font-size: 36px;
-                line-height: 62px;
-                color: #92A3FD;
+                font-size: 48px;
+                color: #92A3FD; // 修改为品牌色
+                font-weight: 500;
             }
 
             .numeric-underline {
                 position: absolute;
-                bottom: -5px; // 下划线贴紧数值下方
+                bottom: -8px;
+                left: 0;
                 height: 2px;
-                background-color: #95bbfc; // 蓝色下划线
-                transition: width 0.2s ease; // 宽度动态变化时的过渡效果
+                width: 100%;
+                background-color: #92a3fd;
             }
         }
 
         .numeric-unit {
-            margin-left: 10px; // 单位与数字分开
-            font-size: 16px; // 单位字体较小
-            color: #95bbfc; // 单位颜色蓝色
-            font-weight: bold;
+            margin-left: 8px;
+            font-size: 20px;
+            color: #92A3FD; // 修改为品牌色
         }
     }
 
-    /* 键盘区域 */
-    /* 键盘区域 */
     .numeric-keyboard {
         display: flex;
-        flex-wrap: wrap;
+        background-color: #f5f5f5;
         width: 100%;
-        max-width: 400px;
+        gap: 8px;
+        padding: 8px;
 
-        .numeric-key {
-            flex: 1 0 30%;
-            margin: 5px;
-            background-color: #ffffff; // 白色背景
-            border-radius: 8px;
-            height: 50px;
+        .numeric-keys {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            flex: 3;
+
+            .numeric-key {
+                background-color: #fff;
+                height: 54px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 8px;
+
+                &:active {
+                    background-color: #f0f0f0;
+                }
+
+                Text {
+                    font-size: 20px;
+                    color: #92A3FD; // 修改为品牌色
+                }
+            }
+        }
+
+        .action-keys {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            color: #333333; // 按钮字体深灰色
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); // 更柔和的阴影
-            transition: background-color 0.2s ease, transform 0.1s ease; // 添加过渡效果
-        }
+            flex-direction: column;
+            flex: 1;
+            gap: 8px;
 
-        .delete-key {
-            color: #c28cf0; // 删除按钮颜色蓝色
-            font-size: 14px;
-            // font-weight: bold;
-        }
+            .numeric-key {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #fff;
+                border-radius: 8px;
 
-        .numeric-key:active {
-            background-color: #f0f0f0; // 点击时高亮
-            transform: scale(0.95); // 点击时缩小效果
+                &:active {
+                    background-color: #f0f0f0;
+                }
+            }
+
+            .delete-key {
+                .delete-icon {
+                    font-size: 24px;
+                    color: #666;
+                }
+            }
+
+            .complete-key {
+                background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
+
+                Text {
+                    color: #fff;
+                    font-size: 16px;
+                }
+
+                &:active {
+                    opacity: 0.9;
+                }
+            }
         }
     }
 }

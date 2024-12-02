@@ -113,7 +113,7 @@ const Profile = () => {
         <Text className="settings-title">个人设置</Text>
         <View className="settings-item" onClick={handlePdPlanClick}>
           <View className="item-label">
-            <Image className="item-icon" src={ICON_PROFILE} />
+            {/* <Image className="item-icon" src={ICON_PROFILE} /> */}
             <Text>腹透方案</Text>
           </View>
           <ArrowRight />

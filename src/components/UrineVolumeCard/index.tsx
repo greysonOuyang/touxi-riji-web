@@ -90,7 +90,7 @@ const UrineVolumeCard: React.FC = () => {
 
       {/* 弹窗组件 */}
       <UrineInputPopup
-        isOpened={isPopupVisible}
+        visible={isPopupVisible}
         onClose={handlePopupClose}
         onSuccess={handleAddSuccess}
       />

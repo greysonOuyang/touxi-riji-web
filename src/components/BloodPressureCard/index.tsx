@@ -112,7 +112,7 @@ const BloodPressureCard: React.FC<BloodPressureCardProps> = ({
             <Text className="separator">/</Text>
             <Text
               className={`diastolic-value ${
-                bpData.diastolic > 80
+                bpData.diastolic > 90
                   ? "low-red"
                   : bpData.diastolic < 60
                   ? "low-green"

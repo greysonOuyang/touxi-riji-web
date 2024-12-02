@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { View } from "@tarojs/components";
-import CustomPopup from "../CustomPopup";
+import { View, Text } from "@tarojs/components";
+import Popup from "../Popup";
 import NumericInput from "../NumericInputProps";
 import { addUrineRecord } from "../../api/urineApi";
 import "./index.scss";
@@ -8,13 +8,12 @@ import Taro from "@tarojs/taro";
 import dayjs from "dayjs";
 
 interface UrineInputPopupProps {
-  isOpened: boolean;
+  visible: boolean;
   onClose: () => void;
   onSuccess: () => void;
   initialValue?: number;
 }
 
-// 时间段配置
 const TIME_PERIODS = [
   { label: "早上 6:00-9:00", tag: "morning", range: [6, 9] },
   { label: "上午 9:00-12:00", tag: "forenoon", range: [9, 12] },
@@ -24,7 +23,7 @@ const TIME_PERIODS = [
 ];
 
 const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
-  isOpened,
+  visible,
   onClose,
   onSuccess,
   initialValue = 0,
@@ -33,7 +32,6 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedPeriod, setSelectedPeriod] = useState<number | null>(null);
 
-  // 根据时间判断时间段
   const determineTimePeriod = (hour: number) => {
     return TIME_PERIODS.findIndex(({ range }) => {
       const [start, end] = range;
@@ -45,19 +43,15 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
     });
   };
 
-  // 初始化时根据当前时间自动选择时间段
   useEffect(() => {
     const currentHour = dayjs().hour();
     const periodIndex = determineTimePeriod(currentHour);
     if (periodIndex !== -1) {
       setSelectedPeriod(periodIndex);
     }
-
-    // Reset the value when the popup is opened
     setValue(initialValue.toString());
-  }, [isOpened, initialValue]); // Reset value on popup open
+  }, [visible, initialValue]);
 
-  // 处理时间段选择
   const handlePeriodSelect = (index: number) => {
     setSelectedPeriod(index);
   };
@@ -110,15 +104,9 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
   };
 
   return (
-    <CustomPopup
-      isOpened={isOpened}
-      onClose={onClose}
-      onConfirm={handleConfirm}
-      title="设置尿量"
-      confirmText={loading ? "提交中..." : "确认"}
-      cancelText="取消"
-    >
+    <Popup visible={visible} onClose={onClose}>
       <View className="urine-input-popup">
+        <Text className="popup-title">设置尿量</Text>
         <View className="period-tags">
           {TIME_PERIODS.map((period, index) => (
             <View
@@ -134,10 +122,27 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
         </View>
 
         <View className="input-section">
-          <NumericInput value={value} onChange={setValue} unit="毫升" />
+          <NumericInput
+            value={value}
+            onChange={setValue}
+            unit="毫升"
+            onComplete={handleConfirm}
+          />
         </View>
+
+        {/* <View className="button-group">
+          <View className="cancel-button" onClick={onClose}>
+            取消
+          </View>
+          <View
+            className={`confirm-button ${loading ? "loading" : ""}`}
+            onClick={handleConfirm}
+          >
+            {loading ? "提交中..." : "确认"}
+          </View>
+        </View> */}
       </View>
-    </CustomPopup>
+    </Popup>
   );
 };
 
