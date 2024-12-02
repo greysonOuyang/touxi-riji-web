@@ -7,6 +7,8 @@ import { fetchWaterTags, saveWaterTags } from "../../api/userSettings";
 import Taro from "@tarojs/taro";
 import dayjs from "dayjs";
 import "./index.scss";
+import Popup from "../Popup";
+import TimePicker from "../TimePicker";
 
 interface WaterInputPopupProps {
   isOpened: boolean;
@@ -156,69 +158,75 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
   };
 
   return (
-    <CustomPopup
-      isOpened={isOpened}
+    <Popup
+      visible={isOpened}
       onClose={() => {
         handleCancelNewTag();
         onClose();
       }}
-      onConfirm={handleConfirm}
       title="添加喝水记录"
-      confirmText={loading ? "提交中..." : "确认"}
-      cancelText="取消"
     >
       <View className="water-input-popup">
-        <View className="time-container">
-          <Text>时间</Text>
-          <Picker mode="time" value={selectedTime} onChange={handleTimeChange}>
-            <View className="picker">
-              <Image className="clock-icon" src="/assets/icons/clock.png" />
-              <Text>{selectedTime}</Text>
-            </View>
-          </Picker>
-        </View>
+        <View className="top-section">
+          <View className="time-container">
+            <TimePicker
+              label="时间"
+              value={selectedTime}
+              showArrowIcon={true}
+              onChange={handleTimeChange}
+            />
+          </View>
 
-        <View className="tags-container">
-          {userTags.map((volume) => (
-            <View
-              key={volume}
-              className="volume-tag"
-              onClick={() => handleVolumeTagClick(volume)}
-              onLongPress={() => handleLongPressTag(volume)}
-            >
-              {volume} ml
-            </View>
-          ))}
+          <View className="tags-container">
+            {userTags.map((volume) => (
+              <View
+                key={volume}
+                className="volume-tag"
+                onClick={() => handleVolumeTagClick(volume)}
+                onLongPress={() => handleLongPressTag(volume)}
+              >
+                {volume} ml
+              </View>
+            ))}
 
-          {isEditingNewTag && (
-            <View className="editing-tag-container">
-              <View className="editing-tag">
-                <input
-                  type="number"
-                  className="tag-input"
-                  value={newTagValue}
-                  onChange={handleTagInputChange}
-                  onBlur={handleTagInputConfirm}
-                />
-                <View className="tag-input-cancel" onClick={handleCancelNewTag}>
-                  取消
+            {isEditingNewTag && (
+              <View className="editing-tag-container">
+                <View className="editing-tag">
+                  <input
+                    type="number"
+                    className="tag-input"
+                    value={newTagValue}
+                    onChange={handleTagInputChange}
+                    onBlur={handleTagInputConfirm}
+                  />
+                  <View
+                    className="tag-input-cancel"
+                    onClick={handleCancelNewTag}
+                  >
+                    取消
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            )}
 
-          {!isEditingNewTag && userTags.length < MAX_TAG_COUNT && (
-            <View className="add-tag-button" onClick={handleAddCustomTag}>
-              ＋
-            </View>
-          )}
+            {!isEditingNewTag && userTags.length < MAX_TAG_COUNT && (
+              <View className="add-tag-button" onClick={handleAddCustomTag}>
+                ＋
+              </View>
+            )}
+          </View>
         </View>
 
         <View className="input-section">
-          <NumericInput value={value} onChange={setValue} unit="毫升" />
+          <NumericInput
+            value={value}
+            onChange={setValue}
+            unit="毫升"
+            onComplete={handleConfirm}
+          />
         </View>
       </View>
-    </CustomPopup>
+    </Popup>
   );
 };
 
