@@ -39,16 +39,6 @@
     color: #666;
 }
 
-.edit-button {
-    background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
-    color: white;
-    padding: 0 20px;
-    font-size: 14px;
-    border-radius: 20px;
-    border: none;
-    height: 32px;
-}
-
 .profile-link {
     display: flex;
     align-items: center;
@@ -61,17 +51,11 @@
     margin-right: 5px;
 }
 
-/* Rest of the CSS remains the same */
-
-
-
-
-
-/* 状态卡片样式 */
 .profile-stats {
     display: flex;
     justify-content: space-between;
     width: 100%;
+    margin-bottom: 20px;
 }
 
 .profile-stat-card {
@@ -82,38 +66,31 @@
     justify-content: center;
     background-color: #ffffff;
     border-radius: 16px;
-    /* 调整圆角 */
     padding: 15px 0;
     margin: 0 5px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    /* 弱化阴影 */
 }
 
-.stat-value {
+.stat-value-unit {
     font-size: 18px;
     font-weight: bold;
     color: #92a3fd;
-    margin-bottom: 5px;
+    white-space: nowrap;
 }
 
 .stat-label {
     font-size: 12px;
     color: #999;
+    margin-top: 5px;
 }
 
-/* 个人设置样式 */
 .profile-settings {
     width: calc(100% - 40px);
-    /* 减去 profile-container 的 padding */
     background-color: #ffffff;
     border-radius: 16px;
-    /* 调整圆角 */
     padding: 20px;
-    /* 卡片内部内容间距 */
-    margin-top: 30px;
-    /* 增大与其他部分的间距 */
+    margin-top: 20px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-    /* 弱化阴影 */
 }
 
 .settings-title {
@@ -121,7 +98,6 @@
     font-weight: 600;
     color: #333;
     margin-bottom: 20px;
-    /* 调整标题和第一个选项间距 */
 }
 
 .settings-item {
@@ -134,7 +110,6 @@
 .item-label {
     display: flex;
     align-items: center;
-    /* 对齐 Icon 和文字 */
     font-size: 14px;
     color: #666;
 }
@@ -143,5 +118,4 @@
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    /* Icon 和文字的间距 */
 }

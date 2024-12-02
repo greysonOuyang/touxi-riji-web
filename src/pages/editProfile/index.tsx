@@ -11,6 +11,7 @@ const EditProfile = () => {
     avatarUrl: DEFAULT_AVATAR,
     userName: "",
     name: "",
+    gender: "",
     height: "",
     weight: "",
     birthDate: "",
@@ -34,6 +35,7 @@ const EditProfile = () => {
               avatarUrl: response.data.avatarUrl || DEFAULT_AVATAR,
               userName: response.data.userName || "",
               name: response.data.name || "",
+              gender: response.data.gender || "",
               height: response.data.height
                 ? response.data.height.toString()
                 : "",
@@ -51,7 +53,6 @@ const EditProfile = () => {
             icon: "error",
             duration: 2000,
           });
-          setProfile((prev) => ({ ...prev, isLoading: false }));
         }
       }
     };
@@ -78,100 +79,126 @@ const EditProfile = () => {
   };
 
   const handleDateChange = (field, e) => {
-    setProfile((prev) => ({ ...prev, [field]: e.detail.value }));
+    const newValue = e.detail.value;
+    setProfile((prev) => ({ ...prev, [field]: newValue }));
+    handleUpdate(field, newValue);
   };
 
-  const handleBlur = async (field) => {
+  const handleGenderChange = (e) => {
+    const genderOptions = ["男", "女", "未知"];
+    const newValue = genderOptions[e.detail.value];
+    setProfile((prev) => ({ ...prev, gender: newValue }));
+    handleUpdate("gender", newValue);
+  };
+
+  const handleUpdate = async (field, value) => {
     const userId = Taro.getStorageSync("userId");
     if (userId) {
       try {
-        await updateUserProfile(userId, { [field]: profile[field] });
+        await updateUserProfile(userId, { [field]: value });
         Taro.showToast({ title: "更新成功", icon: "success", duration: 1500 });
       } catch (error) {
+        console.error("Failed to update profile:", error);
         Taro.showToast({ title: "更新失败", icon: "error", duration: 1500 });
       }
     }
   };
 
+  const handleBlur = (field) => {
+    handleUpdate(field, profile[field]);
+  };
+
   return (
     <View className="edit-profile-container">
       <View className="edit-profile-content">
-        <>
-          <View className="avatar-section" onClick={handleAvatarChange}>
-            <Image className="profile-avatar" src={profile.avatarUrl} />
-            <View className="avatar-edit-overlay">
-              <Text className="edit-text">编辑</Text>
+        <View className="avatar-section" onClick={handleAvatarChange}>
+          <Image className="profile-avatar" src={profile.avatarUrl} />
+          <View className="avatar-edit-overlay">
+            <Text className="edit-text">编辑</Text>
+          </View>
+        </View>
+
+        <View className="profile-field">
+          <Text className="field-label">昵称</Text>
+          <Input
+            className="field-input"
+            value={profile.userName}
+            onInput={(e) => handleInputChange("userName", e.detail.value)}
+            onBlur={() => handleBlur("userName")}
+          />
+        </View>
+
+        <View className="profile-field">
+          <Text className="field-label">姓名</Text>
+          <Input
+            className="field-input"
+            value={profile.name}
+            onInput={(e) => handleInputChange("name", e.detail.value)}
+            onBlur={() => handleBlur("name")}
+          />
+        </View>
+
+        <View className="profile-field">
+          <Text className="field-label">性别</Text>
+          <Picker
+            mode="selector"
+            range={["男", "女", "未知"]}
+            onChange={handleGenderChange}
+            value={["男", "女", "未知"].indexOf(profile.gender)}
+          >
+            <View className="picker-value">
+              {profile.gender || "请选择性别"}
             </View>
-          </View>
+          </Picker>
+        </View>
 
-          <View className="profile-field">
-            <Text className="field-label">昵称</Text>
-            <Input
-              className="field-input"
-              value={profile.userName}
-              onInput={(e) => handleInputChange("userName", e.detail.value)}
-              onBlur={() => handleBlur("userName")}
-            />
-          </View>
+        <View className="profile-field">
+          <Text className="field-label">身高 (cm)</Text>
+          <Input
+            className="field-input"
+            type="digit"
+            value={profile.height}
+            onInput={(e) => handleInputChange("height", e.detail.value)}
+            onBlur={() => handleBlur("height")}
+          />
+        </View>
 
-          <View className="profile-field">
-            <Text className="field-label">姓名</Text>
-            <Input
-              className="field-input"
-              value={profile.name}
-              onInput={(e) => handleInputChange("name", e.detail.value)}
-              onBlur={() => handleBlur("name")}
-            />
-          </View>
+        <View className="profile-field">
+          <Text className="field-label">体重 (kg)</Text>
+          <Input
+            className="field-input"
+            type="digit"
+            value={profile.weight}
+            onInput={(e) => handleInputChange("weight", e.detail.value)}
+            onBlur={() => handleBlur("weight")}
+          />
+        </View>
 
-          <View className="profile-field">
-            <Text className="field-label">身高 (cm)</Text>
-            <Input
-              className="field-input"
-              type="digit"
-              value={profile.height}
-              onInput={(e) => handleInputChange("height", e.detail.value)}
-              onBlur={() => handleBlur("height")}
-            />
-          </View>
+        <View className="profile-field">
+          <Text className="field-label">出生日期</Text>
+          <Picker
+            mode="date"
+            value={profile.birthDate}
+            onChange={(e) => handleDateChange("birthDate", e)}
+          >
+            <View className="picker-value">
+              {profile.birthDate || "请选择日期"}
+            </View>
+          </Picker>
+        </View>
 
-          <View className="profile-field">
-            <Text className="field-label">体重 (kg)</Text>
-            <Input
-              className="field-input"
-              type="digit"
-              value={profile.weight}
-              onInput={(e) => handleInputChange("weight", e.detail.value)}
-              onBlur={() => handleBlur("weight")}
-            />
-          </View>
-
-          <View className="profile-field">
-            <Text className="field-label">出生日期</Text>
-            <Picker
-              mode="date"
-              value={profile.birthDate}
-              onChange={(e) => handleDateChange("birthDate", e)}
-            >
-              <View className="picker-value">
-                {profile.birthDate || "请选择日期"}
-              </View>
-            </Picker>
-          </View>
-
-          <View className="profile-field">
-            <Text className="field-label">腹透开始日期</Text>
-            <Picker
-              mode="date"
-              value={profile.pdStartDate}
-              onChange={(e) => handleDateChange("pdStartDate", e)}
-            >
-              <View className="picker-value">
-                {profile.pdStartDate || "请选择日期"}
-              </View>
-            </Picker>
-          </View>
-        </>
+        <View className="profile-field">
+          <Text className="field-label">腹透开始日期</Text>
+          <Picker
+            mode="date"
+            value={profile.pdStartDate}
+            onChange={(e) => handleDateChange("pdStartDate", e)}
+          >
+            <View className="picker-value">
+              {profile.pdStartDate || "请选择日期"}
+            </View>
+          </Picker>
+        </View>
       </View>
     </View>
   );

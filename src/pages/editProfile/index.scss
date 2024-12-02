@@ -14,11 +14,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 30px;
+    margin: 0 auto 30px;
     position: relative;
     width: 100px;
     height: 100px;
-    margin: 0 auto 30px;
+    border-radius: 50%;
+    overflow: hidden;
 }
 
 .profile-avatar {
@@ -36,8 +37,6 @@
     width: 100%;
     height: 30px;
     background-color: rgba(0, 0, 0, 0.5);
-    border-bottom-left-radius: 50px;
-    border-bottom-right-radius: 50px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -72,13 +71,5 @@
     font-size: 16px;
     color: #666;
     text-align: right;
-}
-
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    font-size: 16px;
-    color: #666;
+    min-width: 120px;
 }
