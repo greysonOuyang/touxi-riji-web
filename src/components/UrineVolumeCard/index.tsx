@@ -69,14 +69,11 @@ const UrineVolumeCard: React.FC = () => {
         />
       </View>
 
-      {/* 卡片内容 */}
       <View className="content">
-        {data.value ? (
-          <View className="urine-value-container">
-            <Text className="global-value">{data.value}</Text>
-            <Text className="global-unit urine-unit">毫升</Text>
-          </View>
-        ) : null}
+        <View className="urine-value-container">
+          <Text className="global-value">{data.value ? data.value : "0"}</Text>
+          <Text className="global-unit urine-unit">毫升</Text>
+        </View>
       </View>
 
       {/* 卡片底部 */}
