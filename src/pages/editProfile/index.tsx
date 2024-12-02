@@ -15,7 +15,6 @@ const EditProfile = () => {
     weight: "",
     birthDate: "",
     pdStartDate: "",
-    isLoading: true,
   });
 
   useDidShow(() => {
@@ -42,8 +41,7 @@ const EditProfile = () => {
                 ? response.data.weight.toString()
                 : "",
               birthDate: response.data.birthDate || "",
-              pdStartDate: response.data.pdStartDate || "",
-              isLoading: false,
+              pdStartDate: response.data.dialysisStartDate || "",
             });
           }
         } catch (error) {
@@ -98,86 +96,82 @@ const EditProfile = () => {
   return (
     <View className="edit-profile-container">
       <View className="edit-profile-content">
-        {profile.isLoading ? (
-          <View className="loading">加载中...</View>
-        ) : (
-          <>
-            <View className="avatar-section" onClick={handleAvatarChange}>
-              <Image className="profile-avatar" src={profile.avatarUrl} />
-              <View className="avatar-edit-overlay">
-                <Text className="edit-text">编辑</Text>
+        <>
+          <View className="avatar-section" onClick={handleAvatarChange}>
+            <Image className="profile-avatar" src={profile.avatarUrl} />
+            <View className="avatar-edit-overlay">
+              <Text className="edit-text">编辑</Text>
+            </View>
+          </View>
+
+          <View className="profile-field">
+            <Text className="field-label">昵称</Text>
+            <Input
+              className="field-input"
+              value={profile.userName}
+              onInput={(e) => handleInputChange("userName", e.detail.value)}
+              onBlur={() => handleBlur("userName")}
+            />
+          </View>
+
+          <View className="profile-field">
+            <Text className="field-label">姓名</Text>
+            <Input
+              className="field-input"
+              value={profile.name}
+              onInput={(e) => handleInputChange("name", e.detail.value)}
+              onBlur={() => handleBlur("name")}
+            />
+          </View>
+
+          <View className="profile-field">
+            <Text className="field-label">身高 (cm)</Text>
+            <Input
+              className="field-input"
+              type="digit"
+              value={profile.height}
+              onInput={(e) => handleInputChange("height", e.detail.value)}
+              onBlur={() => handleBlur("height")}
+            />
+          </View>
+
+          <View className="profile-field">
+            <Text className="field-label">体重 (kg)</Text>
+            <Input
+              className="field-input"
+              type="digit"
+              value={profile.weight}
+              onInput={(e) => handleInputChange("weight", e.detail.value)}
+              onBlur={() => handleBlur("weight")}
+            />
+          </View>
+
+          <View className="profile-field">
+            <Text className="field-label">出生日期</Text>
+            <Picker
+              mode="date"
+              value={profile.birthDate}
+              onChange={(e) => handleDateChange("birthDate", e)}
+            >
+              <View className="picker-value">
+                {profile.birthDate || "请选择日期"}
               </View>
-            </View>
+            </Picker>
+          </View>
 
-            <View className="profile-field">
-              <Text className="field-label">昵称</Text>
-              <Input
-                className="field-input"
-                value={profile.userName}
-                onInput={(e) => handleInputChange("userName", e.detail.value)}
-                onBlur={() => handleBlur("userName")}
-              />
-            </View>
-
-            <View className="profile-field">
-              <Text className="field-label">姓名</Text>
-              <Input
-                className="field-input"
-                value={profile.name}
-                onInput={(e) => handleInputChange("name", e.detail.value)}
-                onBlur={() => handleBlur("name")}
-              />
-            </View>
-
-            <View className="profile-field">
-              <Text className="field-label">身高 (cm)</Text>
-              <Input
-                className="field-input"
-                type="digit"
-                value={profile.height}
-                onInput={(e) => handleInputChange("height", e.detail.value)}
-                onBlur={() => handleBlur("height")}
-              />
-            </View>
-
-            <View className="profile-field">
-              <Text className="field-label">体重 (kg)</Text>
-              <Input
-                className="field-input"
-                type="digit"
-                value={profile.weight}
-                onInput={(e) => handleInputChange("weight", e.detail.value)}
-                onBlur={() => handleBlur("weight")}
-              />
-            </View>
-
-            <View className="profile-field">
-              <Text className="field-label">出生日期</Text>
-              <Picker
-                mode="date"
-                value={profile.birthDate}
-                onChange={(e) => handleDateChange("birthDate", e)}
-              >
-                <View className="picker-value">
-                  {profile.birthDate || "请选择日期"}
-                </View>
-              </Picker>
-            </View>
-
-            <View className="profile-field">
-              <Text className="field-label">腹透开始日期</Text>
-              <Picker
-                mode="date"
-                value={profile.pdStartDate}
-                onChange={(e) => handleDateChange("pdStartDate", e)}
-              >
-                <View className="picker-value">
-                  {profile.pdStartDate || "请选择日期"}
-                </View>
-              </Picker>
-            </View>
-          </>
-        )}
+          <View className="profile-field">
+            <Text className="field-label">腹透开始日期</Text>
+            <Picker
+              mode="date"
+              value={profile.pdStartDate}
+              onChange={(e) => handleDateChange("pdStartDate", e)}
+            >
+              <View className="picker-value">
+                {profile.pdStartDate || "请选择日期"}
+              </View>
+            </Picker>
+          </View>
+        </>
       </View>
     </View>
   );

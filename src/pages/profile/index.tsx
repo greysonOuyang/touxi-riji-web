@@ -10,14 +10,14 @@ const ICON_PROFILE = "../../assets/images/icon-profile.png";
 
 const Profile = () => {
   const [profile, setProfile] = useState({
-    username: "",
+    userName: "",
     avatarUrl: DEFAULT_AVATAR,
     name: "",
     height: 0,
     weight: 0,
     age: 0,
     gender: "",
-    pdDays: 0,
+    dialysisDuration: 0,
   });
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const Profile = () => {
       <View className="profile-header" onClick={handleEditProfile}>
         <Image className="profile-avatar" src={profile.avatarUrl} />
         <View className="profile-info">
-          <Text className="profile-name">{profile.username}</Text>
+          <Text className="profile-name">{profile.userName}</Text>
           <Text className="profile-details">
             {profile.gender} · {profile.age}岁
           </Text>
@@ -70,7 +70,7 @@ const Profile = () => {
           <Text className="stat-label">体重</Text>
         </View>
         <View className="profile-stat-card">
-          <Text className="stat-value">{profile.pdDays || 0}天</Text>
+          <Text className="stat-value">{profile.dialysisDuration || 0}天</Text>
           <Text className="stat-label">腹透</Text>
         </View>
       </View>
