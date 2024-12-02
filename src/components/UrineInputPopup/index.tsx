@@ -104,9 +104,8 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
   };
 
   return (
-    <Popup visible={visible} onClose={onClose}>
+    <Popup visible={visible} onClose={onClose} title="记录尿量">
       <View className="urine-input-popup">
-        <Text className="popup-title">设置尿量</Text>
         <View className="period-tags">
           {TIME_PERIODS.map((period, index) => (
             <View
@@ -129,18 +128,6 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
             onComplete={handleConfirm}
           />
         </View>
-
-        {/* <View className="button-group">
-          <View className="cancel-button" onClick={onClose}>
-            取消
-          </View>
-          <View
-            className={`confirm-button ${loading ? "loading" : ""}`}
-            onClick={handleConfirm}
-          >
-            {loading ? "提交中..." : "确认"}
-          </View>
-        </View> */}
       </View>
     </Popup>
   );
