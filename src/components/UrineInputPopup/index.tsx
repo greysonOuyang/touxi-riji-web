@@ -7,13 +7,6 @@ import "./index.scss";
 import Taro from "@tarojs/taro";
 import dayjs from "dayjs";
 
-interface UrineInputPopupProps {
-  visible: boolean;
-  onClose: () => void;
-  onSuccess: () => void;
-  initialValue?: number;
-}
-
 const TIME_PERIODS = [
   { label: "早上 6:00-9:00", tag: "morning", range: [6, 9] },
   { label: "上午 9:00-12:00", tag: "forenoon", range: [9, 12] },
@@ -22,11 +15,20 @@ const TIME_PERIODS = [
   { label: "夜间 22:00-6:00", tag: "night", range: [22, 6] },
 ];
 
+interface UrineInputPopupProps {
+  visible: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  initialValue?: number;
+  setIsScrollEnabled: (isEnabled: boolean) => void;
+}
+
 const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
   visible,
   onClose,
   onSuccess,
   initialValue = 0,
+  setIsScrollEnabled,
 }) => {
   const [value, setValue] = useState<string>(initialValue.toString());
   const [loading, setLoading] = useState<boolean>(false);
@@ -104,7 +106,12 @@ const UrineInputPopup: React.FC<UrineInputPopupProps> = ({
   };
 
   return (
-    <Popup visible={visible} onClose={onClose} title="记录尿量">
+    <Popup
+      visible={visible}
+      onClose={onClose}
+      title="记录尿量"
+      setIsScrollEnabled={setIsScrollEnabled}
+    >
       <View className="urine-input-popup">
         <View className="period-tags">
           {TIME_PERIODS.map((period, index) => (

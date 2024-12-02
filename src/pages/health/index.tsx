@@ -12,6 +12,7 @@ import "../../app.scss";
 
 const HealthPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!Taro.getStorageSync("token"));
+  const [isScrollEnabled, setIsScrollEnabled] = useState(true);
 
   // 为每个需要刷新的组件添加刷新触发器
   const [refreshTriggers, setRefreshTriggers] = useState({
@@ -34,37 +35,12 @@ const HealthPage: React.FC = () => {
     }));
   });
 
-  // 模拟超滤数据
-  const ultrafiltrationData = {
-    value: -400,
-    maxValue: 1000,
-    concentration: "1.5%",
-    currentSession: 1,
-    totalSession: 4,
-    updateTime: "3天前",
-  };
-
-  // 模拟卡片数据
-  const cardData = {
-    water: {
-      maxIntake: 1000,
-      currentIntake: 450,
-      records: [
-        { time: "18:40", amount: 600 },
-        { time: "16:32", amount: 500 },
-        { time: "13:11", amount: 1000 },
-        { time: "11:40", amount: 700 },
-        { time: "8:30", amount: 900 },
-      ],
-    },
-  };
-
   return (
-    <ScrollView className="health-page" scrollY>
+    <ScrollView className="health-page" scrollY={isScrollEnabled}>
       {!isLoggedIn && <LoginPrompt />}
       <View className="content-wrapper">
         {/* 超滤量卡片 */}
-        <UltrafiltrationView {...ultrafiltrationData} />
+        <UltrafiltrationView />
         <Text className="large_text_semi_bold">健康概览</Text>
 
         {/* 固定布局的健康卡片 */}
