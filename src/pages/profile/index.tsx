@@ -62,6 +62,9 @@ const Profile = () => {
   }, []);
 
   useDidShow(() => {
+    Taro.setNavigationBarTitle({
+      title: "个人设置",
+    });
     fetchProfileData();
   });
 
