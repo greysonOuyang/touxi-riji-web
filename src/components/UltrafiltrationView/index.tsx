@@ -3,6 +3,7 @@ import { View, Text } from "@tarojs/components";
 import UltrafiltrationBall from "../UltrafiltrationBall";
 import AddButton from "@/components/AddButton";
 import { getLatestPdRecord, LatestPdRecordDTO } from "@/api/pdRecordApi";
+import { getCurrentPdPlan } from "@/api/pdPlanApi";
 import "./index.scss";
 import "../../app.scss";
 import Taro, { useDidShow } from "@tarojs/taro";
@@ -46,10 +47,36 @@ const UltrafiltrationView: React.FC = () => {
     }
   };
 
+  const checkPdPlan = async (): Promise<boolean> => {
+    try {
+      const userId = Taro.getStorageSync("userId");
+      const response = await getCurrentPdPlan(userId);
+      return response.isSuccess() && response.data !== null;
+    } catch (error) {
+      console.error("检查腹透计划时发生错误:", error);
+      return false;
+    }
+  };
+
   const onAddClick = async () => {
-    Taro.navigateTo({
-      url: "/pages/PdRecordInputPage/index",
-    });
+    const hasPdPlan = await checkPdPlan();
+    if (hasPdPlan) {
+      Taro.navigateTo({
+        url: "/pages/PdRecordInputPage/index",
+      });
+    } else {
+      Taro.showModal({
+        title: "提示",
+        content: "您还没有设置腹透计划，是否现在去添加？",
+        confirmText: "去添加",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            Taro.navigateTo({ url: "/pages/pdPlan/index" });
+          }
+        },
+      });
+    }
   };
 
   const onViewClick = () => {
