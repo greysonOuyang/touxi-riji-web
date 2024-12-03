@@ -25,9 +25,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 32px; // 调整高度以适应更大数字
-            font-size: 14px; // 字体稍微增大
-            padding: 4px 10px; // 左右留白稍小，适应4位数字
+            height: 30px; // 调整高度以适应更大数字
+            font-size: 12px; // 字体稍微增大
+            padding: 4px 4px; // 左右留白稍小，适应4位数字
             flex: 0 0 calc((100% - 24px) / 4); // 每行显示4个，减去3个间距
             box-shadow: 0 2px 4px rgba(146, 163, 253, 0.2);
             white-space: nowrap; // 防止文字换行
@@ -40,7 +40,7 @@
 
         .editing-tag-container {
             flex: 0 0 calc((100% - 24px) / 4); // 保持与其他标签相同宽度
-            height: 32px; // 与标签一致高度
+            height: 30px; // 与标签一致高度
 
             .editing-tag {
                 display: flex;
@@ -56,7 +56,7 @@
                     border: none;
                     background: transparent;
                     color: #92a3fd;
-                    font-size: 14px; // 与其他标签一致字体大小
+                    font-size: 12px; // 与其他标签一致字体大小
                     outline: none;
                     width: calc(100% - 34px); // 减去取消按钮的宽度
                     text-align: center;
@@ -68,7 +68,7 @@
 
                 .tag-input-cancel {
                     color: #FF3B30;
-                    font-size: 14px;
+                    font-size: 12px;
                     padding-left: 2px;
                     min-width: 28px; // 固定取消按钮宽度
                     text-align: center;
@@ -80,11 +80,11 @@
             background: linear-gradient(274.42deg, #92a3fd 0%, #9dceff 124.45%);
             border-radius: 20px;
             color: #fff;
-            font-size: 14px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 32px;
+            height: 30px;
             flex: 0 0 calc((100% - 24px) / 4); // 与其他标签保持相同宽度
             box-shadow: 0 2px 4px rgba(146, 163, 253, 0.2);
             padding: 0;
