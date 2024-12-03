@@ -9,10 +9,11 @@ export default {
     "pages/pdPlan/index",
     "pages/PdRecordInputPage/index",
     "pages/editProfile/index",
+    "pages/pdDetail/index",
   ],
   window: {
     backgroundTextStyle: "light",
-    navigationBarBackgroundColor: "#FCFCFC",
+    navigationBarBackgroundColor: "#F8F9FA",
     navigationBarTitleText: "健康概览",
     navigationBarTextStyle: "black",
   },
