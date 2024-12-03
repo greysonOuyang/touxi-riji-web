@@ -6,6 +6,7 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import FormItem from "@/components/FormItem";
 import CapsuleSelector from "@/components/CapsuleSelector";
 import "./index.scss";
+import Button from "@/components/Button";
 
 const PdRecordInputPage: React.FC = () => {
   const [plan, setPlan] = useState<PdPlanVO | null>(null);
@@ -194,9 +195,7 @@ const PdRecordInputPage: React.FC = () => {
       </View>
 
       <View className="button-container">
-        <View className="submit-button" onClick={handleSubmit}>
-          确认
-        </View>
+        <Button text="确认" type="primary" onClick={handleSubmit} />
       </View>
     </View>
   );

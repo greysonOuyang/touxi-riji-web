@@ -11,6 +11,7 @@ import {
 import TimeSelector from "@/components/TimeSelector";
 import FormItem from "@/components/FormItem";
 import "./index.scss";
+import Button from "@/components/Button";
 
 interface BloodPressureData {
   systolic: string;
@@ -191,15 +192,13 @@ const BloodPressureInputPage: React.FC = () => {
               className="textarea"
               value={formData.note}
               onInput={(e) => handleInputChange("note", e.detail.value)}
-              placeholder="请输入备注信息"
+              placeholder="可记录今日状态或其他事项，如胸闷、忘吃降压药等"
             />
           </View>
         </View>
 
         <View className="button-container">
-          <View className="submit-button" onClick={handleSubmit}>
-            确认
-          </View>
+          <Button text="确认" type="primary" onClick={handleSubmit} />
         </View>
       </Form>
     </View>

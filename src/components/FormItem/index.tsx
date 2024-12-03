@@ -10,6 +10,8 @@ interface FormItemProps {
   units?: string[];
   onChange?: (value: string) => void;
   onUnitChange?: (value: string, unit: string) => string;
+  required?: boolean;
+  error?: string;
 }
 
 const FormItem: React.FC<FormItemProps> = ({
@@ -20,6 +22,8 @@ const FormItem: React.FC<FormItemProps> = ({
   units = [],
   onChange,
   onUnitChange,
+  required,
+  error,
 }) => {
   const [currentUnitIndex, setCurrentUnitIndex] = useState(0);
 
@@ -34,25 +38,31 @@ const FormItem: React.FC<FormItemProps> = ({
   };
 
   return (
-    <View className="form-item">
-      <View className="left-section">
-        {icon && <Image className="icon" src={icon} />}
-        <Text className="label">{label}</Text>
+    <View className="form-item-wrapper">
+      <View className="form-item">
+        <View className="left-section">
+          {icon && <Image className="icon" src={icon} />}
+          <Text className="label">
+            {label}
+            {required && <Text className="required">*</Text>}
+          </Text>
+        </View>
+        <View className="right-section">
+          <Input
+            type="text"
+            className="input-box"
+            placeholder={placeholder || ""}
+            value={value === undefined || value === null ? "" : String(value)}
+            onInput={(e) => onChange && onChange(e.detail.value)}
+          />
+          {units.length > 0 && (
+            <View className="unit-box" onClick={handleUnitChange}>
+              {units[currentUnitIndex]}
+            </View>
+          )}
+        </View>
       </View>
-      <View className="right-section">
-        <Input
-          type="text"
-          className="input-box"
-          placeholder={placeholder || ""}
-          value={value === undefined || value === null ? "" : String(value)}
-          onInput={(e) => onChange && onChange(e.detail.value)}
-        />
-        {units.length > 0 && (
-          <View className="unit-box" onClick={handleUnitChange}>
-            {units[currentUnitIndex]}
-          </View>
-        )}
-      </View>
+      {error && <Text className="error-text">{error}</Text>}
     </View>
   );
 };
