@@ -1,5 +1,5 @@
 .health-page {
-  background-color: #FCFCFC;
+  background: #F8F9FA;
   min-height: 100vh;
   overflow: hidden;
   box-sizing: border-box;
@@ -108,14 +108,14 @@
 }
 
 // TimeSelector 样式
-:global {
-  .time-selector {
-    padding: 10px 0;
-    border-bottom: 1px solid #EEEEEE;
+// :global {
+//   .time-selector {
+//     padding: 10px 0;
+//     border-bottom: 1px solid #EEEEEE;
 
-    .label-wrapper {
-      font-size: 15px;
-      color: #333333;
-    }
-  }
-}
+//     .label-wrapper {
+//       font-size: 15px;
+//       color: #333333;
+//     }
+//   }
+// }
