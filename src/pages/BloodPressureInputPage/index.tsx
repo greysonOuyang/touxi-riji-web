@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Taro from "@tarojs/taro";
-import { View, Form, Input, Text, Textarea } from "@tarojs/components";
+import { View, Form, Text, Textarea } from "@tarojs/components";
 import { addBloodPressureRecord } from "@/api/bloodPressureApi";
 import {
   FORM_TYPES,
@@ -9,13 +9,13 @@ import {
   clearTempFormData,
 } from "@/utils/tempFormStorage";
 import TimeSelector from "@/components/TimeSelector";
+import FormItem from "@/components/FormItem";
 import "./index.scss";
-import CustomTimePicker from "@/components/CustomTimePicker";
 
 interface BloodPressureData {
-  systolic: string | number;
-  diastolic: string | number;
-  heartRate: string | number;
+  systolic: string;
+  diastolic: string;
+  heartRate: string;
   measureDateTime: string;
   note: string;
 }
@@ -141,65 +141,39 @@ const BloodPressureInputPage: React.FC = () => {
     }
   };
 
-  // BloodPressureInputPage 组件的 return 部分修改
   return (
     <View className="blood-pressure-input-page">
       <Form onSubmit={handleSubmit}>
         <View className="input-section">
-          <View className="form-item">
-            <Text className="label">
-              收缩压<Text className="required">*</Text>
-            </Text>
-            <View className="input-wrapper">
-              <Input
-                type="number"
-                className="input"
-                value={formData.systolic as string}
-                onInput={(e) => handleInputChange("systolic", e.detail.value)}
-                placeholder="请输入收缩压"
-              />
-              <Text className="unit">mmHg</Text>
-            </View>
-            {errors.systolic && (
-              <Text className="error-text">{errors.systolic}</Text>
-            )}
-          </View>
+          <FormItem
+            label="收缩压"
+            value={formData.systolic}
+            units={["mmHg"]}
+            onChange={(value) => handleInputChange("systolic", value)}
+            placeholder="请输入收缩压"
+            error={errors.systolic}
+            required
+          />
 
-          <View className="form-item">
-            <Text className="label">
-              舒张压<Text className="required">*</Text>
-            </Text>
-            <View className="input-wrapper">
-              <Input
-                type="number"
-                className="input"
-                value={formData.diastolic as string}
-                onInput={(e) => handleInputChange("diastolic", e.detail.value)}
-                placeholder="请输入舒张压"
-              />
-              <Text className="unit">mmHg</Text>
-            </View>
-            {errors.diastolic && (
-              <Text className="error-text">{errors.diastolic}</Text>
-            )}
-          </View>
+          <FormItem
+            label="舒张压"
+            value={formData.diastolic}
+            units={["mmHg"]}
+            onChange={(value) => handleInputChange("diastolic", value)}
+            placeholder="请输入舒张压"
+            error={errors.diastolic}
+            required
+          />
 
-          <View className="form-item">
-            <Text className="label">心率</Text>
-            <View className="input-wrapper">
-              <Input
-                type="number"
-                className="input"
-                value={formData.heartRate as string}
-                onInput={(e) => handleInputChange("heartRate", e.detail.value)}
-                placeholder="请输入心率"
-              />
-              <Text className="unit">次/分</Text>
-            </View>
-            {errors.heartRate && (
-              <Text className="error-text">{errors.heartRate}</Text>
-            )}
-          </View>
+          <FormItem
+            label="心率"
+            value={formData.heartRate}
+            units={["次/分"]}
+            onChange={(value) => handleInputChange("heartRate", value)}
+            placeholder="请输入心率"
+            error={errors.heartRate}
+          />
+
           <View className="time-item">
             <TimeSelector
               showLabel={false}
@@ -222,8 +196,10 @@ const BloodPressureInputPage: React.FC = () => {
           </View>
         </View>
 
-        <View className="confirm-button" onClick={handleSubmit}>
-          确认
+        <View className="button-container">
+          <View className="submit-button" onClick={handleSubmit}>
+            确认
+          </View>
         </View>
       </Form>
     </View>
