@@ -3,7 +3,7 @@ import { View, Text, Image } from "@tarojs/components";
 import { getUserProfile } from "../../api/profile";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
-import ArrowRight from "@/components/ArrowRight";
+import ArrowRight from "@/components/common/ArrowRight";
 
 const DEFAULT_AVATAR = "../../assets/images/face.png";
 const ICON_PROFILE = "../../assets/icons/icon-profile.png";
@@ -69,11 +69,11 @@ const Profile = () => {
   });
 
   const handleEditProfile = () => {
-    Taro.navigateTo({ url: "/pages/editProfile/index" });
+    Taro.navigateTo({ url: "/pages/profile/edit/index" });
   };
 
   const handlePdPlanClick = () => {
-    Taro.navigateTo({ url: "/pages/pdPlan/index" });
+    Taro.navigateTo({ url: "/pages/pdPlan/planManage/index" });
   };
 
   return (

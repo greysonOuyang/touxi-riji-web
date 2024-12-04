@@ -1,0 +1,17 @@
+.historical-data {
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .more {
+            color: #007aff;
+        }
+    }
+}

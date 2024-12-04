@@ -1,0 +1,45 @@
+.dialysis-data {
+    .date-picker {
+        margin-bottom: 20px;
+    }
+
+    .summary {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+
+        .ultrafiltration {
+            font-weight: bold;
+            color: #007aff;
+        }
+    }
+
+    .timeline {
+        margin-top: 20px;
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+
+            .time {
+                font-weight: bold;
+            }
+
+            .details {
+                text-align: right;
+
+                .ultrafiltration {
+                    color: #007aff;
+                    font-weight: bold;
+                }
+            }
+        }
+    }
+
+    .add-record {
+        margin-top: 20px;
+    }
+}

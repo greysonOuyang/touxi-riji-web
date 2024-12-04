@@ -64,7 +64,7 @@ instance.interceptors.request.use(
     const token = Taro.getStorageSync("token");
     if (token && !isWhiteListUrl(config.url ?? "")) {
       config.headers.Authorization = `${token}`;
-      console.log("Request headers:", config.headers);
+      // console.log("Request headers:", config.headers);
     }
 
     return config;

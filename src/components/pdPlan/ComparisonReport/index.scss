@@ -1,0 +1,19 @@
+.comparison-report {
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        .title {
+            font-size: 18px;
+            font-weight: bold;
+        }
+    }
+
+    .summary {
+        font-size: 14px;
+        color: #666;
+        margin-top: 20px;
+    }
+}

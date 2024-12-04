@@ -1,0 +1,115 @@
+.ultrafiltration-view {
+  width: 100%;
+}
+
+.ultrafiltration-card {
+  margin-top: 15px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 25vh;
+  /* 使用视口高度单位，使其自适应不同屏幕 */
+  background-color: #e0e9ff;
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 15px;
+  box-sizing: border-box;
+}
+
+.ultrafiltration-card::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  background-image: url('../../../assets/images/Banner.png');
+  background-size: cover;
+  background-position: center;
+  z-index: 1;
+}
+
+.ball {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  /* 40vw = 40 * 3.75px */
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+
+.session-info {
+  position: absolute;
+  top: 15px;
+  /* 4vw = 4 * 3.75px */
+  left: 18.75px;
+  /* 5vw = 5 * 3.75px */
+  z-index: 2;
+  color: #FFFFFF;
+  padding: 3.75px;
+  /* 1vw = 1 * 3.75px */
+}
+
+.concentration {
+  position: absolute;
+  right: 37.5px;
+  /* 10vw = 10 * 3.75px */
+  bottom: 45px;
+  /* 12vw = 12 * 3.75px */
+  font-size: 12px;
+  color: #FFFFFF;
+  z-index: 2;
+}
+
+.ultrafiltration-update-time {
+  position: absolute;
+  bottom: 15px;
+  /* 4vw = 4 * 3.75px */
+  left: 15px;
+  /* 5vw = 5 * 3.75px */
+  font-size: 12px;
+  color: #FFFFFF;
+  z-index: 2;
+}
+
+.view-button {
+  width: 75px;
+  /* 20vw = 20 * 3.75px */
+  height: 22.5px;
+  /* 6vw = 6 * 3.75px */
+  position: absolute;
+  bottom: 15px;
+  /* 4vw = 4 * 3.75px */
+  right: 20px;
+  /* 5vw = 5 * 3.75px */
+  background-color: #C58BF2;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 18.75px;
+  /* 5vw = 5 * 3.75px */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11.25px;
+  /* 3vw = 3 * 3.75px */
+  line-height: 1;
+  /* 确保行高不影响显示 */
+  padding: 0;
+  /* 去掉内边距，避免内容被挤出 */
+  z-index: 2;
+}
+
+.ultrafiltration-add-button {
+  position: absolute;
+  top: 15px !important;
+  right: 15px !important;
+  z-index: 3;
+  /* 确保按钮在其他内容上方 */
+}

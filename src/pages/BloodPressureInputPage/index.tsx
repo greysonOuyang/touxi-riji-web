@@ -8,10 +8,10 @@ import {
   getTempFormData,
   clearTempFormData,
 } from "@/utils/tempFormStorage";
-import TimeSelector from "@/components/TimeSelector";
-import FormItem from "@/components/FormItem";
+import TimeSelector from "@/components/common/TimeSelector";
+import FormItem from "@/components/common/FormItem";
 import "./index.scss";
-import Button from "@/components/Button";
+import Button from "@/components/common/ConfirmButton";
 
 interface BloodPressureData {
   systolic: string;

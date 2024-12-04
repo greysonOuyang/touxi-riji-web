@@ -1,0 +1,54 @@
+.statics-page {
+    padding: 20px;
+    background-color: #f8f9fa;
+
+    .data-type-selector,
+    .time-range-selector {
+        margin-bottom: 20px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .picker {
+            font-size: 16px;
+            color: #333;
+        }
+    }
+
+    .chart-container {
+        margin-top: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        height: 240px;
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+    }
+
+    .stats-container {
+        margin-top: 20px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .stats-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .stats-item {
+            display: block;
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+    }
+}

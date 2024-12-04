@@ -1,0 +1,22 @@
+.dialysis-details-page {
+  padding: 20px;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .export-button {
+      padding: 5px 10px;
+      background-color: #007aff;
+      color: #fff;
+      border-radius: 5px;
+    }
+  }
+}

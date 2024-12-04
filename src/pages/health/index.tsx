@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import Taro, { useDidShow } from "@tarojs/taro";
 import LoginPrompt from "@/components/LoginPrompt";
-import UltrafiltrationView from "@/components/UltrafiltrationView";
-import WaterIntakeCard from "@/components/WaterIntakeCard";
-import UrineVolumeCard from "@/components/UrineVolumeCard";
-import BloodPressureCard from "@/components/BloodPressureCard";
-import WeightCard from "@/components/WeightCard";
+import UltrafiltrationView from "@/components/pdPlan/UltrafiltrationView";
+import WaterIntakeCard from "@/components/water/WaterIntakeCard";
+import UrineVolumeCard from "@/components/urine/UrineVolumeCard";
+import BloodPressureCard from "@/components/bloodPresure/BloodPressureCard";
+import WeightCard from "@/components/weight/WeightCard";
 import "./index.scss";
 import "../../app.scss";
 

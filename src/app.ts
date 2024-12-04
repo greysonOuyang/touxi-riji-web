@@ -1,31 +1,32 @@
 // app.ts
-import { Component } from 'react'
-import { autoLogin } from '@/utils/auth'
-import Taro from '@tarojs/taro'
+import { Component } from "react";
+import { autoLogin } from "@/utils/auth";
+import Taro from "@tarojs/taro";
+import "taro-ui/dist/style/index.scss";
 
 interface IProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 class App extends Component<IProps> {
   componentDidMount() {
-    this.checkLoginStatus()
+    this.checkLoginStatus();
   }
 
   async checkLoginStatus() {
     try {
-      const token = Taro.getStorageSync('token')
+      const token = Taro.getStorageSync("token");
       if (!token) {
-        await autoLogin()
+        await autoLogin();
       }
     } catch (error) {
-      console.error('登录状态检查失败:', error)
+      console.error("登录状态检查失败:", error);
     }
   }
 
   render() {
-    return this.props.children
+    return this.props.children;
   }
 }
 
-export default App
+export default App;

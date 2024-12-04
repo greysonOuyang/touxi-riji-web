@@ -21,6 +21,13 @@ export interface NewPdRecord {
   notes?: string;
 }
 
+// 今日腹透记录数据类型定义
+export interface TodayPdRecordDTO {
+  recordTime: string;
+  infusionVolume: number;
+  ultrafiltration: number | null;
+}
+
 /**
  * 获取用户最新的腹透记录
  * @param userId 用户ID
@@ -50,4 +57,19 @@ export const isFirstTimeUser = (
   userId: number
 ): Promise<ApiResponse<boolean>> => {
   return get<boolean>(`/api/pd-record/is-first-time/${userId}`);
+};
+
+/**
+ * 获取用户指定日期的腹透记录
+ * @param userId 用户ID
+ * @param date 日期 (YYYY-MM-DD)
+ * @returns Promise<ApiResponse<TodayPdRecordDTO[]>>
+ */
+export const getPdRecordsByDate = (
+  userId: number,
+  date: string
+): Promise<ApiResponse<TodayPdRecordDTO[]>> => {
+  return get<TodayPdRecordDTO[]>(
+    `/api/pd-record/by-date/${userId}?date=${date}`
+  );
 };
