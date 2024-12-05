@@ -3,7 +3,7 @@ import { View, Text } from "@tarojs/components";
 import { AtProgress } from "taro-ui";
 import "./index.scss";
 
-export const DataReport: React.FC = () => {
+const DataReport: React.FC = () => {
   return (
     <View className="data-report">
       <Text className="title">本周数据报告</Text>
@@ -34,3 +34,5 @@ export const DataReport: React.FC = () => {
     </View>
   );
 };
+
+export default DataReport;

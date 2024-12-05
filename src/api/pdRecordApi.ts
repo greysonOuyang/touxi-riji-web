@@ -21,10 +21,18 @@ export interface NewPdRecord {
   notes?: string;
 }
 
+export interface PdRecordVO {
+  dailyFrequency: number;
+  totalUltrafiltration: number;
+  totalCount: number;
+  dateRecords: TodayPdRecordDTO[];
+}
+
 // 今日腹透记录数据类型定义
 export interface TodayPdRecordDTO {
   recordTime: string;
-  infusionVolume: number;
+  dialysateType: string;
+  drainageVolume: number;
   ultrafiltration: number | null;
 }
 
@@ -68,8 +76,6 @@ export const isFirstTimeUser = (
 export const getPdRecordsByDate = (
   userId: number,
   date: string
-): Promise<ApiResponse<TodayPdRecordDTO[]>> => {
-  return get<TodayPdRecordDTO[]>(
-    `/api/pd-record/by-date/${userId}?date=${date}`
-  );
+): Promise<ApiResponse<PdRecordVO>> => {
+  return get<PdRecordVO>(`/api/pd-record/by-date/${userId}?date=${date}`);
 };

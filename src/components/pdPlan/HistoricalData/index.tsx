@@ -3,7 +3,7 @@ import { View, Text } from "@tarojs/components";
 import { AtList, AtListItem } from "taro-ui";
 import "./index.scss";
 
-export const HistoricalData: React.FC = () => {
+const HistoricalData: React.FC = () => {
   const historicalData = [
     { date: "2023-06-10", avgUltrafiltration: 550 },
     { date: "2023-06-09", avgUltrafiltration: 520 },
@@ -30,3 +30,5 @@ export const HistoricalData: React.FC = () => {
     </View>
   );
 };
+
+export default HistoricalData;

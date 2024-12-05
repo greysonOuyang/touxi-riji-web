@@ -78,8 +78,23 @@ const UltrafiltrationView: React.FC = () => {
     }
   };
 
-  const onViewClick = () => {
-    Taro.navigateTo({ url: "/pages/pdPlan/dialysisDetails/index" });
+  const onViewClick = async () => {
+    const hasPdPlan = await checkPdPlan();
+    if (hasPdPlan) {
+      Taro.navigateTo({ url: "/pages/pdPlan/dialysisDetails/index" });
+    } else {
+      Taro.showModal({
+        title: "提示",
+        content: "您还没有设置腹透计划，是否现在去添加？",
+        confirmText: "去添加",
+        cancelText: "取消",
+        success: (res) => {
+          if (res.confirm) {
+            Taro.navigateTo({ url: "/pages/pdPlan/planManage/index" });
+          }
+        },
+      });
+    }
   };
 
   const toggleAnimation = () => {

@@ -36,7 +36,6 @@
   ],
   "author": "",
   "dependencies": {
-    "@antv/f2-react": "^5.7.4",
     "@babel/runtime": "^7.21.5",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
@@ -58,10 +57,12 @@
     "@tarojs/taro": "^4.0.6",
     "axios": "^1.7.7",
     "date-fns": "^4.1.0",
+    "echarts": "^5.5.1",
     "lottie-miniprogram": "^1.0.12",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "redux": "^5.0.1",
+    "taro-echarts": "^1.1.2",
     "taro-ui": "latest"
   },
   "devDependencies": {
