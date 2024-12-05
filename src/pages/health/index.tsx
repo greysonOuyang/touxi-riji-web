@@ -6,9 +6,8 @@ import UltrafiltrationView from "@/components/pdPlan/UltrafiltrationView";
 import WaterIntakeCard from "@/components/water/WaterIntakeCard";
 import UrineVolumeCard from "@/components/urine/UrineVolumeCard";
 import BloodPressureCard from "@/components/bloodPresure/BloodPressureCard";
-import WeightCard from "@/components/weight/WeightCard";
+import WeightCard from "@/components/WeightCard";
 import "./index.scss";
-import "../../app.scss";
 
 const HealthPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!Taro.getStorageSync("token"));
