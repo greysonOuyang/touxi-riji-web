@@ -242,17 +242,6 @@ const HistoricalDataMore: React.FC = () => {
             <Text className="stat-label">最小超滤量</Text>
             <Text className="stat-value highlight-min">{statistics.min}</Text>
           </View>
-          <View className="stat-item">
-            <Text className="stat-label">超滤量变化</Text>
-            <Text
-              className={`stat-value ${
-                statistics.change >= 0 ? "positive" : "negative"
-              }`}
-            >
-              {statistics.change >= 0 ? "+" : ""}
-              {statistics.change}
-            </Text>
-          </View>
         </View>
       </View>
 
