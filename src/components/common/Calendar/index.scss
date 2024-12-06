@@ -134,7 +134,7 @@
                             left: 2px;
                             right: 2px;
                             bottom: 2px;
-                            border: 2px solid #92e3a9;
+                            border: 2px solid #92a3fd;
                             border-top: none;
                             border-radius: 0 0 8px 8px;
                             background-color: rgba(146, 227, 169, 0.1);
@@ -166,7 +166,7 @@
                         color: #666;
 
                         &.positive {
-                            color: #92e3a9;
+                            color: #92a3fd;
                         }
 
                         &.negative {
@@ -196,7 +196,7 @@
                 transition: all 0.3s ease;
 
                 &:hover:not(.future) {
-                    background-color: #e0e0e0;
+                    background-color: #e5e5e5;
                 }
 
                 &.future {

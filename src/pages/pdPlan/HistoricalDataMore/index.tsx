@@ -192,7 +192,7 @@ const HistoricalDataMore: React.FC = () => {
       <View className="custom-nav">
         <View className="nav-content">
           <View className="back-button" onClick={handleBack}>
-            <AtIcon value="chevron-left" size="20" color="#333"></AtIcon>
+            <AtIcon value="chevron-left" size="14" color="#666"></AtIcon>
           </View>
           <View className="view-modes">
             <View

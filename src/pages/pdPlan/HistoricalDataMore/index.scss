@@ -1,6 +1,6 @@
 .historical-data-more {
     padding: 0;
-    background: linear-gradient(180deg, rgba(146, 163, 253, 0.2) 0%, rgba(157, 206, 255, 0.1) 30%, rgba(255, 255, 255, 1) 50%);
+    background: linear-gradient(180deg, rgba(146, 163, 253, 0.3) 0%, rgba(157, 206, 255, 0.1) 60%, #fcfcfc 50%);
     padding-top: 88px;
     min-height: 100vh;
 
@@ -43,24 +43,18 @@
             justify-content: center;
         }
 
-        .nav-title {
-            flex: 1;
-            text-align: center;
-            font-size: 18px;
-            font-weight: 500;
-            transition: opacity 0.3s ease;
-        }
+
 
         .view-modes {
             display: flex;
-            background: #f5f5f5;
+            background: #fcfcfc;
             border-radius: 20px;
-            padding: 2px 6px;
+            padding: 2px 10px;
 
             .view-mode {
-                padding: 8px 20px;
+                padding: 6px 20px;
                 /* 增加内边距以增加宽度 */
-                font-size: 16px;
+                font-size: 14px;
                 /* 稍微增加字体大小 */
                 color: #666;
                 border-radius: 18px;
