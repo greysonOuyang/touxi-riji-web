@@ -140,22 +140,21 @@
 
 
     .data-list {
-        height: calc(100vh - 520px);
         margin-top: 20px;
-    }
+        transition: all 0.3s ease;
 
-    .card {
-        background: #fff;
-        margin: 16px 15px;
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        &.card {
+            background: #fff;
+            margin: 16px 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
         .card-header {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 16px;
+            padding: 16px;
             cursor: pointer;
 
             .title-container {
@@ -174,9 +173,8 @@
         .column-headers {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 8px 16px;
             border-bottom: 1px solid #f0f0f0;
-            margin-bottom: 8px;
 
             .header-ultrafiltration,
             .header-time {
@@ -186,11 +184,14 @@
         }
 
         .data-records {
+            max-height: calc(100vh - 600px);
+            overflow-y: auto;
+
             .data-item {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                padding: 12px 0;
+                padding: 12px 16px;
                 border-bottom: 1px solid #f0f0f0;
 
                 &:last-child {
@@ -216,13 +217,17 @@
                 }
             }
         }
-    }
 
-    .collapsed {
-        .card-header {
-            padding: 16px 0;
+        &.collapsed {
+            height: auto;
+
+            .card-header {
+                padding: 12px 16px;
+            }
         }
     }
+
+
 }
 
 .popup-content-wrapper {
