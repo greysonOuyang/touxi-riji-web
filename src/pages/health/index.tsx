@@ -35,7 +35,7 @@ const HealthPage: React.FC = () => {
 
   return (
     <View className="page-container">
-      <CustomNavBar title="健康概览" />
+      <CustomNavBar title="健康概览" showBackButton={false} />
       <ScrollView className="health-page" scrollY={isScrollEnabled}>
         {!isLoggedIn && <LoginPrompt />}
         <View className="content-wrapper">

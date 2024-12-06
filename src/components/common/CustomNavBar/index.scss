@@ -4,7 +4,7 @@
     left: 0;
     right: 0;
     z-index: 100;
-    background: transparent; // Changed from #fff to transparent
+    background: transparent;
 
     --status-bar-height: 44px;
     --nav-content-height: 44px;
@@ -18,7 +18,7 @@
         right: 0;
         bottom: 0;
         height: 1px;
-        background: rgba(255, 255, 255, 0.1); // Changed to a light color for better visibility on gradient
+        background: rgba(255, 255, 255, 0.1);
         transform: scaleY(0.5);
     }
 
@@ -47,7 +47,7 @@
     .back-arrow {
         width: 10px;
         height: 10px;
-        border-left: 2px solid #fff; // Changed to white for better visibility on gradient
+        border-left: 2px solid #fff;
         border-bottom: 2px solid #fff;
         transform: rotate(45deg);
     }
@@ -55,6 +55,13 @@
     .nav-title {
         font-size: 17px;
         font-weight: 500;
-        color: #1d1617; // Changed to white for better visibility on gradient
+        color: #1d1617;
+    }
+
+    .center-content {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
