@@ -16,6 +16,7 @@ import {
   endOfYear,
 } from "date-fns";
 import "./index.scss";
+import Taro from "@tarojs/taro";
 
 interface CalendarProps {
   viewMode: "month" | "year";
@@ -50,7 +51,34 @@ const Calendar: React.FC<CalendarProps> = ({
 
     // Prevent navigation to future years
     if (newDate.getFullYear() <= today.getFullYear()) {
-      onNavigate(direction);
+      if (
+        viewMode === "month" &&
+        newDate.getFullYear() === today.getFullYear() &&
+        newDate.getMonth() > today.getMonth()
+      ) {
+        Taro.showToast({
+          title: "没有更多未来日期可选",
+          icon: "none",
+          duration: 2000,
+        });
+      } else if (
+        viewMode === "year" &&
+        newDate.getFullYear() > today.getFullYear()
+      ) {
+        Taro.showToast({
+          title: "没有更多未来年份可选",
+          icon: "none",
+          duration: 2000,
+        });
+      } else {
+        onNavigate(direction);
+      }
+    } else {
+      Taro.showToast({
+        title: "没有更多未来年份可选",
+        icon: "none",
+        duration: 2000,
+      });
     }
   };
 
@@ -115,7 +143,7 @@ const Calendar: React.FC<CalendarProps> = ({
           className={`month-cell ${isFuture ? "future" : ""}`}
           onClick={() => !isFuture && onMonthSelect(date)}
         >
-          <Text className="month-name">{format(date, "M")}月</Text>
+          <Text className="month-name">{format(date, "M月")}</Text>
         </View>
       );
     }
@@ -127,9 +155,11 @@ const Calendar: React.FC<CalendarProps> = ({
       <View className="calendar-header">
         <View className="calendar-navigation">
           <View
-            className="nav-button prev"
+            className="nav-button-wrapper prev"
             onClick={() => handleNavigate("prev")}
-          ></View>
+          >
+            <View className="nav-button prev"></View>
+          </View>
           <Text className="current-date">
             {viewMode === "month" ? (
               format(currentDate, "yyyy年MM月")
@@ -138,9 +168,11 @@ const Calendar: React.FC<CalendarProps> = ({
             )}
           </Text>
           <View
-            className="nav-button next"
+            className="nav-button-wrapper next"
             onClick={() => handleNavigate("next")}
-          ></View>
+          >
+            <View className="nav-button next"></View>
+          </View>
         </View>
       </View>
       <View className="calendar-body">

@@ -1,6 +1,5 @@
 .calendar {
     background: #fff;
-    border: 1px solid #e0e0e0;
     border-radius: 16px;
     overflow: hidden;
 
@@ -10,21 +9,30 @@
 
         .calendar-navigation {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             padding: 12px 0;
-            // Border removed as requested
 
-            .date-navigation {
+            .nav-button-wrapper {
+                width: 44px;
+                height: 44px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                cursor: pointer;
+
+                &.prev {
+                    justify-content: flex-start;
+                }
+
+                &.next {
+                    justify-content: flex-end;
+                }
             }
 
             .nav-button {
                 width: 24px;
                 height: 24px;
-                cursor: pointer;
                 position: relative;
                 display: flex;
                 align-items: center;
@@ -34,7 +42,7 @@
                 &::after {
                     content: '';
                     position: absolute;
-                    width: 8px;
+                    width: 10px;
                     height: 2px;
                     background-color: #666;
                 }
@@ -42,24 +50,28 @@
                 &.prev {
                     &::before {
                         transform: rotate(-45deg);
-                        top: 10px;
+                        top: 14px;
+                        left: 6px;
                     }
 
                     &::after {
                         transform: rotate(45deg);
-                        top: 14px;
+                        top: 20px;
+                        left: 6px;
                     }
                 }
 
                 &.next {
                     &::before {
                         transform: rotate(45deg);
-                        top: 10px;
+                        top: 14px;
+                        right: 6px;
                     }
 
                     &::after {
                         transform: rotate(-45deg);
-                        top: 14px;
+                        top: 20px;
+                        right: 6px;
                     }
                 }
             }
@@ -68,7 +80,6 @@
                 font-size: 18px;
                 font-weight: normal;
                 color: #333;
-                margin: 0 12px;
             }
         }
     }
@@ -169,7 +180,7 @@
         .year-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 12px;
             padding: 16px;
 
             .month-cell {
@@ -177,8 +188,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background-color: #fff;
-                border: 1px solid #e0e0e0;
+                background-color: #f0f0f0;
                 border-radius: 8px;
                 font-size: 16px;
                 color: #333;
@@ -186,18 +196,18 @@
                 transition: all 0.3s ease;
 
                 &:hover:not(.future) {
-                    border-color: #92e3a9;
-                    background-color: rgba(146, 227, 169, 0.1);
+                    background-color: #e0e0e0;
                 }
 
                 &.future {
+                    background-color: #f8f8f8;
                     color: #ccc;
                     cursor: not-allowed;
                 }
 
                 .month-name {
-                    font-size: 14px;
-                    color: #333;
+                    font-size: 16px;
+                    font-weight: 500;
                 }
             }
         }
