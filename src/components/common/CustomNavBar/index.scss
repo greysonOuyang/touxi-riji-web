@@ -1,0 +1,60 @@
+.custom-nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: transparent; // Changed from #fff to transparent
+
+    --status-bar-height: 44px;
+    --nav-content-height: 44px;
+
+    height: calc(var(--status-bar-height) + var(--nav-content-height));
+
+    &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: rgba(255, 255, 255, 0.1); // Changed to a light color for better visibility on gradient
+        transform: scaleY(0.5);
+    }
+
+    .nav-content {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: var(--nav-content-height);
+        padding: 0 16px;
+        box-sizing: border-box;
+    }
+
+    .back-button {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .back-arrow {
+        width: 10px;
+        height: 10px;
+        border-left: 2px solid #fff; // Changed to white for better visibility on gradient
+        border-bottom: 2px solid #fff;
+        transform: rotate(45deg);
+    }
+
+    .nav-title {
+        font-size: 17px;
+        font-weight: 500;
+        color: #1d1617; // Changed to white for better visibility on gradient
+    }
+}

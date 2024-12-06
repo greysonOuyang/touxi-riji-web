@@ -8,12 +8,12 @@ import UrineVolumeCard from "@/components/urine/UrineVolumeCard";
 import BloodPressureCard from "@/components/bloodPresure/BloodPressureCard";
 import WeightCard from "@/components/WeightCard";
 import "./index.scss";
+import CustomNavBar from "@/components/common/CustomNavBar";
 
 const HealthPage: React.FC = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(!!Taro.getStorageSync("token"));
   const [isScrollEnabled, setIsScrollEnabled] = useState(true);
 
-  // 为每个需要刷新的组件添加刷新触发器
   const [refreshTriggers, setRefreshTriggers] = useState({
     bloodPressure: 0,
     waterIntake: 0,
@@ -22,7 +22,6 @@ const HealthPage: React.FC = () => {
     ultrafiltration: 0,
   });
 
-  // 页面显示时触发刷新
   useDidShow(() => {
     setIsLoggedIn(!!Taro.getStorageSync("token"));
     setRefreshTriggers((prev) => ({
@@ -35,35 +34,30 @@ const HealthPage: React.FC = () => {
   });
 
   return (
-    <ScrollView className="health-page" scrollY={isScrollEnabled}>
-      {!isLoggedIn && <LoginPrompt />}
-      <View className="content-wrapper">
-        {/* 超滤量卡片 */}
-        <UltrafiltrationView />
-        <Text className="large_text_semi_bold">健康概览</Text>
-
-        {/* 固定布局的健康卡片 */}
-        <View className="health-grid">
-          <View className="top-row">
-            {/* 左侧：喝水卡片 */}
-            <View className="left-column">
-              <WaterIntakeCard />
+    <View className="page-container">
+      <CustomNavBar title="健康概览" />
+      <ScrollView className="health-page" scrollY={isScrollEnabled}>
+        {!isLoggedIn && <LoginPrompt />}
+        <View className="content-wrapper">
+          <UltrafiltrationView />
+          <Text className="large_text_semi_bold">健康概览</Text>
+          <View className="health-grid">
+            <View className="top-row">
+              <View className="left-column">
+                <WaterIntakeCard />
+              </View>
+              <View className="right-column">
+                <UrineVolumeCard />
+                <BloodPressureCard />
+              </View>
             </View>
-
-            {/* 右侧：尿液卡片和血压卡片 */}
-            <View className="right-column">
-              <UrineVolumeCard />
-              <BloodPressureCard />
+            <View className="full-width-card">
+              <WeightCard />
             </View>
-          </View>
-
-          {/* 底部跨两列的体重卡片 */}
-          <View className="full-width-card">
-            <WeightCard />
           </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 

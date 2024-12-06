@@ -40,6 +40,10 @@ const HistoricalDataMore: React.FC = () => {
     change: 0,
   });
   const [navOpacity, setNavOpacity] = useState(0);
+  usePageScroll(({ scrollTop }) => {
+    const newOpacity = Math.min(scrollTop / 50, 0.9);
+    setNavOpacity(newOpacity);
+  });
 
   useEffect(() => {
     fetchData(startOfMonth(currentDate), endOfMonth(currentDate));
@@ -185,10 +189,7 @@ const HistoricalDataMore: React.FC = () => {
 
   return (
     <View className="historical-data-more">
-      <View
-        className="custom-nav"
-        style={{ backgroundColor: `rgba(255, 255, 255, ${navOpacity})` }}
-      >
+      <View className="custom-nav">
         <View className="nav-content">
           <View className="back-button" onClick={handleBack}>
             <AtIcon value="chevron-left" size="20" color="#333"></AtIcon>
@@ -211,15 +212,17 @@ const HistoricalDataMore: React.FC = () => {
         </View>
       </View>
 
-      <Calendar
-        viewMode={viewMode}
-        currentDate={currentDate}
-        selectedDates={selectedDates}
-        onNavigate={handleNavigate}
-        onDateClick={handleDateClick}
-        onMonthSelect={handleMonthSelect}
-        dateData={dateData}
-      />
+      <View className="calendar">
+        <Calendar
+          viewMode={viewMode}
+          currentDate={currentDate}
+          selectedDates={selectedDates}
+          onNavigate={handleNavigate}
+          onDateClick={handleDateClick}
+          onMonthSelect={handleMonthSelect}
+          dateData={dateData}
+        />
+      </View>
 
       <View className="statistics-card">
         <View className="card-header">
@@ -302,7 +305,6 @@ const HistoricalDataMore: React.FC = () => {
         visible={isPopupVisible}
         onClose={closePopup}
         title={selectedItem ? selectedItem.date : ""}
-        contentStyle={{ padding: "15px" }}
       >
         <View className="popup-content-wrapper">
           {selectedItem && (
