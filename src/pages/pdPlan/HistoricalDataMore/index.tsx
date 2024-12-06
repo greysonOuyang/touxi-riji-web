@@ -221,6 +221,7 @@ const HistoricalDataMore: React.FC = () => {
           onDateClick={handleDateClick}
           onMonthSelect={handleMonthSelect}
           dateData={dateData}
+          onViewModeChange={handleViewModeChange}
         />
       </View>
 

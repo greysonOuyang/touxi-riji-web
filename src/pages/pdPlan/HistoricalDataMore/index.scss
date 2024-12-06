@@ -48,7 +48,7 @@
         .view-modes {
             display: flex;
             background: #fcfcfc;
-            border-radius: 20px;
+            border-radius: 18px;
             padding: 2px 10px;
 
             .view-mode {
@@ -57,7 +57,7 @@
                 font-size: 14px;
                 /* 稍微增加字体大小 */
                 color: #666;
-                border-radius: 18px;
+                border-radius: 20px;
                 transition: all 0.3s ease;
 
                 &.active {

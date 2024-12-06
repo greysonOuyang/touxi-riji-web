@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text } from "@tarojs/components";
+import React, { useState, useCallback } from "react";
+import { View, Text, ITouchEvent } from "@tarojs/components";
 import {
   format,
   startOfMonth,
@@ -12,8 +12,6 @@ import {
   subMonths,
   addYears,
   subYears,
-  startOfYear,
-  endOfYear,
 } from "date-fns";
 import "./index.scss";
 import Taro from "@tarojs/taro";
@@ -26,6 +24,7 @@ interface CalendarProps {
   onDateClick: (date: Date) => void;
   onMonthSelect: (date: Date) => void;
   dateData: Array<{ date: string; totalUltrafiltration: number }>;
+  onViewModeChange: (mode: "month" | "year") => void;
 }
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -36,53 +35,80 @@ const Calendar: React.FC<CalendarProps> = ({
   onDateClick,
   onMonthSelect,
   dateData,
+  onViewModeChange,
 }): JSX.Element => {
   const today = new Date();
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
 
-  const handleNavigate = (direction: "prev" | "next") => {
-    const newDate =
-      viewMode === "month"
-        ? direction === "next"
-          ? addMonths(currentDate, 1)
-          : subMonths(currentDate, 1)
-        : direction === "next"
-        ? addYears(currentDate, 1)
-        : subYears(currentDate, 1);
+  const handleNavigate = useCallback(
+    (direction: "prev" | "next") => {
+      const newDate =
+        viewMode === "month"
+          ? direction === "next"
+            ? addMonths(currentDate, 1)
+            : subMonths(currentDate, 1)
+          : direction === "next"
+          ? addYears(currentDate, 1)
+          : subYears(currentDate, 1);
 
-    // Prevent navigation to future years
-    if (newDate.getFullYear() <= today.getFullYear()) {
-      if (
-        viewMode === "month" &&
-        newDate.getFullYear() === today.getFullYear() &&
-        newDate.getMonth() > today.getMonth()
-      ) {
-        Taro.showToast({
-          title: "没有更多未来日期可选",
-          icon: "none",
-          duration: 2000,
-        });
-      } else if (
-        viewMode === "year" &&
-        newDate.getFullYear() > today.getFullYear()
-      ) {
+      // Prevent navigation to future years
+      if (newDate.getFullYear() <= today.getFullYear()) {
+        if (
+          viewMode === "month" &&
+          newDate.getFullYear() === today.getFullYear() &&
+          newDate.getMonth() > today.getMonth()
+        ) {
+          Taro.showToast({
+            title: "没有更多未来日期可选",
+            icon: "none",
+            duration: 2000,
+          });
+        } else if (
+          viewMode === "year" &&
+          newDate.getFullYear() > today.getFullYear()
+        ) {
+          Taro.showToast({
+            title: "没有更多未来年份可选",
+            icon: "none",
+            duration: 2000,
+          });
+        } else {
+          onNavigate(direction);
+        }
+      } else {
         Taro.showToast({
           title: "没有更多未来年份可选",
           icon: "none",
           duration: 2000,
         });
-      } else {
-        onNavigate(direction);
       }
-    } else {
-      Taro.showToast({
-        title: "没有更多未来年份可选",
-        icon: "none",
-        duration: 2000,
-      });
-    }
-  };
+    },
+    [viewMode, currentDate, onNavigate, today]
+  );
 
-  const renderMonthView = (): JSX.Element => {
+  const handleTouchStart = useCallback((e: ITouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  }, []);
+
+  const handleTouchEnd = useCallback(
+    (e: ITouchEvent) => {
+      if (touchStartX === null) return;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const diff = touchEndX - touchStartX;
+
+      if (Math.abs(diff) > 50) {
+        // Threshold for swipe detection
+        const newMode = viewMode === "month" ? "year" : "month";
+        onViewModeChange(newMode);
+      }
+
+      setTouchStartX(null);
+    },
+    [touchStartX, viewMode, onViewModeChange]
+  );
+
+  const renderMonthView = useCallback((): JSX.Element => {
     const monthStart = startOfMonth(currentDate);
     const monthEnd = endOfMonth(currentDate);
     const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -130,9 +156,9 @@ const Calendar: React.FC<CalendarProps> = ({
         </View>
       </View>
     );
-  };
+  }, [currentDate, dateData, onDateClick, selectedDates, today]);
 
-  const renderYearView = (): JSX.Element => {
+  const renderYearView = useCallback((): JSX.Element => {
     const months: JSX.Element[] = [];
     for (let month = 0; month < 12; month++) {
       const date = new Date(currentDate.getFullYear(), month, 1);
@@ -148,10 +174,15 @@ const Calendar: React.FC<CalendarProps> = ({
       );
     }
     return <View className="year-grid">{months}</View>;
-  };
+  }, [currentDate, onMonthSelect, today]);
 
   return (
-    <View className="calendar">
+    <View
+      className="calendar"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      catchMove
+    >
       <View className="calendar-header">
         <View className="calendar-navigation">
           <View
