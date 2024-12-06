@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
-import { AtIcon, AtTabs, AtTabsPane, AtFloatLayout } from "taro-ui";
+import { AtIcon } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import {
   format,
-  addMonths,
-  subMonths,
-  addYears,
-  subYears,
   startOfMonth,
   endOfMonth,
   isSameMonth,
-  isSameDay,
   subDays,
 } from "date-fns";
 import {
@@ -20,6 +15,8 @@ import {
   PdRecordDateVO,
   PdRecordData,
 } from "@/api/pdRecordApi";
+import Popup from "@/components/common/Popup";
+import Calendar from "@/components/common/Calendar";
 import "./index.scss";
 
 const HistoricalDataMore: React.FC = () => {
@@ -28,7 +25,7 @@ const HistoricalDataMore: React.FC = () => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [dateData, setDateData] = useState<PdRecordDateVO[]>([]);
   const [detailedData, setDetailedData] = useState<PdRecordData[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PdRecordDateVO | null>(null);
   const [showDetailedView, setShowDetailedView] = useState(false);
 
@@ -111,11 +108,11 @@ const HistoricalDataMore: React.FC = () => {
   const handleNavigate = (direction: "prev" | "next") => {
     if (viewMode === "month") {
       setCurrentDate((prev) =>
-        direction === "prev" ? subMonths(prev, 1) : addMonths(prev, 1)
+        direction === "prev" ? subDays(prev, 30) : subDays(prev, -30)
       );
     } else {
       setCurrentDate((prev) =>
-        direction === "prev" ? subYears(prev, 1) : addYears(prev, 1)
+        direction === "prev" ? subDays(prev, 365) : subDays(prev, -365)
       );
     }
     setSelectedDates([]);
@@ -123,11 +120,11 @@ const HistoricalDataMore: React.FC = () => {
 
   const handleItemClick = (item: PdRecordDateVO) => {
     setSelectedItem(item);
-    setIsModalOpen(true);
+    setIsPopupVisible(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const closePopup = () => {
+    setIsPopupVisible(false);
     setSelectedItem(null);
   };
 
@@ -165,145 +162,22 @@ const HistoricalDataMore: React.FC = () => {
     fetchDataForRange(startDate, endDate);
   };
 
-  const renderMonthView = () => {
-    const daysInMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    ).getDate();
-    const firstDayOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      1
-    ).getDay();
-    const days = [];
-
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<View key={`empty-${i}`} className="calendar-day empty" />);
-    }
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        day
-      );
-      const isSelected = selectedDates.some((selectedDate) =>
-        isSameDay(selectedDate, date)
-      );
-      const isInRange =
-        selectedDates.length === 2 &&
-        date >= selectedDates[0] &&
-        date <= selectedDates[1];
-
-      days.push(
-        <View
-          key={day}
-          className={`calendar-day ${isSelected ? "selected" : ""} ${
-            isInRange ? "in-range" : ""
-          }`}
-          onClick={() => handleDateClick(date)}
-        >
-          {day}
-        </View>
-      );
-    }
-
-    return (
-      <View className="calendar-grid">
-        <View className="calendar-weekdays">
-          {["日", "一", "二", "三", "四", "五", "六"].map((day) => (
-            <View key={day} className="weekday">
-              {day}
-            </View>
-          ))}
-        </View>
-        <View className="calendar-days">{days}</View>
-      </View>
-    );
+  const handleViewModeChange = (mode: "month" | "year") => {
+    setViewMode(mode);
+    setSelectedDates([]);
   };
-
-  const renderYearView = () => {
-    const months = [];
-    for (let month = 1; month <= 12; month++) {
-      months.push(
-        <View
-          key={month}
-          className="month-cell"
-          onClick={() => handleMonthClick(month)}
-        >
-          <Text className="month-name">{month}月</Text>
-        </View>
-      );
-    }
-    return <View className="year-grid">{months}</View>;
-  };
-
-  const renderDetailRecords = (records: any[]) => (
-    <View className="detail-records">
-      {records.map((record, index) => (
-        <View key={index} className="detail-item">
-          <View className="time-line">
-            <View className="time-dot"></View>
-          </View>
-          <View className="record-content">
-            <View className="record-row">
-              <Text className="time">{record.recordTime}</Text>
-              <Text className="ultrafiltration">
-                {record.ultrafiltration} ml
-              </Text>
-            </View>
-            <View className="record-row">
-              <Text className="details">
-                浓度: {record.dialysateType} | 引流量: {record.drainageVolume}ml
-              </Text>
-            </View>
-          </View>
-        </View>
-      ))}
-    </View>
-  );
 
   return (
     <View className="historical-data-more">
-      <View className="calendar-header">
-        <View className="view-modes">
-          <View
-            className={`view-mode ${viewMode === "month" ? "active" : ""}`}
-            onClick={() => setViewMode("month")}
-          >
-            月
-          </View>
-          <View
-            className={`view-mode ${viewMode === "year" ? "active" : ""}`}
-            onClick={() => setViewMode("year")}
-          >
-            年
-          </View>
-        </View>
-      </View>
-
-      <View className="calendar-navigation">
-        <AtIcon
-          value="chevron-left"
-          size="20"
-          color="#666"
-          onClick={() => handleNavigate("prev")}
-        />
-        <Text className="current-date">
-          {viewMode === "month"
-            ? format(currentDate, "yyyy年MM月")
-            : `${currentDate.getFullYear()}年`}
-        </Text>
-        <AtIcon
-          value="chevron-right"
-          size="20"
-          color="#666"
-          onClick={() => handleNavigate("next")}
-        />
-      </View>
-
-      {viewMode === "month" ? renderMonthView() : renderYearView()}
+      <Calendar
+        viewMode={viewMode}
+        currentDate={currentDate}
+        selectedDates={selectedDates}
+        onNavigate={handleNavigate}
+        onDateClick={handleDateClick}
+        onMonthClick={handleMonthClick}
+        onViewModeChange={handleViewModeChange}
+      />
 
       <View className="data-view-toggle">
         <Text
@@ -345,19 +219,41 @@ const HistoricalDataMore: React.FC = () => {
             ))}
       </ScrollView>
 
-      <AtFloatLayout isOpened={isModalOpen} onClose={closeModal}>
-        <View className="modal-header">
-          <Text className="modal-title">
-            {selectedItem ? selectedItem.date : ""}
-          </Text>
-          <View className="close-button" onClick={closeModal}>
-            ×
-          </View>
+      <Popup
+        visible={isPopupVisible}
+        onClose={closePopup}
+        title={selectedItem ? selectedItem.date : ""}
+      >
+        <View className="popup-content-wrapper">
+          {selectedItem && (
+            <ScrollView scrollY className="popup-content">
+              <View className="detail-records">
+                {selectedItem.recordData.map((record, index) => (
+                  <View key={index} className="detail-item">
+                    <View className="time-line">
+                      <View className="time-dot"></View>
+                    </View>
+                    <View className="record-content">
+                      <View className="record-row">
+                        <Text className="time">{record.recordTime}</Text>
+                        <Text className="ultrafiltration">
+                          {record.ultrafiltration} ml
+                        </Text>
+                      </View>
+                      <View className="record-row">
+                        <Text className="details">
+                          浓度: {record.dialysateType} | 引流量:{" "}
+                          {record.drainageVolume}ml
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          )}
         </View>
-        <ScrollView scrollY className="modal-content">
-          {selectedItem && renderDetailRecords(selectedItem.recordData)}
-        </ScrollView>
-      </AtFloatLayout>
+      </Popup>
     </View>
   );
 };
