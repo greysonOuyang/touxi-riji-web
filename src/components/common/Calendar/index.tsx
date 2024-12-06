@@ -1,13 +1,19 @@
-import React, { ReactNode } from "react";
+import React from "react";
 import { View, Text } from "@tarojs/components";
-import { AtIcon } from "taro-ui";
 import {
   format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  isAfter,
   addMonths,
   subMonths,
   addYears,
   subYears,
-  isSameDay,
+  startOfYear,
+  endOfYear,
 } from "date-fns";
 import "./index.scss";
 
@@ -17,8 +23,8 @@ interface CalendarProps {
   selectedDates: Date[];
   onNavigate: (direction: "prev" | "next") => void;
   onDateClick: (date: Date) => void;
-  onMonthClick: (month: number) => void;
-  onViewModeChange: (mode: "month" | "year") => void;
+  onMonthSelect: (date: Date) => void;
+  dateData: Array<{ date: string; totalUltrafiltration: number }>;
 }
 
 const Calendar: React.FC<CalendarProps> = ({
@@ -27,52 +33,31 @@ const Calendar: React.FC<CalendarProps> = ({
   selectedDates,
   onNavigate,
   onDateClick,
-  onMonthClick,
-  onViewModeChange,
-}) => {
-  const renderMonthView = () => {
-    const days: ReactNode[] = [];
-    const daysInMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth() + 1,
-      0
-    ).getDate();
-    const firstDayOfMonth = new Date(
-      currentDate.getFullYear(),
-      currentDate.getMonth(),
-      1
-    ).getDay();
+  onMonthSelect,
+  dateData,
+}): JSX.Element => {
+  const today = new Date();
 
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      days.push(<View key={`empty-${i}`} className="calendar-day empty" />);
+  const handleNavigate = (direction: "prev" | "next") => {
+    const newDate =
+      viewMode === "month"
+        ? direction === "next"
+          ? addMonths(currentDate, 1)
+          : subMonths(currentDate, 1)
+        : direction === "next"
+        ? addYears(currentDate, 1)
+        : subYears(currentDate, 1);
+
+    // Prevent navigation to future years
+    if (newDate.getFullYear() <= today.getFullYear()) {
+      onNavigate(direction);
     }
+  };
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth(),
-        day
-      );
-      const isSelected = selectedDates.some((selectedDate) =>
-        isSameDay(selectedDate, date)
-      );
-      const isInRange =
-        selectedDates.length === 2 &&
-        date >= selectedDates[0] &&
-        date <= selectedDates[1];
-
-      days.push(
-        <View
-          key={day}
-          className={`calendar-day ${isSelected ? "selected" : ""} ${
-            isInRange ? "in-range" : ""
-          }`}
-          onClick={() => onDateClick(date)}
-        >
-          {day}
-        </View>
-      );
-    }
+  const renderMonthView = (): JSX.Element => {
+    const monthStart = startOfMonth(currentDate);
+    const monthEnd = endOfMonth(currentDate);
+    const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     return (
       <View className="calendar-grid">
@@ -83,21 +68,54 @@ const Calendar: React.FC<CalendarProps> = ({
             </View>
           ))}
         </View>
-        <View className="calendar-days">{days}</View>
+        <View className="calendar-days">
+          {days.map((day) => {
+            const dateString = format(day, "yyyy-MM-dd");
+            const dayData = dateData.find((d) => d.date === dateString);
+            const isSelected = selectedDates.some((selectedDate) =>
+              isSameDay(selectedDate, day)
+            );
+            const isCurrentMonth = isSameMonth(day, currentDate);
+            const isFuture = isAfter(day, today);
+
+            return (
+              <View
+                key={dateString}
+                className={`calendar-day ${isSelected ? "selected" : ""} ${
+                  !isCurrentMonth ? "other-month" : ""
+                } ${isFuture ? "future" : ""}`}
+                onClick={() => !isFuture && onDateClick(day)}
+              >
+                <Text className="day-number">{format(day, "d")}</Text>
+                {dayData && (
+                  <Text
+                    className={`ultrafiltration-value ${
+                      dayData.totalUltrafiltration > 0 ? "positive" : "negative"
+                    }`}
+                  >
+                    {dayData.totalUltrafiltration}ml
+                  </Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
       </View>
     );
   };
 
-  const renderYearView = () => {
-    const months: ReactNode[] = [];
-    for (let month = 1; month <= 12; month++) {
+  const renderYearView = (): JSX.Element => {
+    const months: JSX.Element[] = [];
+    for (let month = 0; month < 12; month++) {
+      const date = new Date(currentDate.getFullYear(), month, 1);
+      const isFuture = isAfter(date, today);
       months.push(
         <View
           key={month}
-          className="month-cell"
-          onClick={() => onMonthClick(month)}
+          className={`month-cell ${isFuture ? "future" : ""}`}
+          onClick={() => !isFuture && onMonthSelect(date)}
         >
-          <Text className="month-name">{month}月</Text>
+          <Text className="month-name">{format(date, "M")}月</Text>
         </View>
       );
     }
@@ -107,43 +125,27 @@ const Calendar: React.FC<CalendarProps> = ({
   return (
     <View className="calendar">
       <View className="calendar-header">
-        <View className="view-modes">
+        <View className="calendar-navigation">
           <View
-            className={`view-mode ${viewMode === "month" ? "active" : ""}`}
-            onClick={() => onViewModeChange("month")}
-          >
-            月
-          </View>
+            className="nav-button prev"
+            onClick={() => handleNavigate("prev")}
+          ></View>
+          <Text className="current-date">
+            {viewMode === "month" ? (
+              format(currentDate, "yyyy年MM月")
+            ) : (
+              <Text>{currentDate.getFullYear()}年</Text>
+            )}
+          </Text>
           <View
-            className={`view-mode ${viewMode === "year" ? "active" : ""}`}
-            onClick={() => onViewModeChange("year")}
-          >
-            年
-          </View>
+            className="nav-button next"
+            onClick={() => handleNavigate("next")}
+          ></View>
         </View>
       </View>
-
-      <View className="calendar-navigation">
-        <AtIcon
-          value="chevron-left"
-          size="20"
-          color="#666"
-          onClick={() => onNavigate("prev")}
-        />
-        <Text className="current-date">
-          {viewMode === "month"
-            ? format(currentDate, "yyyy年MM月")
-            : `${currentDate.getFullYear()}年`}
-        </Text>
-        <AtIcon
-          value="chevron-right"
-          size="20"
-          color="#666"
-          onClick={() => onNavigate("next")}
-        />
+      <View className="calendar-body">
+        {viewMode === "month" ? renderMonthView() : renderYearView()}
       </View>
-
-      {viewMode === "month" ? renderMonthView() : renderYearView()}
     </View>
   );
 };

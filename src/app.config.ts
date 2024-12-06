@@ -17,6 +17,7 @@ export default {
     navigationBarBackgroundColor: "#F8F9FA",
     navigationBarTitleText: "健康概览",
     navigationBarTextStyle: "black",
+    navigationStyle: "default", // 添加这一行来使用自定义导航栏
   },
 
   tabBar: {

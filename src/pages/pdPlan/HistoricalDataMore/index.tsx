@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { AtIcon } from "taro-ui";
-import Taro, { useDidShow } from "@tarojs/taro";
+import Taro, { usePageScroll } from "@tarojs/taro";
 import {
   format,
   startOfMonth,
   endOfMonth,
-  isSameMonth,
   subDays,
+  subMonths,
+  addMonths,
+  subYears,
+  addYears,
+  startOfYear,
+  endOfYear,
 } from "date-fns";
 import {
   getPaginatedPdRecords,
@@ -27,43 +32,87 @@ const HistoricalDataMore: React.FC = () => {
   const [detailedData, setDetailedData] = useState<PdRecordData[]>([]);
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PdRecordDateVO | null>(null);
-  const [showDetailedView, setShowDetailedView] = useState(false);
+  const [isDataExpanded, setIsDataExpanded] = useState(true);
+  const [statistics, setStatistics] = useState({
+    average: 0,
+    max: 0,
+    min: 0,
+    change: 0,
+  });
+  const [navOpacity, setNavOpacity] = useState(0);
 
-  useDidShow(() => {
-    Taro.setNavigationBarTitle({ title: "历史数据" });
-    fetchData();
+  useEffect(() => {
+    fetchData(startOfMonth(currentDate), endOfMonth(currentDate));
+  }, [currentDate]);
+
+  useEffect(() => {
+    if (detailedData.length > 0) {
+      const values = detailedData
+        .map((record) => record.ultrafiltration)
+        .filter((value): value is number => value !== null && !isNaN(value));
+
+      if (values.length > 0) {
+        const max = Math.max(...values);
+        const min = Math.min(...values);
+        const average = Math.round(
+          values.reduce((a, b) => a + b, 0) / values.length
+        );
+        const change = values[values.length - 1] - values[0];
+
+        setStatistics({
+          average,
+          max,
+          min,
+          change,
+        });
+      } else {
+        setStatistics({
+          average: 0,
+          max: 0,
+          min: 0,
+          change: 0,
+        });
+      }
+    }
+  }, [detailedData]);
+
+  usePageScroll(({ scrollTop }) => {
+    const newOpacity = Math.min(scrollTop / 100, 1);
+    setNavOpacity(newOpacity);
   });
 
-  const fetchData = async () => {
+  const fetchData = async (start?: Date, end?: Date) => {
     try {
       const userId = Taro.getStorageSync("userId");
       if (!userId) return;
 
-      const endDate = format(new Date(), "yyyy-MM-dd");
-      const startDate = format(subDays(new Date(), 30), "yyyy-MM-dd");
+      const endDate = end
+        ? format(end, "yyyy-MM-dd")
+        : format(new Date(), "yyyy-MM-dd");
+      const startDate = start
+        ? format(start, "yyyy-MM-dd")
+        : format(subDays(new Date(), 30), "yyyy-MM-dd");
 
-      if (showDetailedView) {
-        const response = await getPaginatedPdRecordsData(
-          userId,
-          1,
-          100,
-          startDate,
-          endDate
-        );
-        if (response.isSuccess()) {
-          setDetailedData(response.data.records);
-        }
-      } else {
-        const response = await getPaginatedPdRecords(
-          userId,
-          1,
-          100,
-          startDate,
-          endDate
-        );
-        if (response.isSuccess()) {
-          setDateData(response.data.records);
-        }
+      const response = await getPaginatedPdRecords(
+        userId,
+        1,
+        100,
+        startDate,
+        endDate
+      );
+      if (response.isSuccess()) {
+        setDateData(response.data.records);
+      }
+
+      const detailedResponse = await getPaginatedPdRecordsData(
+        userId,
+        1,
+        100,
+        startDate,
+        endDate
+      );
+      if (detailedResponse.isSuccess()) {
+        setDetailedData(detailedResponse.data.records);
       }
     } catch (err) {
       console.error("获取数据失败:", err);
@@ -71,51 +120,23 @@ const HistoricalDataMore: React.FC = () => {
     }
   };
 
-  const fetchDataForRange = async (startDate: Date, endDate: Date) => {
-    try {
-      const userId = Taro.getStorageSync("userId");
-      if (!userId) return;
-
-      if (showDetailedView) {
-        const response = await getPaginatedPdRecordsData(
-          userId,
-          1,
-          100,
-          format(startDate, "yyyy-MM-dd"),
-          format(endDate, "yyyy-MM-dd")
-        );
-        if (response.isSuccess()) {
-          setDetailedData(response.data.records);
-        }
-      } else {
-        const response = await getPaginatedPdRecords(
-          userId,
-          1,
-          100,
-          format(startDate, "yyyy-MM-dd"),
-          format(endDate, "yyyy-MM-dd")
-        );
-        if (response.isSuccess()) {
-          setDateData(response.data.records);
-        }
-      }
-    } catch (err) {
-      console.error("获取日期范围数据失败:", err);
-      Taro.showToast({ title: "获取数据失败", icon: "none" });
-    }
-  };
-
   const handleNavigate = (direction: "prev" | "next") => {
+    let newDate;
     if (viewMode === "month") {
-      setCurrentDate((prev) =>
-        direction === "prev" ? subDays(prev, 30) : subDays(prev, -30)
-      );
+      newDate =
+        direction === "prev"
+          ? subMonths(currentDate, 1)
+          : addMonths(currentDate, 1);
+      setCurrentDate(newDate);
+      setSelectedDates([]);
+      fetchData(startOfMonth(newDate), endOfMonth(newDate));
     } else {
-      setCurrentDate((prev) =>
-        direction === "prev" ? subDays(prev, 365) : subDays(prev, -365)
-      );
+      newDate =
+        direction === "prev"
+          ? subYears(currentDate, 1)
+          : addYears(currentDate, 1);
+      setCurrentDate(newDate);
     }
-    setSelectedDates([]);
   };
 
   const handleItemClick = (item: PdRecordDateVO) => {
@@ -128,105 +149,164 @@ const HistoricalDataMore: React.FC = () => {
     setSelectedItem(null);
   };
 
-  const toggleView = () => {
-    setShowDetailedView(!showDetailedView);
-    fetchData();
-  };
-
   const handleDateClick = (date: Date) => {
-    if (viewMode === "month") {
-      if (selectedDates.length === 2) {
-        setSelectedDates([date]);
-      } else if (selectedDates.length === 1) {
-        const newDates = [selectedDates[0], date].sort(
-          (a, b) => a.getTime() - b.getTime()
-        );
-        if (isSameMonth(newDates[0], newDates[1])) {
-          setSelectedDates(newDates);
-          fetchDataForRange(newDates[0], newDates[1]);
-        } else {
-          Taro.showToast({ title: "请选择同一个月内的日期", icon: "none" });
-        }
-      } else {
-        setSelectedDates([date]);
+    if (dateData.length > 0) {
+      const clickedItem = dateData.find(
+        (item) => item.date === format(date, "yyyy-MM-dd")
+      );
+      if (clickedItem) {
+        handleItemClick(clickedItem);
       }
     }
   };
 
-  const handleMonthClick = (month: number) => {
-    const startDate = startOfMonth(
-      new Date(currentDate.getFullYear(), month - 1)
-    );
-    const endDate = endOfMonth(startDate);
-    setSelectedDates([startDate, endDate]);
-    fetchDataForRange(startDate, endDate);
+  const handleBack = () => {
+    Taro.navigateBack();
   };
 
   const handleViewModeChange = (mode: "month" | "year") => {
     setViewMode(mode);
     setSelectedDates([]);
+    if (mode === "year") {
+      setCurrentDate(new Date(currentDate.getFullYear(), 0, 1));
+    } else {
+      const now = new Date();
+      setCurrentDate(now);
+      fetchData(startOfMonth(now), endOfMonth(now));
+    }
+  };
+
+  const handleMonthSelect = (date: Date) => {
+    setCurrentDate(date);
+    setViewMode("month");
+    setSelectedDates([]);
+    fetchData(startOfMonth(date), endOfMonth(date));
   };
 
   return (
     <View className="historical-data-more">
+      <View
+        className="custom-nav"
+        style={{ backgroundColor: `rgba(255, 255, 255, ${navOpacity})` }}
+      >
+        <View className="nav-content">
+          <View className="back-button" onClick={handleBack}>
+            <AtIcon value="chevron-left" size="20" color="#333"></AtIcon>
+          </View>
+          <View className="view-modes">
+            <View
+              className={`view-mode ${viewMode === "month" ? "active" : ""}`}
+              onClick={() => handleViewModeChange("month")}
+            >
+              月
+            </View>
+            <View
+              className={`view-mode ${viewMode === "year" ? "active" : ""}`}
+              onClick={() => handleViewModeChange("year")}
+            >
+              年
+            </View>
+          </View>
+          <View className="placeholder"></View>
+        </View>
+      </View>
+
       <Calendar
         viewMode={viewMode}
         currentDate={currentDate}
         selectedDates={selectedDates}
         onNavigate={handleNavigate}
         onDateClick={handleDateClick}
-        onMonthClick={handleMonthClick}
-        onViewModeChange={handleViewModeChange}
+        onMonthSelect={handleMonthSelect}
+        dateData={dateData}
       />
 
-      <View className="data-view-toggle">
-        <Text
-          className={`toggle-option ${!showDetailedView ? "active" : ""}`}
-          onClick={() => setShowDetailedView(false)}
-        >
-          日期数据
-        </Text>
-        <Text
-          className={`toggle-option ${showDetailedView ? "active" : ""}`}
-          onClick={() => setShowDetailedView(true)}
-        >
-          腹透详细数据
-        </Text>
+      <View className="statistics-card">
+        <View className="card-header">
+          <Text className="card-title">本月数据统计</Text>
+        </View>
+        <View className="statistics-grid">
+          <View className="stat-item">
+            <Text className="stat-label">平均超滤量</Text>
+            <Text className="stat-value">{statistics.average}</Text>
+          </View>
+          <View className="stat-item">
+            <Text className="stat-label">最大超滤量</Text>
+            <Text className="stat-value highlight-max">{statistics.max}</Text>
+          </View>
+          <View className="stat-item">
+            <Text className="stat-label">最小超滤量</Text>
+            <Text className="stat-value highlight-min">{statistics.min}</Text>
+          </View>
+          <View className="stat-item">
+            <Text className="stat-label">超滤量变化</Text>
+            <Text
+              className={`stat-value ${
+                statistics.change >= 0 ? "positive" : "negative"
+              }`}
+            >
+              {statistics.change >= 0 ? "+" : ""}
+              {statistics.change}
+            </Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView scrollY className="data-list">
-        {showDetailedView
-          ? detailedData.map((record, index) => (
-              <View key={index} className="data-item">
-                <Text className="date">{`${record.recordDate} ${record.recordTime}`}</Text>
-                <Text className="value">{record.ultrafiltration} ml</Text>
+        <View className={`card ${!isDataExpanded ? "collapsed" : ""}`}>
+          <View
+            className="card-header"
+            onClick={() => setIsDataExpanded(!isDataExpanded)}
+          >
+            <View className="title-container">
+              <Text className="card-title">
+                {isDataExpanded ? "收起全部数据" : "查看全部数据"}
+              </Text>
+              <AtIcon
+                value={isDataExpanded ? "chevron-up" : "chevron-down"}
+                size="14"
+                color="#92A3FD"
+              />
+            </View>
+          </View>
+
+          {isDataExpanded && (
+            <>
+              <View className="column-headers">
+                <Text className="header-ultrafiltration">超滤量</Text>
+                <Text className="header-time">时间</Text>
               </View>
-            ))
-          : dateData.map((record, index) => (
-              <View
-                key={index}
-                className="data-item"
-                onClick={() => handleItemClick(record)}
-              >
-                <Text className="date">{record.date}</Text>
-                <View className="value-container">
-                  <Text className="value">
-                    {record.totalUltrafiltration} ml
-                  </Text>
-                  <AtIcon value="chevron-right" size="14" color="#666" />
-                </View>
+              <View className="data-records">
+                {detailedData.map((record, index) => (
+                  <View key={index} className="data-item">
+                    <Text className="ultrafiltration">
+                      {record.ultrafiltration} ml
+                    </Text>
+                    <View className="time-info">
+                      <Text className="date">
+                        {format(new Date(record.recordDate), "MM/dd")}
+                      </Text>
+                      <Text className="time">
+                        {record.recordTime.substring(0, 5)}
+                      </Text>
+                    </View>
+                  </View>
+                ))}
               </View>
-            ))}
+            </>
+          )}
+        </View>
       </ScrollView>
 
       <Popup
         visible={isPopupVisible}
         onClose={closePopup}
         title={selectedItem ? selectedItem.date : ""}
+        contentStyle={{ padding: "15px" }}
       >
         <View className="popup-content-wrapper">
           {selectedItem && (
-            <ScrollView scrollY className="popup-content">
+            <ScrollView scrollY className="popup-content-scroll">
               <View className="detail-records">
                 {selectedItem.recordData.map((record, index) => (
                   <View key={index} className="detail-item">
