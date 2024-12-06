@@ -5,7 +5,7 @@ import Taro from "@tarojs/taro";
 import {
   getPdRecordsByDate,
   PdRecordVO,
-  TodayPdRecordDTO,
+  PdRecordData,
 } from "@/api/pdRecordApi";
 import { format, parse } from "date-fns";
 import "./index.scss";
@@ -118,24 +118,22 @@ export const DialysisData: React.FC = () => {
 
       <View className="timeline">
         {pdRecord.dateRecords &&
-          pdRecord.dateRecords.map(
-            (record: TodayPdRecordDTO, index: number) => (
-              <View key={index} className="timeline-item">
-                <View className="time-content">
-                  <Text className="time">
-                    {record.recordTime.substring(0, 5)}
-                  </Text>
-                  <Text className="details">
-                    浓度: {record.dialysateType} | 引流量:{" "}
-                    {record.drainageVolume}ml
-                  </Text>
-                </View>
-                <Text className="ultrafiltration">
-                  {record.ultrafiltration || 0} ml
+          pdRecord.dateRecords.map((record: PdRecordData, index: number) => (
+            <View key={index} className="timeline-item">
+              <View className="time-content">
+                <Text className="time">
+                  {record.recordTime.substring(0, 5)}
+                </Text>
+                <Text className="details">
+                  浓度: {record.dialysateType} | 引流量: {record.drainageVolume}
+                  ml
                 </Text>
               </View>
-            )
-          )}
+              <Text className="ultrafiltration">
+                {record.ultrafiltration || 0} ml
+              </Text>
+            </View>
+          ))}
       </View>
 
       {format(selectedDate, "yyyy-MM-dd") ===

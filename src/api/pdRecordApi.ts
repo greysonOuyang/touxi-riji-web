@@ -1,7 +1,37 @@
 import { get, post } from "../utils/request";
 import { ApiResponse } from "../utils/request";
 
-// 最新腹透记录数据类型定义
+// Base interface for PD record data
+export interface PdRecordData {
+  userId: number;
+  recordDate: string; // ISO date string
+  recordTime: string; // ISO time string
+  dialysateType: string;
+  infusionVolume: number;
+  drainageVolume: number;
+  ultrafiltration: number | null;
+  notes?: string;
+}
+
+// Interface for adding a new PD record (same as PdRecordData)
+export type NewPdRecord = PdRecordData;
+
+// Interface for PD record with date grouping
+export interface PdRecordDateVO {
+  date: string; // ISO date string
+  totalUltrafiltration: number;
+  recordData: PdRecordData[];
+}
+
+// Interface for daily PD record summary
+export interface PdRecordVO {
+  dailyFrequency: number;
+  totalUltrafiltration: number;
+  totalCount: number;
+  dateRecords: PdRecordData[];
+}
+
+// Interface for latest PD record
 export interface LatestPdRecordDTO {
   totalUltrafiltration: number;
   latestConcentration: string;
@@ -10,36 +40,25 @@ export interface LatestPdRecordDTO {
   updateTime: string;
 }
 
-// 添加新的腹透记录请求参数
-export interface NewPdRecord {
-  userId: number;
-  recordDate: string;
-  recordTime: string;
-  dialysateType: string;
-  infusionVolume: number;
-  drainageVolume: number;
-  notes?: string;
+// Interface for paginated PD records
+export interface PaginatedPdRecordDateVO {
+  records: PdRecordDateVO[];
+  total: number;
+  size: number;
+  current: number;
 }
 
-export interface PdRecordVO {
-  dailyFrequency: number;
-  totalUltrafiltration: number;
-  totalCount: number;
-  dateRecords: TodayPdRecordDTO[];
+export interface PaginatedPdRecordDataVO {
+  records: PdRecordData[];
+  total: number;
+  size: number;
+  current: number;
 }
 
-// 今日腹透记录数据类型定义
-export interface TodayPdRecordDTO {
-  recordTime: string;
-  dialysateType: string;
-  drainageVolume: number;
-  ultrafiltration: number | null;
-}
+// API Functions
 
 /**
  * 获取用户最新的腹透记录
- * @param userId 用户ID
- * @returns Promise<ApiResponse<LatestPdRecordDTO>>
  */
 export const getLatestPdRecord = (
   userId: number
@@ -49,8 +68,6 @@ export const getLatestPdRecord = (
 
 /**
  * 添加新的腹透记录
- * @param data NewPdRecord
- * @returns Promise<ApiResponse<null>>
  */
 export const addPdRecord = (data: NewPdRecord): Promise<ApiResponse<null>> => {
   return post<null>("/api/pd-record/add", data);
@@ -58,8 +75,6 @@ export const addPdRecord = (data: NewPdRecord): Promise<ApiResponse<null>> => {
 
 /**
  * 检查用户是否是第一次使用（没有腹透记录）
- * @param userId 用户ID
- * @returns Promise<ApiResponse<boolean>>
  */
 export const isFirstTimeUser = (
   userId: number
@@ -69,13 +84,39 @@ export const isFirstTimeUser = (
 
 /**
  * 获取用户指定日期的腹透记录
- * @param userId 用户ID
- * @param date 日期 (YYYY-MM-DD)
- * @returns Promise<ApiResponse<TodayPdRecordDTO[]>>
  */
 export const getPdRecordsByDate = (
   userId: number,
   date: string
 ): Promise<ApiResponse<PdRecordVO>> => {
   return get<PdRecordVO>(`/api/pd-record/by-date/${userId}?date=${date}`);
+};
+
+/**
+ * 获取用户的分页腹透记录
+ */
+export const getPaginatedPdRecords = (
+  userId: number,
+  pageNum: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string
+): Promise<ApiResponse<PaginatedPdRecordDateVO>> => {
+  let url = `/api/pd-record/paginated/${userId}?pageNum=${pageNum}&pageSize=${pageSize}`;
+  if (startDate) url += `&startDate=${startDate}`;
+  if (endDate) url += `&endDate=${endDate}`;
+  return get<PaginatedPdRecordDateVO>(url);
+};
+
+export const getPaginatedPdRecordsData = (
+  userId: number,
+  pageNum: number,
+  pageSize: number,
+  startDate?: string,
+  endDate?: string
+): Promise<ApiResponse<PaginatedPdRecordDataVO>> => {
+  let url = `/api/pd-record/paginated/data/${userId}?pageNum=${pageNum}&pageSize=${pageSize}`;
+  if (startDate) url += `&startDate=${startDate}`;
+  if (endDate) url += `&endDate=${endDate}`;
+  return get<PaginatedPdRecordDataVO>(url);
 };

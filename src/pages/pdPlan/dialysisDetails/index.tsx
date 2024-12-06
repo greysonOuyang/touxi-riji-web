@@ -22,12 +22,6 @@ const DialysisDetailsPage: React.FC = () => {
     { title: "对比" },
   ];
 
-  const historyData = [
-    { date: "2023-06-10", value: 550 },
-    { date: "2023-06-09", value: 520 },
-    { date: "2023-06-08", value: 580 },
-  ];
-
   const handleClick = (value: number) => {
     setCurrent(value);
   };
@@ -40,7 +34,7 @@ const DialysisDetailsPage: React.FC = () => {
             <AtTabsPane current={current} index={0}>
               <View className="tab-content">
                 <DialysisData />
-                <HistoricalData data={historyData} />
+                <HistoricalData />
               </View>
             </AtTabsPane>
 

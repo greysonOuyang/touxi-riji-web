@@ -10,6 +10,7 @@ export default {
     "pages/pdPlan/record/index",
     "pages/profile/edit/index",
     "pages/pdPlan/dialysisDetails/index",
+    "pages/pdPlan/historicalDataMore/index",
   ],
   window: {
     backgroundTextStyle: "light",
