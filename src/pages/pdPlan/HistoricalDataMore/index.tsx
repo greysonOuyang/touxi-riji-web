@@ -256,51 +256,49 @@ const HistoricalDataMore: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView scrollY className="data-list">
-        <View className={`card ${!isDataExpanded ? "collapsed" : ""}`}>
-          <View
-            className="card-header"
-            onClick={() => setIsDataExpanded(!isDataExpanded)}
-          >
-            <View className="title-container">
-              <Text className="card-title">
-                {isDataExpanded ? "收起全部数据" : "查看全部数据"}
-              </Text>
-              <AtIcon
-                value={isDataExpanded ? "chevron-up" : "chevron-down"}
-                size="14"
-                color="#92A3FD"
-              />
-            </View>
+      <View className={`data-list card ${!isDataExpanded ? "collapsed" : ""}`}>
+        <View
+          className="card-header"
+          onClick={() => setIsDataExpanded(!isDataExpanded)}
+        >
+          <View className="title-container">
+            <Text className="card-title">
+              {isDataExpanded ? "收起全部数据" : "查看全部数据"}
+            </Text>
+            <AtIcon
+              value={isDataExpanded ? "chevron-up" : "chevron-down"}
+              size="14"
+              color="#92A3FD"
+            />
           </View>
-
-          {isDataExpanded && (
-            <>
-              <View className="column-headers">
-                <Text className="header-ultrafiltration">超滤量</Text>
-                <Text className="header-time">时间</Text>
-              </View>
-              <View className="data-records">
-                {detailedData.map((record, index) => (
-                  <View key={index} className="data-item">
-                    <Text className="ultrafiltration">
-                      {record.ultrafiltration} ml
-                    </Text>
-                    <View className="time-info">
-                      <Text className="date">
-                        {format(new Date(record.recordDate), "MM/dd")}
-                      </Text>
-                      <Text className="time">
-                        {record.recordTime.substring(0, 5)}
-                      </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </>
-          )}
         </View>
-      </ScrollView>
+
+        {isDataExpanded && (
+          <>
+            <View className="column-headers">
+              <Text className="header-ultrafiltration">超滤量</Text>
+              <Text className="header-time">时间</Text>
+            </View>
+            <View className="data-records">
+              {detailedData.map((record, index) => (
+                <View key={index} className="data-item">
+                  <Text className="ultrafiltration">
+                    {record.ultrafiltration} ml
+                  </Text>
+                  <View className="time-info">
+                    <Text className="date">
+                      {format(new Date(record.recordDate), "MM/dd")}
+                    </Text>
+                    <Text className="time">
+                      {record.recordTime.substring(0, 5)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+      </View>
 
       <Popup
         visible={isPopupVisible}
