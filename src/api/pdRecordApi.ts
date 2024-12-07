@@ -120,3 +120,35 @@ export const getPaginatedPdRecordsData = (
   if (endDate) url += `&endDate=${endDate}`;
   return get<PaginatedPdRecordDataVO>(url);
 };
+
+export interface PdRecordStatistics {
+  minUltrafiltration: number;
+  maxUltrafiltration: number;
+  averageUltrafiltration: number;
+}
+
+export async function getPdRecordsStatistics(
+  userId: number,
+  startDate?: string,
+  endDate?: string
+): Promise<PdRecordStatistics> {
+  try {
+    const params: Record<string, string> = {};
+    if (startDate) params.startDate = startDate;
+    if (endDate) params.endDate = endDate;
+
+    const response = await get<PdRecordStatistics>(
+      `/api/pd-record/statistics/${userId}`,
+      params
+    );
+
+    if (response.isSuccess()) {
+      return response.data;
+    } else {
+      throw new Error(response.msg || "Failed to fetch PD record statistics");
+    }
+  } catch (error) {
+    console.error("Error fetching PD record statistics:", error);
+    throw error;
+  }
+}

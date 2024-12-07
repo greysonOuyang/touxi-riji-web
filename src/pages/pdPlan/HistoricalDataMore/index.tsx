@@ -19,6 +19,8 @@ import {
   getPaginatedPdRecordsData,
   PdRecordDateVO,
   PdRecordData,
+  getPdRecordsStatistics,
+  PdRecordStatistics,
 } from "@/api/pdRecordApi";
 import Popup from "@/components/common/Popup";
 import Calendar from "@/components/common/Calendar";
@@ -33,12 +35,7 @@ const HistoricalDataMore: React.FC = () => {
   const [isPopupVisible, setIsPopupVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PdRecordDateVO | null>(null);
   const [isDataExpanded, setIsDataExpanded] = useState(true);
-  const [statistics, setStatistics] = useState({
-    average: 0,
-    max: 0,
-    min: 0,
-    change: 0,
-  });
+  const [statistics, setStatistics] = useState<PdRecordStatistics | null>(null);
   const [navOpacity, setNavOpacity] = useState(0);
   usePageScroll(({ scrollTop }) => {
     const newOpacity = Math.min(scrollTop / 50, 0.9);
@@ -48,37 +45,6 @@ const HistoricalDataMore: React.FC = () => {
   useEffect(() => {
     fetchData(startOfMonth(currentDate), endOfMonth(currentDate));
   }, [currentDate]);
-
-  useEffect(() => {
-    if (detailedData.length > 0) {
-      const values = detailedData
-        .map((record) => record.ultrafiltration)
-        .filter((value): value is number => value !== null && !isNaN(value));
-
-      if (values.length > 0) {
-        const max = Math.max(...values);
-        const min = Math.min(...values);
-        const average = Math.round(
-          values.reduce((a, b) => a + b, 0) / values.length
-        );
-        const change = values[values.length - 1] - values[0];
-
-        setStatistics({
-          average,
-          max,
-          min,
-          change,
-        });
-      } else {
-        setStatistics({
-          average: 0,
-          max: 0,
-          min: 0,
-          change: 0,
-        });
-      }
-    }
-  }, [detailedData]);
 
   usePageScroll(({ scrollTop }) => {
     const newOpacity = Math.min(scrollTop / 100, 1);
@@ -96,6 +62,13 @@ const HistoricalDataMore: React.FC = () => {
       const startDate = start
         ? format(start, "yyyy-MM-dd")
         : format(subDays(new Date(), 30), "yyyy-MM-dd");
+
+      const responseStatistics = await getPdRecordsStatistics(
+        userId,
+        startDate,
+        endDate
+      );
+      setStatistics(responseStatistics);
 
       const response = await getPaginatedPdRecords(
         userId,
@@ -232,15 +205,21 @@ const HistoricalDataMore: React.FC = () => {
         <View className="statistics-grid">
           <View className="stat-item">
             <Text className="stat-label">平均超滤量</Text>
-            <Text className="stat-value">{statistics.average}</Text>
+            <Text className="stat-value">
+              {statistics?.averageUltrafiltration} ml
+            </Text>
           </View>
           <View className="stat-item">
             <Text className="stat-label">最大超滤量</Text>
-            <Text className="stat-value highlight-max">{statistics.max}</Text>
+            <Text className="stat-value highlight-max">
+              {statistics?.maxUltrafiltration} ml
+            </Text>
           </View>
           <View className="stat-item">
             <Text className="stat-label">最小超滤量</Text>
-            <Text className="stat-value highlight-min">{statistics.min}</Text>
+            <Text className="stat-value highlight-min">
+              {statistics?.minUltrafiltration} ml
+            </Text>
           </View>
         </View>
       </View>
