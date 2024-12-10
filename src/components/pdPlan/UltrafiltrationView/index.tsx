@@ -81,7 +81,11 @@ const UltrafiltrationView: React.FC = () => {
   const onViewClick = async () => {
     const hasPdPlan = await checkPdPlan();
     if (hasPdPlan) {
+      console.log("有腹透计划");
       Taro.navigateTo({ url: "/pages/pdPlan/historicalDataMore/index" });
+      // Taro.navigateTo({
+      //   url: "/pages/pdPlan/dialysisDetails/index",
+      // });
     } else {
       Taro.showModal({
         title: "提示",

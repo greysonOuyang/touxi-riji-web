@@ -5,15 +5,16 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import { DialysisData } from "@/components/pdPlan/DialysisData";
 import HistoricalData from "@/components/pdPlan/HistoricalData";
 import "./index.scss";
+import HistoricalDataMore from "../HistoricalDataMore";
 
 const DialysisDetailsPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
 
-  useDidShow(() => {
-    Taro.setNavigationBarTitle({
-      title: "腹透详情",
-    });
-  });
+  // useDidShow(() => {
+  //   Taro.setNavigationBarTitle({
+  //     title: "腹透详情",
+  //   });
+  // });
 
   const tabList = [
     { title: "数据" },
@@ -34,14 +35,12 @@ const DialysisDetailsPage: React.FC = () => {
             <AtTabsPane current={current} index={0}>
               <View className="tab-content">
                 <DialysisData />
-                <HistoricalData />
               </View>
             </AtTabsPane>
 
             <AtTabsPane current={current} index={1}>
               <View className="tab-content">
-                <Text className="section-title">趋势分析</Text>
-                <Text>这里是趋势分析的内容</Text>
+                <HistoricalDataMore />
               </View>
             </AtTabsPane>
 
