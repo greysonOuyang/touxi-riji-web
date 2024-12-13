@@ -152,3 +152,55 @@ export async function getPdRecordsStatistics(
     throw error;
   }
 }
+
+export interface PdAggregatedStats {
+  id: number;
+  userId: number;
+  timeKey: string;
+  timeDimension: "week" | "month" | "year";
+  totalUltrafiltration: number;
+  avgUltrafiltration: number;
+  avgDwellTime: number;
+  varianceDwellTime: number;
+  actualRecords: number;
+  createdAt: string;
+  updatedAt: string;
+  maxUltrafiltration: number;
+  minUltrafiltration: number;
+}
+
+export interface DetailItem {
+  key: string;
+  value: number;
+}
+
+export interface AggregatedStatsVO {
+  aggregatedStats: PdAggregatedStats;
+  details: DetailItem[];
+}
+
+export interface StatsQuery {
+  userId: number;
+  timeDimension: "week" | "month" | "year";
+  timeKey: string;
+}
+
+export const getStats = async (
+  query: StatsQuery
+): Promise<ApiResponse<AggregatedStatsVO>> => {
+  const params = new URLSearchParams({
+    userId: query.userId.toString(),
+    timeDimension: query.timeDimension,
+    timeKey: query.timeKey,
+  });
+  const url = `/api/stats?${params.toString()}`;
+  console.log(`Sending request to: ${url}`);
+  try {
+    const response = await get<AggregatedStatsVO>(url);
+    console.log(`Response received:`, response);
+    return response;
+  } catch (error) {
+    console.error(`Error in getStats:`, error);
+    throw error;
+  }
+};

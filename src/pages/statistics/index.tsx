@@ -4,7 +4,6 @@ import { AtTabs, AtTabsPane } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 import TrendAnalysis from "@/components/pdPlan/TrendAnalysis";
-import SimpleChartDemo from "@/components/pdPlan/TrendAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -34,8 +33,7 @@ const StatisticsReportPage: React.FC = () => {
           <View className="content-wrapper">
             <AtTabsPane current={current} index={0}>
               <View className="tab-content">
-                {/* <TrendAnalysis /> */}
-                <SimpleChartDemo />
+                <TrendAnalysis />
               </View>
             </AtTabsPane>
 
