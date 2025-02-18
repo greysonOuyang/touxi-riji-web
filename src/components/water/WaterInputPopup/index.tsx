@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View } from "@tarojs/components";
+import { View, Text } from "@tarojs/components";
 import NumericInput from "@/components/common/NumericInputProps";
 import { addWaterIntakeRecord } from "../../../api/waterIntakeApi";
 import { fetchWaterTags, saveWaterTags } from "../../../api/userSettings";
@@ -163,19 +163,26 @@ const WaterInputPopup: React.FC<WaterInputPopupProps> = ({
         handleCancelNewTag();
         onClose();
       }}
-      title="添加喝水记录"
+      title={<View style={{ 
+        display: 'flex', 
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: '4px'  // 减小间距
+      }}>
+        <Text style={{
+          fontSize: '16px',
+          whiteSpace: 'nowrap'  // 防止文字换行
+        }}>今日喝水</Text>
+        <TimePicker
+          showLabel={false}
+          value={selectedTime}
+          showArrowIcon={true}
+          onChange={handleTimeChange}
+        />
+      </View>}
     >
       <View className="water-input-popup">
         <View className="top-section">
-          <View className="time-container">
-            <TimePicker
-              label="时间"
-              value={selectedTime}
-              showArrowIcon={true}
-              onChange={handleTimeChange}
-            />
-          </View>
-
           <View className="tags-container">
             {userTags.map((volume) => (
               <View

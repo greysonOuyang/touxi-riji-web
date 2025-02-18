@@ -8,7 +8,7 @@ interface PopupProps {
   visible: boolean;
   onClose: () => void;
   children: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
 }
 
 const Popup: React.FC<PopupProps> = ({ visible, onClose, children, title }) => {
@@ -94,7 +94,7 @@ const Popup: React.FC<PopupProps> = ({ visible, onClose, children, title }) => {
         onTouchEnd={handleTouchEnd}
       >
         <View className="popup-header">
-          <Text className="popup-title">{title}</Text>
+          {React.isValidElement(title) ? title : <Text className="popup-title">{title}</Text>}
           <View className="popup-close" onClick={onClose}>
             ×
           </View>
