@@ -112,7 +112,7 @@ const WeightCard: React.FC = () => {
       </View>
 
       <WeightInputPopup
-        isOpen={isPopupOpen}
+        isOpened={isPopupOpen}
         onClose={handlePopupClose}
         onAfterSubmit={handlePopupAfterSubmit}
       />

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { View, Text, Picker, Image } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import dayjs from "dayjs";
-import CustomPopup from "@/components/common/CustomPopup";
+import Popup from "@/components/common/Popup";
 import {
   addWeightRecord,
   NewWeightRecord,
@@ -13,7 +13,7 @@ import "./index.scss";
 import ArrowRight from "@/components/common/ArrowRight";
 
 interface WeightInputPopupProps {
-  isOpen: boolean;
+  isOpened: boolean;
   onClose: () => void;
   onAfterSubmit: () => void;
 }
@@ -25,7 +25,7 @@ interface FormState {
 }
 
 const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
-  isOpen,
+  isOpened,
   onClose,
   onAfterSubmit,
 }) => {
@@ -41,7 +41,7 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
 
   // 每次打开弹窗时更新时间和获取最新体重
   useEffect(() => {
-    if (isOpen) {
+    if (isOpened) {
       const currentTime = dayjs();
       setFormData((prev) => ({
         ...prev,
@@ -62,7 +62,7 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
       };
       fetchLatestWeight();
     }
-  }, [isOpen]);
+  }, [isOpened]);
 
   const generateWeightColumns = () => {
     const integers = Array.from({ length: 151 }, (_, i) =>
@@ -82,18 +82,16 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
     ];
   };
 
-  const handleWeightChange = (e) => {
+  const handleWeightChange = async (e) => {
     const [integer, , decimal] = e.detail.value;
     const weightValue = `${integer}.${decimal}`;
     setFormData((prev) => ({ ...prev, weight: weightValue }));
-  };
-
-  const handleSubmit = async () => {
+    
+    // 直接提交体重记录
     const userId = Taro.getStorageSync("userId");
-
     const requestData: NewWeightRecord = {
       userId,
-      weight: parseFloat(formData.weight),
+      weight: parseFloat(weightValue),
       measurementDatetime: formData.measurementDatetime,
       scaleType: "MANUAL",
     };
@@ -120,11 +118,10 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
   };
 
   return (
-    <CustomPopup
-      isOpened={isOpen}
+    <Popup
+      visible={isOpened}
       onClose={onClose}
-      onConfirm={handleSubmit}
-      title="记录体重"
+      title={<Text>记录体重</Text>}
     >
       <View className="weight-input-popup">
         <View className="weight-form-item">
@@ -156,7 +153,7 @@ const WeightInputPopup: React.FC<WeightInputPopupProps> = ({
           </View>
         </View>
       </View>
-    </CustomPopup>
+    </Popup>
   );
 };
 
