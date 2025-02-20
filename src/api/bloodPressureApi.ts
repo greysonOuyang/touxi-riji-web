@@ -22,3 +22,26 @@ export const fetchLatestBloodPressure = async (): Promise<ApiResponse<BloodPress
 export const addBloodPressureRecord = async (data: BloodPressureRecord): Promise<ApiResponse<null> | null> => {
     return post<null>('/api/bpRecord/add', data);
 };
+interface BpTrendData {
+  timestamp: string;      // 数据的时间戳，通常是日期或日期+时间
+  systolic: number;       // 收缩压
+  diastolic: number;      // 舒张压
+  heartRate?: number;     // 心率，可选字段
+}
+
+interface BpTrendParams {
+  userId: number;
+  timeSpan: string;
+  startDate: string;
+  endDate: string;
+}
+
+export const fetchBpTrendWeekly = async (params: BpTrendParams): Promise<ApiResponse<BpTrendData[]> | null> => {
+  const { userId, timeSpan, startDate, endDate } = params;
+  return get<BpTrendData[]>(`/api/bp-trend/weekly`, {
+    userId,
+    timeSpan,
+    startDate,
+    endDate
+  });
+};

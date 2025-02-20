@@ -66,7 +66,7 @@ const BloodPressureCard: React.FC<BloodPressureCardProps> = ({
   }, [refreshTrigger]);
 
   const onAddClick = () => {
-    Taro.navigateTo({ url: "/pages/BloodPressureInputPage/index" });
+    Taro.navigateTo({ url: "/pages/bloodPresure/input/index" });
   };
 
   if (loading) {

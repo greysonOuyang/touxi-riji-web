@@ -5,7 +5,7 @@ import LoginPrompt from "@/components/LoginPrompt";
 import UltrafiltrationView from "@/components/pdPlan/UltrafiltrationView";
 import WaterIntakeCard from "@/components/water/WaterIntakeCard";
 import UrineVolumeCard from "@/components/urine/UrineVolumeCard";
-import BloodPressureCard from "@/components/bloodPresure/BloodPressureCard";
+import BloodPressureCard from "@/components/bloodPresure/card";
 import WeightCard from "@/components/weight/WeightCard";
 import "./index.scss";
 import CustomNavBar from "@/components/common/CustomNavBar";

@@ -4,7 +4,7 @@ export default {
     "pages/statistics/index",
     "pages/profile/index",
     "pages/login/index",
-    "pages/BloodPressureInputPage/index",
+    "pages/bloodPresure/input/index",
     "pages/pdPlan/input/index",
     "pages/pdPlan/planManage/index",
     "pages/pdPlan/record/index",

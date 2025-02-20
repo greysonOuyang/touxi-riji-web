@@ -3,7 +3,7 @@ import { View, Text, ScrollView } from "@tarojs/components";
 import { AtTabs, AtTabsPane } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
-import TrendAnalysis from "@/components/pdPlan/TrendAnalysis";
+import BPAnalysis from "@/components/bloodPresure/analysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -33,7 +33,7 @@ const StatisticsReportPage: React.FC = () => {
           <View className="content-wrapper">
             <AtTabsPane current={current} index={0}>
               <View className="tab-content">
-                <TrendAnalysis />
+                {/* <TrendAnalysis /> */}
               </View>
             </AtTabsPane>
 
@@ -60,8 +60,7 @@ const StatisticsReportPage: React.FC = () => {
 
             <AtTabsPane current={current} index={4}>
               <View className="tab-content">
-                <Text className="section-title">血压统计</Text>
-                <Text>这里是血压统计的内容</Text>
+                <BPAnalysis />
               </View>
             </AtTabsPane>
           </View>
