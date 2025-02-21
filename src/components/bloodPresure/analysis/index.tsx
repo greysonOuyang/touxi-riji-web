@@ -68,25 +68,28 @@ const BPAnalysis: React.FC = () => {
       startDate.setDate(endDate.getDate() - 6)
 
       // 生成完整的7天日期数组
-      const dateRange = Array.from({ length: 7 }, (_, i) => {
+      const dateRange = ['', ...Array.from({ length: 7 }, (_, i) => {
         const date = new Date(startDate)
         date.setDate(startDate.getDate() + i)
         return `${date.getMonth() + 1}/${date.getDate()}`
-      })
+      })]
 
-      // 将数据映射到完整的7天
-      const fullData = dateRange.map(date => {
-        const matchingData = bpData.find(item => {
-          const itemDate = new Date(item.timestamp)
-          return `${itemDate.getMonth() + 1}/${itemDate.getDate()}` === date
+      // 将数据映射到完整的7天，并在开头添加空数据
+      const fullData = [
+        { systolic: null, diastolic: null, heartRate: null, timestamp: '' },
+        ...dateRange.slice(1).map(date => {
+          const matchingData = bpData.find(item => {
+            const itemDate = new Date(item.timestamp)
+            return `${itemDate.getMonth() + 1}/${itemDate.getDate()}` === date
+          })
+          return matchingData || {
+            systolic: null,
+            diastolic: null,
+            heartRate: null,
+            timestamp: date
+          }
         })
-        return matchingData || {
-          systolic: null,
-          diastolic: null,
-          heartRate: null,
-          timestamp: date
-        }
-      })
+      ]
 
       const chartData = {
         categories: dateRange,
@@ -128,23 +131,20 @@ const BPAnalysis: React.FC = () => {
           rotateLabel: false,
           fontSize: 11,
           boundaryGap: true,
-          itemCount: 7,
+          itemCount: 8,
           axisLine: true,
-          // calibration: true,
           format: (val) => val,
         },
         yAxis: {
           gridType: "dash",
-          gridColor: "#E0E0E0",
+          gridColor: "#f0f0f0",
           dashLength: 2,
-          splitNumber: 5,
-          min: Math.floor((minValue - 5) / 10) * 10,
-          max: Math.ceil((maxValue + 5) / 10) * 10,
+          splitNumber: 4,
+          min: Math.floor((minValue - 10) / 10) * 10,
+          max: Math.ceil((maxValue + 10) / 10) * 10,
           format: (val) => val + "",
           fontColor: "#999999",
           fontSize: 11,
-          // width: 35,
-          // marginRight: 20,
         },
         legend: {
           show: false,
