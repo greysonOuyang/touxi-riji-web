@@ -1,5 +1,6 @@
 .bp-analysis {
   padding: 0;
+  margin: 0;
   background: #fff;
   border-radius: 16px;
 
@@ -27,6 +28,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 0 15px 10px;
+    margin-top: 10px;
 
     .chart-title {
       font-size: 16px;
@@ -226,5 +228,33 @@
         line-height: 1.4;
       }
     }
+  }
+
+  .abnormal-values-container {
+    margin-top: 16px;
+    padding: 16px;
+    background: #FFF8F8;
+    border-radius: 12px;
+    border: 1px solid #FFDDDD;
+  }
+
+  .abnormal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #FF4444;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .abnormal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .abnormal-item {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
   }
 } 

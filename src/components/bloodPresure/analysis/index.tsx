@@ -18,6 +18,7 @@ interface BPDataPoint {
 
 const BPAnalysis: React.FC = () => {
   const [bpData, setBpData] = useState<BPDataPoint[]>([])
+  const [abnormalValues, setAbnormalValues] = useState<string[]>([])
   const fetchBpTrendRef = useRef(null)
 
   const fetchBpTrend = useCallback(async () => {
@@ -91,6 +92,48 @@ const BPAnalysis: React.FC = () => {
         })
       ]
 
+      // 定义血压和心率的正常范围
+      const normalRanges = {
+        systolic: { min: 90, max: 140 },
+        diastolic: { min: 60, max: 90 },
+        heartRate: { min: 60, max: 100 }
+      }
+
+      // 收集异常值提醒
+      const abnormalMessages: string[] = []
+      
+      fullData.forEach((item, index) => {
+        if (!item?.timestamp || index === 0) return
+        
+        const date = item.timestamp
+        if (item.systolic !== null) {
+          if (item.systolic > normalRanges.systolic.max) {
+            abnormalMessages.push(`${date}: 收缩压 ${item.systolic} mmHg 偏高`)
+          } else if (item.systolic < normalRanges.systolic.min) {
+            abnormalMessages.push(`${date}: 收缩压 ${item.systolic} mmHg 偏低`)
+          }
+        }
+        
+        if (item.diastolic !== null) {
+          if (item.diastolic > normalRanges.diastolic.max) {
+            abnormalMessages.push(`${date}: 舒张压 ${item.diastolic} mmHg 偏高`)
+          } else if (item.diastolic < normalRanges.diastolic.min) {
+            abnormalMessages.push(`${date}: 舒张压 ${item.diastolic} mmHg 偏低`)
+          }
+        }
+        
+        if (item.heartRate !== null) {
+          if (item.heartRate > normalRanges.heartRate.max) {
+            abnormalMessages.push(`${date}: 心率 ${item.heartRate} 次/分 偏快`)
+          } else if (item.heartRate < normalRanges.heartRate.min) {
+            abnormalMessages.push(`${date}: 心率 ${item.heartRate} 次/分 偏慢`)
+          }
+        }
+      })
+      
+      setAbnormalValues(abnormalMessages)
+
+      // 修改 chartData 的 series 配置，添加标记点
       const chartData = {
         categories: dateRange,
         series: [
@@ -98,16 +141,70 @@ const BPAnalysis: React.FC = () => {
             name: "收缩压",
             data: fullData.map(item => item?.systolic || null),
             color: "#FF8A8A",
+            markPoint: fullData.map((item, index) => {
+              if (!item?.systolic) return null;
+              if (item.systolic > normalRanges.systolic.max) {
+                return {
+                  value: '偏高',
+                  coord: [index, item.systolic],
+                  color: '#FF4444'
+                };
+              }
+              if (item.systolic < normalRanges.systolic.min) {
+                return {
+                  value: '偏低',
+                  coord: [index, item.systolic],
+                  color: '#FF4444'
+                };
+              }
+              return null;
+            }).filter(Boolean)
           },
           {
             name: "舒张压",
             data: fullData.map(item => item?.diastolic || null),
             color: "#92A3FD",
+            markPoint: fullData.map((item, index) => {
+              if (!item?.diastolic) return null;
+              if (item.diastolic > normalRanges.diastolic.max) {
+                return {
+                  value: '偏高',
+                  coord: [index, item.diastolic],
+                  color: '#FF4444'
+                };
+              }
+              if (item.diastolic < normalRanges.diastolic.min) {
+                return {
+                  value: '偏低',
+                  coord: [index, item.diastolic],
+                  color: '#FF4444'
+                };
+              }
+              return null;
+            }).filter(Boolean)
           },
           {
             name: "心率",
             data: fullData.map(item => item?.heartRate || null),
             color: "#4CAF50",
+            markPoint: fullData.map((item, index) => {
+              if (!item?.heartRate) return null;
+              if (item.heartRate > normalRanges.heartRate.max) {
+                return {
+                  value: '偏快',
+                  coord: [index, item.heartRate],
+                  color: '#FF4444'
+                };
+              }
+              if (item.heartRate < normalRanges.heartRate.min) {
+                return {
+                  value: '偏慢',
+                  coord: [index, item.heartRate],
+                  color: '#FF4444'
+                };
+              }
+              return null;
+            }).filter(Boolean)
           },
         ],
       }
@@ -124,7 +221,7 @@ const BPAnalysis: React.FC = () => {
         series: chartData.series,
         animation: true,
         background: "#FFFFFF",
-        padding: [15,10,0,15],
+        padding: [30, 15, 15, 15],
         xAxis: {
           disableGrid: true,
           fontColor: "#999999",
@@ -156,6 +253,21 @@ const BPAnalysis: React.FC = () => {
             activeType: "none",
             connectNulls: true,
           },
+          markLine: {
+            type: 'dash',
+            data: []
+          },
+          markPoint: {
+            show: true,
+            type: 'text',
+            fontSize: 11,
+            textAlign: 'center',
+            textOffset: 10,
+            showBox: true,
+            boxPadding: 3,
+            boxColor: '#FF4444',
+            boxBorder: false,
+          },
           point: {
             size: 4,
             activeSize: 6,
@@ -173,7 +285,7 @@ const BPAnalysis: React.FC = () => {
             format: (val) => val,
             padding: 4,
             offset: 5,
-          },
+          }
         },
         enableScroll: false,
         dataPointShape: true,
@@ -236,6 +348,17 @@ const BPAnalysis: React.FC = () => {
           }}
         />
       </View>
+      
+      {abnormalValues.length > 0 && (
+        <View className="abnormal-values-container">
+          <Text className="abnormal-title">异常值提醒</Text>
+          <View className="abnormal-list">
+            {abnormalValues.map((message, index) => (
+              <Text key={index} className="abnormal-item">{message}</Text>
+            ))}
+          </View>
+        </View>
+      )}
     </View>
   )
 }
