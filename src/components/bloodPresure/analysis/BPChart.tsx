@@ -78,41 +78,43 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
 
   const initDailyChart = (canvas: any, ctx: any, width: number, height: number) => {
     try {
-      if (!dailyBpData || dailyBpData.length === 0) {
-        console.log("没有日视图数据可显示");
-        return;
-      }
-      
-      const categories = dailyBpData.map(item => 
-        format(new Date(item.measurementTime), 'HH:mm')
-      );
+      // 即使没有数据也创建图表，显示坐标轴
+      const categories = dailyBpData && dailyBpData.length > 0 
+        ? dailyBpData.map(item => format(new Date(item.measurementTime), 'HH:mm'))
+        : generateEmptyTimeCategories();
       
       const series = [
         {
           name: "收缩压",
-          data: dailyBpData.map(item => item.systolic),
+          data: dailyBpData && dailyBpData.length > 0 
+            ? dailyBpData.map(item => item.systolic)
+            : [],
           color: "#FF8A8A",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
         {
           name: "舒张压",
-          data: dailyBpData.map(item => item.diastolic),
+          data: dailyBpData && dailyBpData.length > 0 
+            ? dailyBpData.map(item => item.diastolic)
+            : [],
           color: "#92A3FD",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
         {
           name: "心率",
-          data: dailyBpData.map(item => item.heartRate),
+          data: dailyBpData && dailyBpData.length > 0 
+            ? dailyBpData.map(item => item.heartRate)
+            : [],
           color: "#4CAF50",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
       ];
@@ -128,7 +130,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         series,
         animation: true,
         background: "#FFFFFF",
-        padding: [15, 15, 30, 15], // 增加底部内边距
+        padding: [15, 15, 30, 15],
         enableScroll: true,
         legend: {
           show: false
@@ -137,8 +139,8 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
           disableGrid: true,
           scrollShow: true,
           itemCount: 5,
-          fontSize: 12, // 增加字体大小
-          fontColor: "#333333", // 加深字体颜色
+          fontSize: 12,
+          fontColor: "#333333",
         },
         yAxis: {
           gridType: "dash",
@@ -147,18 +149,18 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
             {
               min: 0,
               max: 200,
-              fontSize: 12, // 增加字体大小
-              fontColor: "#333333", // 加深字体颜色
+              fontSize: 12,
+              fontColor: "#333333",
             },
           ],
         },
         extra: {
           line: {
             type: "straight",
-            width: 3, // 增加线宽
+            width: 3,
             activeType: "hollow",
-            linearType: "custom", // 使用自定义线性渐变
-            activeOpacity: 0.8, // 活动状态的透明度
+            linearType: "custom",
+            activeOpacity: 0.8,
           },
           tooltip: {
             showBox: true,
@@ -171,54 +173,64 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
             bgOpacity: 0.9,
             fontColor: "#333333",
             fontSize: 12,
+          },
+          empty: {
+            content: "暂无数据",
+            fontSize: 14,
+            fontColor: "#999999",
           }
         },
       };
       
       chartRef.current = new UCharts(config);
+      
+      // 如果没有数据，在图表中心显示"暂无数据"
+      if (!dailyBpData || dailyBpData.length === 0) {
+        drawNoDataText(ctx, width, height);
+      }
     } catch (error) {
       console.error("初始化日视图图表失败:", error);
+      // 出错时也显示空图表
+      drawEmptyChart(ctx, width, height);
     }
   };
 
   const initTrendChart = (canvas: any, ctx: any, width: number, height: number) => {
     try {
-      if (!bpData || bpData.length === 0) {
-        console.log("没有趋势数据可显示");
-        return;
-      }
-      
-      const categories = bpData.map(item => {
-        const date = new Date(item.timestamp);
-        return format(date, 'MM/dd');
-      });
+      // 即使没有数据也创建图表，显示坐标轴
+      const categories = bpData && bpData.length > 0 
+        ? bpData.map(item => {
+            const date = new Date(item.timestamp);
+            return format(date, 'MM/dd');
+          })
+        : generateEmptyDateCategories(viewMode);
       
       const series = [
         {
           name: "收缩压",
-          data: bpData.map(item => item.systolic),
+          data: bpData && bpData.length > 0 ? bpData.map(item => item.systolic) : [],
           color: "#FF8A8A",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
         {
           name: "舒张压",
-          data: bpData.map(item => item.diastolic),
+          data: bpData && bpData.length > 0 ? bpData.map(item => item.diastolic) : [],
           color: "#92A3FD",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
         {
           name: "心率",
-          data: bpData.map(item => item.heartRate),
+          data: bpData && bpData.length > 0 ? bpData.map(item => item.heartRate) : [],
           color: "#4CAF50",
-          lineWidth: 3, // 增加线宽
+          lineWidth: 3,
           pointStyle: {
-            size: 5, // 增加点的大小
+            size: 5,
           }
         },
       ];
@@ -234,7 +246,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         series,
         animation: true,
         background: "#FFFFFF",
-        padding: [15, 15, 30, 15], // 增加底部内边距
+        padding: [15, 15, 30, 15],
         enableScroll: true,
         legend: {
           show: false
@@ -243,8 +255,8 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
           disableGrid: true,
           scrollShow: true,
           itemCount: 5,
-          fontSize: 12, // 增加字体大小
-          fontColor: "#333333", // 加深字体颜色
+          fontSize: 12,
+          fontColor: "#333333",
         },
         yAxis: {
           gridType: "dash",
@@ -253,18 +265,18 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
             {
               min: 0,
               max: 200,
-              fontSize: 12, // 增加字体大小
-              fontColor: "#333333", // 加深字体颜色
+              fontSize: 12,
+              fontColor: "#333333",
             },
           ],
         },
         extra: {
           line: {
             type: "straight",
-            width: 3, // 增加线宽
+            width: 3,
             activeType: "hollow",
-            linearType: "custom", // 使用自定义线性渐变
-            activeOpacity: 0.8, // 活动状态的透明度
+            linearType: "custom",
+            activeOpacity: 0.8,
           },
           tooltip: {
             showBox: true,
@@ -277,14 +289,92 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
             bgOpacity: 0.9,
             fontColor: "#333333",
             fontSize: 12,
+          },
+          empty: {
+            content: "暂无数据",
+            fontSize: 14,
+            fontColor: "#999999",
           }
         },
       };
       
       chartRef.current = new UCharts(config);
+      
+      // 如果没有数据，在图表中心显示"暂无数据"
+      if (!bpData || bpData.length === 0) {
+        drawNoDataText(ctx, width, height);
+      }
     } catch (error) {
       console.error("初始化趋势图表失败:", error);
+      // 出错时也显示空图表
+      drawEmptyChart(ctx, width, height);
     }
+  };
+
+  // 生成空的时间类别（用于日视图）
+  const generateEmptyTimeCategories = () => {
+    const hours = [];
+    for (let i = 0; i < 24; i += 4) {
+      hours.push(`${i.toString().padStart(2, '0')}:00`);
+    }
+    return hours;
+  };
+
+  // 生成空的日期类别（用于周视图和月视图）
+  const generateEmptyDateCategories = (mode: "day" | "week" | "month") => {
+    const today = new Date();
+    const dates = [];
+    
+    if (mode === "week") {
+      // 生成最近7天的日期
+      for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(format(date, 'MM/dd'));
+      }
+    } else if (mode === "month") {
+      // 生成当月的几个日期点
+      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      for (let i = 1; i <= daysInMonth; i += 5) {
+        dates.push(`${(today.getMonth() + 1).toString().padStart(2, '0')}/${i.toString().padStart(2, '0')}`);
+      }
+    }
+    
+    return dates;
+  };
+
+  // 在图表中心绘制"暂无数据"文本
+  const drawNoDataText = (ctx: any, width: number, height: number) => {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = '14px sans-serif';
+    ctx.fillStyle = '#999999';
+    ctx.fillText('暂无数据', width / 2, height / 2);
+    ctx.restore();
+  };
+
+  // 绘制空图表（出错时使用）
+  const drawEmptyChart = (ctx: any, width: number, height: number) => {
+    ctx.save();
+    
+    // 绘制X轴
+    ctx.beginPath();
+    ctx.moveTo(30, height - 30);
+    ctx.lineTo(width - 15, height - 30);
+    ctx.strokeStyle = '#CCCCCC';
+    ctx.stroke();
+    
+    // 绘制Y轴
+    ctx.beginPath();
+    ctx.moveTo(30, 15);
+    ctx.lineTo(30, height - 30);
+    ctx.stroke();
+    
+    // 绘制"暂无数据"文本
+    drawNoDataText(ctx, width, height);
+    
+    ctx.restore();
   };
 
   return (

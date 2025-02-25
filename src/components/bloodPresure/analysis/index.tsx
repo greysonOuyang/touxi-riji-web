@@ -36,10 +36,13 @@ const BPAnalysis: React.FC = () => {
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week")
   const [hasDailyData, setHasDailyData] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [showNoDataTip, setShowNoDataTip] = useState(false)
+  const [noDataMessage, setNoDataMessage] = useState("")
 
   // 获取日视图数据
   const fetchDailyBpData = useCallback(async (date: Date) => {
     setIsLoading(true)
+    setShowNoDataTip(false)
     try {
       const params = {
         userId: Taro.getStorageSync("userId") || 1,
@@ -61,27 +64,33 @@ const BPAnalysis: React.FC = () => {
       } else {
         setDailyBpData([])
         setHasDailyData(false)
-        // 如果日视图没有数据，自动切换到周视图
-        if (viewMode === "day") {
-          setViewMode("week")
-          fetchWeeklyBpData(date)
-        } else {
-          setIsLoading(false)
-        }
+        setShowNoDataTip(true)
+        setNoDataMessage(`${format(date, 'MM月dd日')}暂无数据记录`)
+        
+        // 当没有日视图数据时，同时加载周视图数据作为备用
+        fetchWeeklyBpData(date, false)
+        
+        setIsLoading(false)
         return false
       }
     } catch (error) {
       console.error("获取当日血压数据失败:", error)
       setDailyBpData([])
       setHasDailyData(false)
+      setShowNoDataTip(true)
+      setNoDataMessage("数据加载失败，请稍后再试")
       setIsLoading(false)
       return false
     }
-  }, [viewMode])
+  }, [])
 
   // 获取周视图数据
-  const fetchWeeklyBpData = useCallback(async (endDate: Date) => {
-    setIsLoading(true)
+  const fetchWeeklyBpData = useCallback(async (endDate: Date, showLoading = true) => {
+    if (showLoading) {
+      setIsLoading(true)
+      setShowNoDataTip(false)
+    }
+    
     try {
       const startDate = new Date(endDate)
       startDate.setDate(endDate.getDate() - 6)
@@ -104,22 +113,27 @@ const BPAnalysis: React.FC = () => {
 
         const sortedData = newData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
         setBpData(sortedData)
-        setIsLoading(false)
+        if (showLoading) {
+          setIsLoading(false)
+        }
         return true
       } else {
         setBpData([])
-        setIsLoading(false)
+        if (showLoading) {
+          setIsLoading(false)
+          setShowNoDataTip(true)
+          setNoDataMessage(`${format(startDate, 'MM/dd')}-${format(endDate, 'MM/dd')}暂无数据记录`)
+        }
         return false
       }
     } catch (error) {
       console.error("获取血压周趋势数据失败:", error)
-      Taro.showToast({
-        title: "获取数据失败",
-        icon: "error",
-        duration: 2000
-      })
+      if (showLoading) {
+        setIsLoading(false)
+        setShowNoDataTip(true)
+        setNoDataMessage("数据加载失败，请稍后再试")
+      }
       setBpData([])
-      setIsLoading(false)
       return false
     }
   }, [])
@@ -127,6 +141,7 @@ const BPAnalysis: React.FC = () => {
   // 获取月视图数据
   const fetchMonthlyBpData = useCallback(async (date: Date) => {
     setIsLoading(true)
+    setShowNoDataTip(false)
     try {
       const yearMonth = format(date, 'yyyy-MM')
       
@@ -151,6 +166,8 @@ const BPAnalysis: React.FC = () => {
       } else {
         setBpData([])
         setIsLoading(false)
+        setShowNoDataTip(true)
+        setNoDataMessage(`${format(date, 'yyyy年MM月')}暂无数据记录`)
         return false
       }
     } catch (error) {
@@ -162,109 +179,88 @@ const BPAnalysis: React.FC = () => {
       })
       setBpData([])
       setIsLoading(false)
+      setShowNoDataTip(true)
+      setNoDataMessage("数据加载失败，请稍后再试")
       return false
     }
   }, [])
 
   // 初始化数据
   useEffect(() => {
-    const loadData = async () => {
-      const today = new Date()
-      setCurrentEndDate(today)
-      
-      // 先尝试获取日视图数据
-      const hasDailyData = await fetchDailyBpData(today)
-      
-      // 如果没有日视图数据，则获取周视图数据
-      if (!hasDailyData) {
-        await fetchWeeklyBpData(today)
-      }
+    fetchWeeklyBpData(new Date())
+  }, [fetchWeeklyBpData])
+
+  // 当日期或视图模式变化时，重新获取数据
+  useEffect(() => {
+    if (viewMode === "day") {
+      fetchDailyBpData(currentEndDate)
+    } else if (viewMode === "week") {
+      fetchWeeklyBpData(currentEndDate)
+    } else if (viewMode === "month") {
+      fetchMonthlyBpData(currentEndDate)
     }
-    
-    loadData()
-  }, [fetchDailyBpData, fetchWeeklyBpData])
+  }, [viewMode, currentEndDate, fetchDailyBpData, fetchWeeklyBpData, fetchMonthlyBpData])
 
   // 切换视图模式
-  const toggleViewMode = useCallback(async (mode: "day" | "week" | "month") => {
-    setViewMode(mode)
+  const toggleViewMode = useCallback((mode: "day" | "week" | "month") => {
+    if (mode === viewMode) return
     
-    if (mode === "day") {
-      await fetchDailyBpData(currentEndDate)
-      if (!hasDailyData) {
-        await fetchWeeklyBpData(currentEndDate)
-      }
-    } else if (mode === "week") {
-      await fetchWeeklyBpData(currentEndDate)
-    } else if (mode === "month") {
-      await fetchMonthlyBpData(currentEndDate)
-    }
-  }, [currentEndDate, fetchDailyBpData, fetchWeeklyBpData, fetchMonthlyBpData, hasDailyData])
+    setViewMode(mode)
+    // 重置为当前日期
+    setCurrentEndDate(new Date())
+  }, [viewMode])
 
   // 处理日期变更
-  const handleDateChange = useCallback(async (direction: 'prev' | 'next') => {
+  const handleDateChange = useCallback((direction: 'prev' | 'next') => {
     let newDate = new Date(currentEndDate)
     
     if (viewMode === "day") {
-      newDate = direction === 'prev' 
-        ? subDays(currentEndDate, 1) 
-        : addDays(currentEndDate, 1)
-        
-      // 不允许选择未来日期
-      if (direction === 'next' && isToday(currentEndDate)) {
-        return
+      newDate = direction === 'prev' ? subDays(newDate, 1) : addDays(newDate, 1)
+      
+      // 限制不能超过今天
+      if (newDate > new Date()) {
+        newDate = new Date()
       }
     } else if (viewMode === "week") {
-      newDate = direction === 'prev' 
-        ? subDays(currentEndDate, 7) 
-        : addDays(currentEndDate, 7)
-        
-      // 不允许选择未来周
-      if (direction === 'next' && new Date() < addDays(currentEndDate, 1)) {
-        return
+      newDate = direction === 'prev' ? subDays(newDate, 7) : addDays(newDate, 7)
+      
+      // 限制不能超过今天
+      if (newDate > new Date()) {
+        newDate = new Date()
       }
     } else if (viewMode === "month") {
-      newDate = direction === 'prev' 
-        ? subMonths(currentEndDate, 1) 
-        : addMonths(currentEndDate, 1)
-        
-      // 不允许选择未来月
-      if (direction === 'next' && new Date() < addDays(endOfMonth(currentEndDate), 1)) {
-        return
+      newDate = direction === 'prev' ? subMonths(newDate, 1) : addMonths(newDate, 1)
+      
+      // 限制不能超过当前月
+      const today = new Date()
+      if (newDate.getFullYear() > today.getFullYear() || 
+          (newDate.getFullYear() === today.getFullYear() && newDate.getMonth() > today.getMonth())) {
+        newDate = new Date(today.getFullYear(), today.getMonth(), 1)
       }
     }
     
     setCurrentEndDate(newDate)
-    
-    if (viewMode === "day") {
-      await fetchDailyBpData(newDate)
-      if (!hasDailyData) {
-        await fetchWeeklyBpData(newDate)
-      }
-    } else if (viewMode === "week") {
-      await fetchWeeklyBpData(newDate)
-    } else if (viewMode === "month") {
-      await fetchMonthlyBpData(newDate)
-    }
-  }, [currentEndDate, viewMode, fetchDailyBpData, fetchWeeklyBpData, fetchMonthlyBpData, hasDailyData])
+  }, [currentEndDate, viewMode])
 
-  // 处理触摸滑动
+  // 处理触摸开始
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX)
   }
 
+  // 处理触摸结束
   const handleTouchEnd = (e) => {
     if (touchStartX === null) return
     
     const touchEndX = e.changedTouches[0].clientX
     const diff = touchEndX - touchStartX
     
-    // 滑动距离超过50像素才触发
+    // 如果滑动距离超过50px，则切换日期
     if (Math.abs(diff) > 50) {
       if (diff > 0) {
-        // 右滑，显示前一天/周/月
+        // 向右滑动，显示前一天/周/月
         handleDateChange('prev')
       } else {
-        // 左滑，显示后一天/周/月
+        // 向左滑动，显示后一天/周/月
         handleDateChange('next')
       }
     }
@@ -272,7 +268,7 @@ const BPAnalysis: React.FC = () => {
     setTouchStartX(null)
   }
 
-  // 格式化日期范围显示
+  // 格式化日期范围
   const formatDateRange = () => {
     if (viewMode === "day") {
       return format(currentEndDate, 'yyyy年MM月dd日')
@@ -348,6 +344,12 @@ const BPAnalysis: React.FC = () => {
         {isLoading && (
           <View className="loading-overlay">
             <Text className="loading-text">加载中...</Text>
+          </View>
+        )}
+        
+        {showNoDataTip && !isLoading && (
+          <View className="no-data-overlay">
+            <Text className="no-data-text">{noDataMessage}</Text>
           </View>
         )}
         
