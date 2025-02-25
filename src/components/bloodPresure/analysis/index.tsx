@@ -36,13 +36,22 @@ const BPAnalysis: React.FC = () => {
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week")
   const [hasDailyData, setHasDailyData] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [showNoDataTip, setShowNoDataTip] = useState(false)
-  const [noDataMessage, setNoDataMessage] = useState("")
+
+  // 显示自动消失的提示
+  const showToast = (message: string) => {
+    Taro.showToast({
+      title: message,
+      icon: 'none',
+      duration: 2000
+    })
+  }
 
   // 获取日视图数据
   const fetchDailyBpData = useCallback(async (date: Date) => {
     setIsLoading(true)
-    setShowNoDataTip(false)
+    // 清空周/月视图数据，确保日视图下不会显示周视图数据
+    setBpData([])
+    
     try {
       const params = {
         userId: Taro.getStorageSync("userId") || 1,
@@ -64,22 +73,17 @@ const BPAnalysis: React.FC = () => {
       } else {
         setDailyBpData([])
         setHasDailyData(false)
-        setShowNoDataTip(true)
-        setNoDataMessage(`${format(date, 'MM月dd日')}暂无数据记录`)
-        
-        // 当没有日视图数据时，同时加载周视图数据作为备用
-        fetchWeeklyBpData(date, false)
-        
         setIsLoading(false)
+        // 使用自动消失的提示
+        showToast(`${format(date, 'MM月dd日')}暂无数据记录`)
         return false
       }
     } catch (error) {
       console.error("获取当日血压数据失败:", error)
       setDailyBpData([])
       setHasDailyData(false)
-      setShowNoDataTip(true)
-      setNoDataMessage("数据加载失败，请稍后再试")
       setIsLoading(false)
+      showToast("数据加载失败，请稍后再试")
       return false
     }
   }, [])
@@ -88,8 +92,11 @@ const BPAnalysis: React.FC = () => {
   const fetchWeeklyBpData = useCallback(async (endDate: Date, showLoading = true) => {
     if (showLoading) {
       setIsLoading(true)
-      setShowNoDataTip(false)
     }
+    
+    // 清空日视图数据，确保周视图下不会显示日视图数据
+    setDailyBpData([])
+    setHasDailyData(false)
     
     try {
       const startDate = new Date(endDate)
@@ -121,8 +128,7 @@ const BPAnalysis: React.FC = () => {
         setBpData([])
         if (showLoading) {
           setIsLoading(false)
-          setShowNoDataTip(true)
-          setNoDataMessage(`${format(startDate, 'MM/dd')}-${format(endDate, 'MM/dd')}暂无数据记录`)
+          showToast(`${format(startDate, 'MM/dd')}-${format(endDate, 'MM/dd')}暂无数据记录`)
         }
         return false
       }
@@ -130,8 +136,7 @@ const BPAnalysis: React.FC = () => {
       console.error("获取血压周趋势数据失败:", error)
       if (showLoading) {
         setIsLoading(false)
-        setShowNoDataTip(true)
-        setNoDataMessage("数据加载失败，请稍后再试")
+        showToast("数据加载失败，请稍后再试")
       }
       setBpData([])
       return false
@@ -141,13 +146,20 @@ const BPAnalysis: React.FC = () => {
   // 获取月视图数据
   const fetchMonthlyBpData = useCallback(async (date: Date) => {
     setIsLoading(true)
-    setShowNoDataTip(false)
+    
+    // 清空日视图数据，确保月视图下不会显示日视图数据
+    setDailyBpData([])
+    setHasDailyData(false)
+    
     try {
-      const yearMonth = format(date, 'yyyy-MM')
+      const firstDay = startOfMonth(date)
+      const lastDay = endOfMonth(date)
       
       const params = {
         userId: Taro.getStorageSync("userId") || 1,
-        yearMonth: yearMonth
+        timeSpan: "month",
+        startDate: format(firstDay, 'yyyy-MM-dd'),
+        endDate: format(lastDay, 'yyyy-MM-dd'),
       }
 
       const response = await fetchBpTrendMonthly(params)
@@ -166,87 +178,67 @@ const BPAnalysis: React.FC = () => {
       } else {
         setBpData([])
         setIsLoading(false)
-        setShowNoDataTip(true)
-        setNoDataMessage(`${format(date, 'yyyy年MM月')}暂无数据记录`)
+        showToast(`${format(date, 'yyyy年MM月')}暂无数据记录`)
         return false
       }
     } catch (error) {
       console.error("获取血压月趋势数据失败:", error)
-      Taro.showToast({
-        title: "获取数据失败",
-        icon: "error",
-        duration: 2000
-      })
-      setBpData([])
       setIsLoading(false)
-      setShowNoDataTip(true)
-      setNoDataMessage("数据加载失败，请稍后再试")
+      showToast("数据加载失败，请稍后再试")
+      setBpData([])
       return false
     }
   }, [])
 
-  // 初始化数据
-  useEffect(() => {
-    fetchWeeklyBpData(new Date())
-  }, [fetchWeeklyBpData])
-
-  // 当日期或视图模式变化时，重新获取数据
-  useEffect(() => {
-    if (viewMode === "day") {
-      fetchDailyBpData(currentEndDate)
-    } else if (viewMode === "week") {
-      fetchWeeklyBpData(currentEndDate)
-    } else if (viewMode === "month") {
-      fetchMonthlyBpData(currentEndDate)
-    }
-  }, [viewMode, currentEndDate, fetchDailyBpData, fetchWeeklyBpData, fetchMonthlyBpData])
-
   // 切换视图模式
-  const toggleViewMode = useCallback((mode: "day" | "week" | "month") => {
+  const toggleViewMode = (mode: "day" | "week" | "month") => {
     if (mode === viewMode) return
     
     setViewMode(mode)
-    // 重置为当前日期
+    // 视图模式变更时，重置日期为当前日期
     setCurrentEndDate(new Date())
-  }, [viewMode])
+  }
 
   // 处理日期变更
-  const handleDateChange = useCallback((direction: 'prev' | 'next') => {
+  const handleDateChange = (direction: 'prev' | 'next') => {
     let newDate = new Date(currentEndDate)
     
     if (viewMode === "day") {
+      // 日视图，前后移动一天
       newDate = direction === 'prev' ? subDays(newDate, 1) : addDays(newDate, 1)
       
       // 限制不能超过今天
-      if (newDate > new Date()) {
-        newDate = new Date()
+      if (direction === 'next' && isToday(newDate)) {
+        return
       }
     } else if (viewMode === "week") {
+      // 周视图，前后移动一周
       newDate = direction === 'prev' ? subDays(newDate, 7) : addDays(newDate, 7)
       
       // 限制不能超过今天
-      if (newDate > new Date()) {
-        newDate = new Date()
+      if (direction === 'next' && newDate > new Date()) {
+        return
       }
-    } else if (viewMode === "month") {
+    } else {
+      // 月视图，前后移动一个月
       newDate = direction === 'prev' ? subMonths(newDate, 1) : addMonths(newDate, 1)
       
       // 限制不能超过当前月
-      const today = new Date()
-      if (newDate.getFullYear() > today.getFullYear() || 
-          (newDate.getFullYear() === today.getFullYear() && newDate.getMonth() > today.getMonth())) {
-        newDate = new Date(today.getFullYear(), today.getMonth(), 1)
+      if (direction === 'next' && 
+          newDate.getMonth() === new Date().getMonth() && 
+          newDate.getFullYear() === new Date().getFullYear()) {
+        return
       }
     }
     
     setCurrentEndDate(newDate)
-  }, [currentEndDate, viewMode])
+  }
 
   // 处理触摸开始
   const handleTouchStart = (e) => {
     setTouchStartX(e.touches[0].clientX)
   }
-
+  
   // 处理触摸结束
   const handleTouchEnd = (e) => {
     if (touchStartX === null) return
@@ -281,6 +273,23 @@ const BPAnalysis: React.FC = () => {
       return format(currentEndDate, 'yyyy年MM月')
     }
   }
+
+  // 初始加载
+  useEffect(() => {
+    // 默认加载周视图数据
+    fetchWeeklyBpData(new Date())
+  }, [fetchWeeklyBpData])
+
+  // 日期变更时重新加载数据
+  useEffect(() => {
+    if (viewMode === "day") {
+      fetchDailyBpData(currentEndDate)
+    } else if (viewMode === "week") {
+      fetchWeeklyBpData(currentEndDate)
+    } else {
+      fetchMonthlyBpData(currentEndDate)
+    }
+  }, [currentEndDate, viewMode, fetchDailyBpData, fetchWeeklyBpData, fetchMonthlyBpData])
 
   return (
     <View className="bp-analysis">
@@ -344,12 +353,6 @@ const BPAnalysis: React.FC = () => {
         {isLoading && (
           <View className="loading-overlay">
             <Text className="loading-text">加载中...</Text>
-          </View>
-        )}
-        
-        {showNoDataTip && !isLoading && (
-          <View className="no-data-overlay">
-            <Text className="no-data-text">{noDataMessage}</Text>
           </View>
         )}
         

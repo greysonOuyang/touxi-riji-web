@@ -67,9 +67,11 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
           ctx.scale(pixelRatio, pixelRatio);
           
           // 根据视图模式选择数据
-          if (viewMode === "day" && hasDailyData) {
+          if (viewMode === "day") {
+            // 日视图下，无论是否有数据，都使用日视图的初始化方法
             initDailyChart(canvas, ctx, res[0].width, res[0].height);
           } else {
+            // 周视图或月视图
             initTrendChart(canvas, ctx, res[0].width, res[0].height);
           }
         }
@@ -201,14 +203,18 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
       const categories = bpData && bpData.length > 0 
         ? bpData.map(item => {
             const date = new Date(item.timestamp);
-            return format(date, 'MM/dd');
+            return viewMode === "week" 
+              ? format(date, 'MM/dd')
+              : format(date, 'MM/dd');
           })
         : generateEmptyDateCategories(viewMode);
       
       const series = [
         {
           name: "收缩压",
-          data: bpData && bpData.length > 0 ? bpData.map(item => item.systolic) : [],
+          data: bpData && bpData.length > 0 
+            ? bpData.map(item => item.systolic)
+            : [],
           color: "#FF8A8A",
           lineWidth: 3,
           pointStyle: {
@@ -217,7 +223,9 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         },
         {
           name: "舒张压",
-          data: bpData && bpData.length > 0 ? bpData.map(item => item.diastolic) : [],
+          data: bpData && bpData.length > 0 
+            ? bpData.map(item => item.diastolic)
+            : [],
           color: "#92A3FD",
           lineWidth: 3,
           pointStyle: {
@@ -226,7 +234,9 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         },
         {
           name: "心率",
-          data: bpData && bpData.length > 0 ? bpData.map(item => item.heartRate) : [],
+          data: bpData && bpData.length > 0 
+            ? bpData.map(item => item.heartRate)
+            : [],
           color: "#4CAF50",
           lineWidth: 3,
           pointStyle: {
