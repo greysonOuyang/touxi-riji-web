@@ -264,7 +264,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         xAxis: {
           disableGrid: true,
           scrollShow: true,
-          itemCount: 5,
+          itemCount: viewMode === "week" ? 7 : 5,
           fontSize: 12,
           fontColor: "#333333",
         },
@@ -336,7 +336,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
     const dates = [];
     
     if (mode === "week") {
-      // 生成最近7天的日期
+      // 生成最近7天的日期，确保正好显示7天
       for (let i = 6; i >= 0; i--) {
         const date = new Date(today);
         date.setDate(today.getDate() - i);

@@ -29,7 +29,9 @@ export function useDateNavigation(
       newDate = direction === 'prev' ? subDays(newDate, 1) : addDays(newDate, 1)
       
       // 限制不能超过今天
-      if (direction === 'next' && isToday(newDate)) {
+      const today = new Date()
+      today.setHours(0, 0, 0, 0);
+      if (direction === 'next' && newDate > today) {
         return
       }
     } else if (viewMode === "week") {
@@ -37,18 +39,24 @@ export function useDateNavigation(
       newDate = direction === 'prev' ? subDays(newDate, 7) : addDays(newDate, 7)
       
       // 限制不能超过今天
-      if (direction === 'next' && newDate > new Date()) {
-        return
+      const today = new Date()
+      if (direction === 'next' && newDate > today) {
+        newDate = new Date(); // 设置为今天
       }
     } else {
       // 月视图，前后移动一个月
       newDate = direction === 'prev' ? subMonths(newDate, 1) : addMonths(newDate, 1)
       
       // 限制不能超过当前月
+      const today = new Date()
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      
       if (direction === 'next' && 
-          newDate.getMonth() === new Date().getMonth() && 
-          newDate.getFullYear() === new Date().getFullYear()) {
-        return
+          (newDate.getFullYear() > currentYear || 
+          (newDate.getFullYear() === currentYear && newDate.getMonth() > currentMonth))) {
+        newDate = new Date();
+        newDate.setDate(1); // 设置为当月第一天
       }
     }
     
