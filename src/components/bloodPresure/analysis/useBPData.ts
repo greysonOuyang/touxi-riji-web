@@ -92,7 +92,6 @@ export const useBPData = () => {
       
       const params = {
         userId: Taro.getStorageSync("userId") || 1,
-        timeSpan: "week",
         startDate: format(startDate, 'yyyy-MM-dd'),
         endDate: format(endDate, 'yyyy-MM-dd'),
       }
@@ -140,14 +139,11 @@ export const useBPData = () => {
     setHasDailyData(false)
     
     try {
-      const firstDay = startOfMonth(date)
-      const lastDay = endOfMonth(date)
+
       
       const params = {
-        userId: Taro.getStorageSync("userId") || 1,
-        timeSpan: "month",
-        startDate: format(firstDay, 'yyyy-MM-dd'),
-        endDate: format(lastDay, 'yyyy-MM-dd'),
+        userId: Taro.getStorageSync("userId"),
+        yearMonth: format(date, 'yyyy-MM')
       }
 
       const response = await fetchBpTrendMonthly(params)

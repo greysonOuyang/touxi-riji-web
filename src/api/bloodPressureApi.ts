@@ -34,16 +34,14 @@ interface BpTrendData {
 
 interface BpTrendParams {
   userId: number;
-  timeSpan: string;
   startDate: string;
   endDate: string;
 }
 
 export const fetchBpTrendWeekly = async (params: BpTrendParams): Promise<ApiResponse<BpTrendData[]> | null> => {
-  const { userId, timeSpan, startDate, endDate } = params;
+  const { userId, startDate, endDate } = params;
   return get<BpTrendData[]>(`/api/bp-trend/weekly`, {
     userId,
-    timeSpan,
     startDate,
     endDate
   });
