@@ -47,24 +47,16 @@ export const fetchBpTrendWeekly = async (params: BpTrendParams): Promise<ApiResp
   });
 };
 
-interface BpRecordDto {
-  id: number;
-  userId: number;
-  systolic: number;
-  diastolic: number;
-  heartRate?: number;
-  measurementTime: string;
-  notes?: string;
-}
+
 
 interface BpDailyParams {
   userId: number;
   date: string; // 格式: yyyy-MM-dd
 }
 
-export const fetchBpRecordDaily = async (params: BpDailyParams): Promise<ApiResponse<BpRecordDto[]> | null> => {
+export const fetchBpRecordDaily = async (params: BpDailyParams): Promise<ApiResponse<BpTrendData[]> | null> => {
   const { userId, date } = params;
-  return get<BpRecordDto[]>('/api/bp-trend/daily', {
+  return get<BpTrendData[]>('/api/bp-trend/daily', {
     userId,
     date
   });
