@@ -1,105 +1,146 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback, useRef } from "react"
 import { View, Text } from "@tarojs/components"
 import "./index.scss"
 import { useBPData } from "./useBPData"
-import { useDateNavigation } from "./useDateNavigation"
 import ViewModeSelector from "./ViewModeSelector"
 import DateNavigator from "./DateNavigator"
 import ChartIndicators from "./ChartIndicators"
 import AbnormalValues from "./AbnormalValues"
 import BPChart from './BPChart'
+import { format } from "date-fns"
+import Taro from "@tarojs/taro"
+
+// 视图模式类型
+type ViewMode = "day" | "week" | "month"
 
 const BPAnalysis: React.FC = () => {
-  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week")
-  const [abnormalValues, setAbnormalValues] = useState<string[]>([])
+  // === 状态管理 ===
+  const [viewMode, setViewMode] = useState<ViewMode>("week")
+  const [currentDate, setCurrentDate] = useState<Date>(new Date())
+  const requestIdRef = useRef<number>(0) // 请求ID用于防止竞态条件
   
+  // === useBPData 钩子 ===
   const {
     bpData,
-    dailyBpData,
     hasDailyData,
     isLoading,
-    fetchDailyBpData,
-    fetchWeeklyBpData,
-    fetchMonthlyBpData
+    fetchData,
+    clearData
   } = useBPData()
   
-  const handleDateChanged = (date: Date) => {
-    if (viewMode === "day") {
-      fetchDailyBpData(date)
-    } else if (viewMode === "week") {
-      fetchWeeklyBpData(date)
-    } else {
-      fetchMonthlyBpData(date)
-    }
-  }
+  // === 日期操作函数 ===
   
-  const {
-    currentEndDate,
-    handleDateChange,
-    handleTouchStart,
-    handleTouchEnd,
-    formatDateRange,
-    resetToCurrentDate
-  } = useDateNavigation(viewMode, handleDateChanged)
-
-  // 切换视图模式
-  const toggleViewMode = (mode: "day" | "week" | "month") => {
-    if (mode === viewMode) return
+  // 日期导航 - 前后切换
+  const navigateDate = useCallback((direction: 'prev' | 'next') => {
+    const newDate = calculateNewDate(currentDate, viewMode, direction)
+    setCurrentDate(newDate)
+  }, [currentDate, viewMode])
+  
+  // 重置到今天
+  const resetToToday = useCallback(() => {
+    setCurrentDate(new Date())
+  }, [])
+  
+  // === 视图切换函数 ===
+  const handleViewModeChange = useCallback((newMode: ViewMode) => {
+    if (newMode === viewMode) return
     
-    setViewMode(mode)
-    // 视图模式变更时，重置日期为当前日期
-    resetToCurrentDate()
-  }
-
-  // 初始加载
+    setViewMode(newMode)
+    setCurrentDate(getInitialDateForMode(newMode))
+    clearData(newMode)
+  }, [viewMode, clearData])
+  
+  // === 数据加载副作用 ===
   useEffect(() => {
-    // 默认加载周视图数据
-    fetchWeeklyBpData(new Date())
-  }, [fetchWeeklyBpData])
+    const currentRequestId = ++requestIdRef.current
+    
+    const loadData = async () => {
+      try {
+        const success = await fetchData(viewMode, currentDate)
+        if (!success && currentRequestId === requestIdRef.current) {
+          clearData(viewMode)
+        }
+      } catch (error) {
+        console.error("数据加载失败:", error)
+        if (currentRequestId === requestIdRef.current) {
+          clearData(viewMode)
+        }
+      }
+    }
 
+    loadData()
+
+    return () => {
+      // 取消未完成的请求
+      if (currentRequestId === requestIdRef.current) {
+        clearData('soft') // 软清除保留loading状态
+      }
+    }
+  }, [viewMode, currentDate, fetchData, clearData])
+  
+  // === 渲染 ===
   return (
     <View className="bp-analysis">
       <View className="header-container">
         <Text className="chart-title">血压趋势</Text>
-        
-        <ViewModeSelector 
-          viewMode={viewMode} 
-          onViewModeChange={toggleViewMode} 
+        <ViewModeSelector
+          viewMode={viewMode}
+          onViewModeChange={handleViewModeChange}
         />
       </View>
       
-      <DateNavigator 
-        dateRange={formatDateRange()} 
-        onPrev={() => handleDateChange('prev')} 
-        onNext={() => handleDateChange('next')} 
+      <DateNavigator
+        mode={viewMode}
+        currentDate={currentDate}
+        onNavigate={navigateDate}
+        onReset={resetToToday}
       />
       
       <ChartIndicators />
       
-      <View 
-        className="chart-container"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      >
+      <View className="chart-container">
         {isLoading && (
           <View className="loading-overlay">
             <Text className="loading-text">加载中...</Text>
           </View>
         )}
         
-        <BPChart 
+        <BPChart
           viewMode={viewMode}
           bpData={bpData}
-          dailyBpData={dailyBpData}
-          hasDailyData={hasDailyData}
         />
       </View>
       
-      <AbnormalValues abnormalValues={abnormalValues} />
+      <AbnormalValues data={bpData} />
     </View>
   )
+}
+
+// 辅助函数
+const calculateNewDate = (date: Date, mode: ViewMode, direction: 'prev' | 'next'): Date => {
+  const newDate = new Date(date)
+  const today = new Date()
+
+  switch (mode) {
+    case 'day':
+      newDate.setDate(date.getDate() + (direction === 'prev' ? -1 : 1))
+      return newDate > today ? today : newDate
+    case 'week':
+      newDate.setDate(date.getDate() + (direction === 'prev' ? -7 : 7))
+      return newDate > today ? today : newDate
+    case 'month':
+      newDate.setMonth(date.getMonth() + (direction === 'prev' ? -1 : 1))
+      return newDate > today ? today : newDate
+    default:
+      return newDate
+  }
+}
+
+const getInitialDateForMode = (mode: ViewMode): Date => {
+  const today = new Date()
+  return mode === 'month' ? new Date(today.getFullYear(), today.getMonth(), 1) : today
 }
 
 export default BPAnalysis

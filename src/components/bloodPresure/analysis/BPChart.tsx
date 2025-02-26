@@ -7,28 +7,16 @@ import { format } from "date-fns";
 interface BPDataPoint {
   systolic: number;
   diastolic: number;
-  heartRate: number;
+  heartRate?: number;  // 心率是可选的
   timestamp: string;
-}
-
-interface DailyBPDataPoint {
-  id: number;
-  userId: number;
-  systolic: number;
-  diastolic: number;
-  heartRate: number;
-  measurementTime: string;
-  notes: string;
 }
 
 interface BPChartProps {
   viewMode: "day" | "week" | "month";
   bpData: BPDataPoint[];
-  dailyBpData: DailyBPDataPoint[];
-  hasDailyData: boolean;
 }
 
-const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDailyData }) => {
+const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
   const chartRef = useRef<any>(null);
 
   useEffect(() => {
@@ -37,7 +25,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [bpData, dailyBpData, viewMode, hasDailyData]);
+  }, [bpData, viewMode]);
 
   const renderChart = () => {
     const query = Taro.createSelectorQuery();
@@ -66,148 +54,28 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
           // 缩放上下文以匹配设备像素比
           ctx.scale(pixelRatio, pixelRatio);
           
-          // 根据视图模式选择数据
-          if (viewMode === "day") {
-            // 日视图下，无论是否有数据，都使用日视图的初始化方法
-            initDailyChart(canvas, ctx, res[0].width, res[0].height);
-          } else {
-            // 周视图或月视图
-            initTrendChart(canvas, ctx, res[0].width, res[0].height);
-          }
+          // 初始化图表（不再区分日视图和周/月视图）
+          initChart(canvas, ctx, res[0].width, res[0].height);
         }
       });
   };
 
-  const initDailyChart = (canvas: any, ctx: any, width: number, height: number) => {
-    try {
-      // 即使没有数据也创建图表，显示坐标轴
-      const categories = dailyBpData && dailyBpData.length > 0 
-        ? dailyBpData.map(item => format(new Date(item.measurementTime), 'HH:mm'))
-        : generateEmptyTimeCategories();
-      
-      const series = [
-        {
-          name: "收缩压",
-          data: dailyBpData && dailyBpData.length > 0 
-            ? dailyBpData.map(item => item.systolic)
-            : [],
-          color: "#FF8A8A",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-        {
-          name: "舒张压",
-          data: dailyBpData && dailyBpData.length > 0 
-            ? dailyBpData.map(item => item.diastolic)
-            : [],
-          color: "#92A3FD",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-        {
-          name: "心率",
-          data: dailyBpData && dailyBpData.length > 0 
-            ? dailyBpData.map(item => item.heartRate)
-            : [],
-          color: "#4CAF50",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-      ];
-      
-      const config = {
-        type: "line",
-        canvasId: 'bpChart',
-        canvas2d: true,
-        context: ctx,
-        width,
-        height,
-        categories,
-        series,
-        animation: true,
-        background: "#FFFFFF",
-        padding: [15, 15, 30, 15],
-        enableScroll: true,
-        legend: {
-          show: false
-        },
-        xAxis: {
-          disableGrid: true,
-          scrollShow: true,
-          itemCount: 5,
-          fontSize: 12,
-          fontColor: "#333333",
-        },
-        yAxis: {
-          gridType: "dash",
-          dashLength: 4,
-          data: [
-            {
-              min: 0,
-              max: 200,
-              fontSize: 12,
-              fontColor: "#333333",
-            },
-          ],
-        },
-        extra: {
-          line: {
-            type: "straight",
-            width: 3,
-            activeType: "hollow",
-            linearType: "custom",
-            activeOpacity: 0.8,
-          },
-          tooltip: {
-            showBox: true,
-            showArrow: true,
-            showCategory: true,
-            borderWidth: 1,
-            borderRadius: 4,
-            borderColor: "#92A3FD",
-            bgColor: "#FFFFFF",
-            bgOpacity: 0.9,
-            fontColor: "#333333",
-            fontSize: 12,
-          },
-          empty: {
-            content: "暂无数据",
-            fontSize: 14,
-            fontColor: "#999999",
-          }
-        },
-      };
-      
-      chartRef.current = new UCharts(config);
-      
-      // 如果没有数据，在图表中心显示"暂无数据"
-      if (!dailyBpData || dailyBpData.length === 0) {
-        drawNoDataText(ctx, width, height);
-      }
-    } catch (error) {
-      console.error("初始化日视图图表失败:", error);
-      // 出错时也显示空图表
-      drawEmptyChart(ctx, width, height);
-    }
-  };
-
-  const initTrendChart = (canvas: any, ctx: any, width: number, height: number) => {
+  // 统一的图表初始化方法
+  const initChart = (canvas: any, ctx: any, width: number, height: number) => {
     try {
       // 即使没有数据也创建图表，显示坐标轴
       const categories = bpData && bpData.length > 0 
         ? bpData.map(item => {
             const date = new Date(item.timestamp);
-            return viewMode === "week" 
-              ? format(date, 'MM/dd')
-              : format(date, 'MM/dd');
+            if (viewMode === "day") {
+              return format(date, 'HH:mm');
+            } else {
+              return format(date, 'MM/dd');
+            }
           })
-        : generateEmptyDateCategories(viewMode);
+        : viewMode === "day" 
+          ? generateEmptyTimeCategories() 
+          : generateEmptyDateCategories(viewMode);
       
       const series = [
         {
@@ -235,7 +103,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         {
           name: "心率",
           data: bpData && bpData.length > 0 
-            ? bpData.map(item => item.heartRate)
+            ? bpData.map(item => item.heartRate || 0)  // 使用 || 0 处理可能的 undefined
             : [],
           color: "#4CAF50",
           lineWidth: 3,
@@ -315,7 +183,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
         drawNoDataText(ctx, width, height);
       }
     } catch (error) {
-      console.error("初始化趋势图表失败:", error);
+      console.error("初始化图表失败:", error);
       // 出错时也显示空图表
       drawEmptyChart(ctx, width, height);
     }
@@ -323,7 +191,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
 
   // 生成空的时间类别（用于日视图）
   const generateEmptyTimeCategories = () => {
-    const hours = [];
+    const hours: string[] = [];
     for (let i = 0; i < 24; i += 4) {
       hours.push(`${i.toString().padStart(2, '0')}:00`);
     }
@@ -333,7 +201,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
   // 生成空的日期类别（用于周视图和月视图）
   const generateEmptyDateCategories = (mode: "day" | "week" | "month") => {
     const today = new Date();
-    const dates = [];
+    const dates: string[] = [];
     
     if (mode === "week") {
       // 生成最近7天的日期，确保正好显示7天
@@ -397,4 +265,4 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, dailyBpData, hasDai
   );
 };
 
-export default BPChart; 
+export default BPChart;
