@@ -2,7 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { Canvas } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import UCharts from "@qiun/ucharts";
-import { format } from "date-fns";
+import { format, isValid, parse } from "date-fns";
+import { zhCN } from 'date-fns/locale';
+
+// 直接在文件中定义类型
+type ViewMode = "day" | "week" | "month";
 
 interface BPDataPoint {
   systolic: number;
@@ -12,7 +16,7 @@ interface BPDataPoint {
 }
 
 interface BPChartProps {
-  viewMode: "day" | "week" | "month";
+  viewMode: ViewMode;
   bpData: BPDataPoint[];
 }
 
@@ -54,10 +58,41 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
           // 缩放上下文以匹配设备像素比
           ctx.scale(pixelRatio, pixelRatio);
           
-          // 初始化图表（不再区分日视图和周/月视图）
+          // 初始化图表
           initChart(canvas, ctx, res[0].width, res[0].height);
         }
       });
+  };
+
+  // 处理日期或时间字符串
+  const processTimestamp = (timestamp: string, viewMode: ViewMode): string => {
+    try {
+      // 检查是否是纯时间格式 (HH:mm:ss 或 HH:mm)
+      if (viewMode === "day" && /^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(timestamp)) {
+        // 直接提取小时和分钟
+        const timeParts = timestamp.split(':');
+        return `${timeParts[0]}:${timeParts[1]}`;
+      }
+      
+      // 尝试解析为日期对象
+      const date = new Date(timestamp);
+      
+      // 检查日期是否有效
+      if (isNaN(date.getTime())) {
+        console.warn(`无效的日期: ${timestamp}`);
+        return viewMode === "day" ? "00:00" : "00/00";
+      }
+      
+      // 根据视图模式格式化
+      if (viewMode === "day") {
+        return format(date, 'HH:mm');
+      } else {
+        return format(date, 'MM/dd');
+      }
+    } catch (error) {
+      console.error(`日期格式化错误: ${error}`, timestamp);
+      return viewMode === "day" ? "00:00" : "00/00";
+    }
   };
 
   // 统一的图表初始化方法
@@ -65,14 +100,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
     try {
       // 即使没有数据也创建图表，显示坐标轴
       const categories = bpData && bpData.length > 0 
-        ? bpData.map(item => {
-            const date = new Date(item.timestamp);
-            if (viewMode === "day") {
-              return format(date, 'HH:mm');
-            } else {
-              return format(date, 'MM/dd');
-            }
-          })
+        ? bpData.map(item => processTimestamp(item.timestamp, viewMode))
         : viewMode === "day" 
           ? generateEmptyTimeCategories() 
           : generateEmptyDateCategories(viewMode);
@@ -199,7 +227,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
   };
 
   // 生成空的日期类别（用于周视图和月视图）
-  const generateEmptyDateCategories = (mode: "day" | "week" | "month") => {
+  const generateEmptyDateCategories = (mode: ViewMode) => {
     const today = new Date();
     const dates: string[] = [];
     
