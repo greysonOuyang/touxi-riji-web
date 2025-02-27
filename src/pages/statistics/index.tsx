@@ -12,6 +12,12 @@ const StatisticsReportPage: React.FC = () => {
     Taro.setNavigationBarTitle({
       title: "统计报告",
     });
+    
+    // 设置导航栏背景色，确保与页面背景一致
+    Taro.setNavigationBarColor({
+      frontColor: '#000000',
+      backgroundColor: '#f5f7fa',
+    });
   });
 
   const tabList = [
@@ -26,47 +32,22 @@ const StatisticsReportPage: React.FC = () => {
     setCurrent(value);
   };
 
-  return (
-    <View className="statistics-report-page">
-      <ScrollView scrollY className="content-scroll">
-        <View className="scrollable-area">
-          <View className="content-wrapper">
-            <AtTabsPane current={current} index={0}>
-              <View className="tab-content">
-                {/* <TrendAnalysis /> */}
-              </View>
-            </AtTabsPane>
-
-            <AtTabsPane current={current} index={1}>
-              <View className="tab-content">
-                <Text className="section-title">尿量统计</Text>
-                <Text>这里是尿量统计的内容</Text>
-              </View>
-            </AtTabsPane>
-
-            <AtTabsPane current={current} index={2}>
-              <View className="tab-content">
-                <Text className="section-title">喝水统计</Text>
-                <Text>这里是喝水统计的内容</Text>
-              </View>
-            </AtTabsPane>
-
-            <AtTabsPane current={current} index={3}>
-              <View className="tab-content">
-                <Text className="section-title">体重统计</Text>
-                <Text>这里是体重统计的内容</Text>
-              </View>
-            </AtTabsPane>
-
-            <AtTabsPane current={current} index={4}>
-              <View className="tab-content">
-                <BPAnalysis />
-              </View>
-            </AtTabsPane>
+  // 渲染其他统计模块的内容
+  const renderOtherTabContent = (title: string) => {
+    return (
+      <View className="tab-content">
+        <View className="statistics-placeholder-card">
+          <Text className="section-title">{title}统计</Text>
+          <View className="placeholder-content">
+            <Text className="placeholder-text">这里是{title}统计的内容</Text>
           </View>
         </View>
-      </ScrollView>
+      </View>
+    );
+  };
 
+  return (
+    <View className="statistics-report-page">
       <View className="fixed-tabs">
         <AtTabs
           current={current}
@@ -75,6 +56,32 @@ const StatisticsReportPage: React.FC = () => {
           className="custom-tabs"
         />
       </View>
+      
+      <ScrollView scrollY className="content-scroll">
+        <View className="content-wrapper">
+          <AtTabsPane current={current} index={0}>
+            {renderOtherTabContent("腹透")}
+          </AtTabsPane>
+
+          <AtTabsPane current={current} index={1}>
+            {renderOtherTabContent("尿量")}
+          </AtTabsPane>
+
+          <AtTabsPane current={current} index={2}>
+            {renderOtherTabContent("喝水")}
+          </AtTabsPane>
+
+          <AtTabsPane current={current} index={3}>
+            {renderOtherTabContent("体重")}
+          </AtTabsPane>
+
+          <AtTabsPane current={current} index={4}>
+            <View className="tab-content">
+              <BPAnalysis />
+            </View>
+          </AtTabsPane>
+        </View>
+      </ScrollView>
     </View>
   );
 };
