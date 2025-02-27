@@ -182,9 +182,50 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, metadata, viewMode 
     };
   }, [bpData, metadata, viewMode]);
 
-  // 初始化饼图 - 修改为与 BPChart 相同的方式
+  // 初始化饼图
+  useEffect(() => {
+    if (!bpData || bpData.length === 0) return;
+    
+    const query = Taro.createSelectorQuery();
+    query
+      .select(`#${canvasId}`)
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (res[0]) {
+          const { width, height } = res[0];
+          const canvas = res[0].node;
+          
+          // 获取设备像素比
+          const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 2;
+          
+          // 设置更高的分辨率
+          canvas.width = width * pixelRatio;
+          canvas.height = height * pixelRatio;
+          
+          const ctx = canvas.getContext('2d');
+          // 缩放绘图上下文，使图形保持正确大小
+          ctx.scale(pixelRatio, pixelRatio);
+          
+          // 启用抗锯齿
+          if (ctx.imageSmoothingEnabled !== undefined) {
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+          }
+          
+          // 初始化图表时传入正确的宽高
+          initPieChart(canvas, width, height);
+        } else {
+          console.error("获取Canvas节点失败");
+        }
+      });
+  }, [bpData, distribution]);
+
+  // 初始化饼图 - 优化渲染质量
   const initPieChart = (canvas, width, height) => {
     const ctx = canvas.getContext("2d");
+    
+    // 确保宽高相等，使用较小的一边作为尺寸
+    const size = Math.min(width, height);
     
     // 准备饼图数据
     const series = [];
@@ -245,48 +286,54 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, metadata, viewMode 
     pieChartRef.current = new UCharts({
       type: "pie",
       context: ctx,
-      width,
-      height,
+      width: size,
+      height: size,
       series: series,
       background: "#FFFFFF",
-      padding: [5, 5, 5, 5],
+      padding: [15, 15, 15, 15],
       legend: {
-        show: true,
-        position: "bottom",
-        lineHeight: 18,
-        padding: 5
+        show: false,  // 不使用内置图例，使用自定义图例
       },
+      animation: true,
+      dataLabel: true,
       extra: {
         pie: {
           activeRadius: 10,
           offsetAngle: 0,
           labelWidth: 15,
-          border: false,
-          borderWidth: 2,
-          borderColor: "#FFFFFF"
+          border: true,
+          borderWidth: 3,
+          borderColor: "#FFFFFF",
+          linearType: 'custom',
+          customColor: [], // 使用series中定义的颜色
+          ringWidth: 0,
+          centerColor: "#FFFFFF",
+          radius: 80,
+          pieChartLinePadding: 5,
+          activeOpacity: 1,
+          borderOpacity: 1,
+          labelAlign: 'center',
+          labelFontSize: 11,
+          labelFontColor: '#666666',
+          format: (val, series, opts) => {
+            return series.name + '\n' + val.toFixed(0) + '%';
+          }
+        },
+        tooltip: {
+          showBox: true,
+          showArrow: true,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderColor: '#000000',
+          backgroundColor: 'rgba(0,0,0,0.7)',
+          fontColor: '#FFFFFF',
+          fontSize: 13
         }
       }
     });
     
     return pieChartRef.current;
   };
-
-  // 初始化饼图
-  useEffect(() => {
-    if (!bpData || bpData.length === 0) return;
-    
-    const query = Taro.createSelectorQuery();
-    query
-      .select(`#${canvasId}`)
-      .fields({ node: true, size: true })
-      .exec((res) => {
-        if (res[0]) {
-          initPieChart(res[0].node, res[0].width, res[0].height);
-        } else {
-          console.error("获取Canvas节点失败");
-        }
-      });
-  }, [bpData]);
 
   // 获取血压状态提醒
   const getBPStatusAlert = () => {
@@ -384,12 +431,15 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, metadata, viewMode 
       <View className="statistics-content">
         <View className="chart-section">
           <Text className="section-title">血压分布</Text>
-          <Canvas
-            type="2d"
-            id={canvasId}
-            canvasId={canvasId}
-            className="distribution-chart"
-          />
+          <View className="chart-container">
+            <Canvas
+              type="2d"
+              id={canvasId}
+              canvasId={canvasId}
+              className="distribution-chart"
+              style={{ width: '100%', height: '100%' }}
+            />
+          </View>
           {renderDistributionList()}
         </View>
 
