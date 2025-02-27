@@ -16,7 +16,6 @@ const BPAnalysis: React.FC = () => {
   // === 状态管理 ===
   const pageActive = useRef(true);
   const [viewMode, setViewMode] = useState<ViewMode>("week")
-  const [chartType, setChartType] = useState<ChartType>("line") // 默认折线图
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const requestIdRef = useRef<number>(0) // 请求ID用于防止竞态条件
   
@@ -98,13 +97,6 @@ const BPAnalysis: React.FC = () => {
     safelyFetchData(mode, initialDate);
   }, [clearData, safelyFetchData])
   
-  // 图表类型切换函数 - 仅在日视图下可用
-  const toggleChartType = useCallback(() => {
-    if (!pageActive.current) return;
-    
-    setChartType(prev => prev === 'line' ? 'column' : 'line');
-  }, [])
-  
   // 初始数据加载
   useEffect(() => {
     if (pageActive.current) {
@@ -143,15 +135,7 @@ const BPAnalysis: React.FC = () => {
         <View className="chart-controls">
           <ChartIndicators />
           
-          {/* 在所有视图模式下都显示图表类型切换按钮 */}
-          <View className="chart-type-toggle" onClick={toggleChartType}>
-            <View className={`toggle-icon ${chartType === 'line' ? 'active' : ''}`}>
-              <View className="line-icon"></View>
-            </View>
-            <View className={`toggle-icon ${chartType === 'column' ? 'active' : ''}`}>
-              <View className="column-icon"></View>
-            </View>
-          </View>
+          {/* 移除图表类型切换按钮 */}
         </View>
         
         <View className="chart-container">
@@ -165,7 +149,6 @@ const BPAnalysis: React.FC = () => {
             viewMode={viewMode}
             bpData={bpData}
             onSwipe={handleChartSwipe}
-            chartType={chartType}
           />
         </View>
       </View>
