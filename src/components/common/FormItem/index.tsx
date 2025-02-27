@@ -12,6 +12,7 @@ interface FormItemProps {
   onUnitChange?: (value: string, unit: string) => string;
   required?: boolean;
   error?: string;
+  type?: string;
 }
 
 const FormItem: React.FC<FormItemProps> = ({
