@@ -1,0 +1,33 @@
+.chart-indicators {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  
+  .indicators-group {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  
+  .indicator-text {
+    font-size: 12px;
+    color: #666666;
+  }
+  
+  .chart-unit {
+    font-size: 12px;
+    color: #999999;
+  }
+}

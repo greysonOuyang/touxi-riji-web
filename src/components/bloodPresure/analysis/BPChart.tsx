@@ -156,7 +156,7 @@ const BPChart: React.FC<BPChartProps> = ({
         series,
         animation: true,
         background: "#FFFFFF",
-        padding: [15, 15, 30, 15],
+        padding: [15, 15, 25, 30],
         enableScroll: true,
         legend: {
           show: false
@@ -167,10 +167,12 @@ const BPChart: React.FC<BPChartProps> = ({
           itemCount: viewMode === "day" ? 6 : (viewMode === "week" ? 7 : 5),
           fontSize: 11,
           fontColor: "#666666",
+          margin: 10,
         },
         yAxis: {
           gridType: "dash",
           dashLength: 4,
+          splitNumber: 5,
           data: [
             {
               min: 0,

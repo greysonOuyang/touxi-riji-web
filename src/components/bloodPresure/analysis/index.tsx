@@ -121,35 +121,37 @@ const BPAnalysis: React.FC = () => {
         onReset={resetToToday}
       />
       
-      <View className="chart-controls">
-        <ChartIndicators />
-        
-        {/* 日视图下显示图表类型切换按钮 */}
-        {viewMode === 'day' && (
-          <View className="chart-type-toggle" onClick={toggleChartType}>
-            <View className={`toggle-icon ${chartType === 'line' ? 'active' : ''}`}>
-              <View className="line-icon"></View>
+      <View className="chart-section">
+        <View className="chart-controls">
+          <ChartIndicators />
+          
+          {/* 日视图下显示图表类型切换按钮 */}
+          {viewMode === 'day' && (
+            <View className="chart-type-toggle" onClick={toggleChartType}>
+              <View className={`toggle-icon ${chartType === 'line' ? 'active' : ''}`}>
+                <View className="line-icon"></View>
+              </View>
+              <View className={`toggle-icon ${chartType === 'column' ? 'active' : ''}`}>
+                <View className="column-icon"></View>
+              </View>
             </View>
-            <View className={`toggle-icon ${chartType === 'column' ? 'active' : ''}`}>
-              <View className="column-icon"></View>
-            </View>
-          </View>
-        )}
-      </View>
-      
-      <View className="chart-container">
-        {isLoading && (
-          <View className="loading-overlay">
-            <Text className="loading-text">加载中...</Text>
-          </View>
-        )}
+          )}
+        </View>
         
-        <BPChart
-          viewMode={viewMode}
-          bpData={bpData}
-          onSwipe={handleChartSwipe}
-          chartType={chartType}
-        />
+        <View className="chart-container">
+          {isLoading && (
+            <View className="loading-overlay">
+              <Text className="loading-text">加载中...</Text>
+            </View>
+          )}
+          
+          <BPChart
+            viewMode={viewMode}
+            bpData={bpData}
+            onSwipe={handleChartSwipe}
+            chartType={chartType}
+          />
+        </View>
       </View>
       
       {/* 添加血压统计分析组件 */}

@@ -84,7 +84,7 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ data = [] }) => {
       {abnormalItems.map((item, index) => {
         const category = getBPCategory(item.systolic, item.diastolic);
         return (
-          <View key={index} className={`abnormal-item ${category.className}`}>
+          <View key={index} className={`abnormal-item ${(category.name || '').toLowerCase().replace('_', '-')}`}>
             <View className="abnormal-header">
               <Text className="abnormal-time">{formatTimestamp(item.timestamp)}</Text>
               <Text className="abnormal-category" style={{ color: category.color }}>

@@ -7,21 +7,21 @@
   .header-container {
     display: flex;
     flex-direction: column;
-    padding: 15px 15px 5px;
+    padding: 10px 15px 0;
   }
 
   .chart-title {
     font-size: 18px;
     font-weight: 600;
     color: #333;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .control-panel {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
   }
 
   .view-type-selector {
@@ -151,26 +151,34 @@
   }
 
   .chart-container {
+    width: 100%;
+    height: 280px;
     position: relative;
-    height: 240px;
-    margin: 0 15px;
+    margin: 0 0 16px 0;
+    padding: 0;
+    overflow: hidden;
+    
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
     
     .loading-overlay {
       position: absolute;
       top: 0;
       left: 0;
-      right: 0;
-      bottom: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
-      background: rgba(255, 255, 255, 0.8);
       z-index: 10;
-      
-      .loading-text {
-        font-size: 14px;
-        color: #666;
-      }
+    }
+    
+    .loading-text {
+      font-size: 14px;
+      color: #666;
     }
   }
 
@@ -290,7 +298,7 @@
   }
 
   .abnormal-values {
-    margin: 16px;
+    margin: 0 16px 16px;
     padding: 16px;
     background: #FFFFFF;
     border-radius: 12px;
@@ -380,7 +388,7 @@
   }
 
   .bp-statistics {
-    margin: 16px;
+    margin: 0 16px 16px;
     margin-bottom: 0;
   }
 
@@ -391,27 +399,17 @@
     padding: 10px 15px;
     
     .date-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      
-      .date-text {
-        font-size: 16px;
-        font-weight: 500;
-        color: #333;
-      }
-      
-      .date-label {
-        font-size: 12px;
-        color: #999;
-        margin-top: 2px;
-      }
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+      flex: 1;
+      text-align: center;
     }
     
     .nav-button {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
       background: #f5f5f5;
       display: flex;
       justify-content: center;
@@ -443,7 +441,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 15px 10px;
+    margin-bottom: 8px;
+    padding: 0 12px;
     
     .indicators {
       display: flex;
@@ -476,8 +475,9 @@
     
     .chart-type-toggle {
       display: flex;
+      align-items: center;
       background: #f5f5f5;
-      border-radius: 8px;
+      border-radius: 16px;
       padding: 2px;
       
       .toggle-icon {
@@ -486,7 +486,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 6px;
+        border-radius: 12px;
         margin: 0 2px;
         
         &.active {
@@ -496,51 +496,56 @@
         
         .line-icon {
           width: 14px;
-          height: 10px;
+          height: 8px;
           position: relative;
           
           &:before {
             content: '';
             position: absolute;
-            top: 2px;
+            top: 4px;
             left: 0;
-            width: 14px;
-            height: 2px;
-            background: #92A3FD;
+            width: 100%;
+            height: 1px;
+            background: #666;
           }
           
           &:after {
             content: '';
             position: absolute;
-            bottom: 2px;
+            top: 0;
             left: 0;
-            width: 14px;
-            height: 2px;
-            background: #92A3FD;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #666;
+            box-shadow: 5px 2px 0 #666, 10px -2px 0 #666;
           }
         }
         
         .column-icon {
           width: 14px;
           height: 10px;
-          display: flex;
-          justify-content: space-between;
+          position: relative;
           
           &:before {
             content: '';
-            width: 4px;
-            height: 10px;
-            background: #92A3FD;
-            border-radius: 1px;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 3px;
+            height: 6px;
+            background: #666;
           }
           
           &:after {
             content: '';
-            width: 4px;
-            height: 6px;
-            background: #92A3FD;
-            border-radius: 1px;
-            align-self: flex-end;
+            position: absolute;
+            bottom: 0;
+            left: 6px;
+            width: 3px;
+            height: 10px;
+            background: #666;
+            box-shadow: 5px 0 0 #666;
           }
         }
       }
