@@ -18,10 +18,13 @@ interface BPDataPoint {
 interface BPChartProps {
   viewMode: ViewMode;
   bpData: BPDataPoint[];
+  onSwipe?: (direction: 'left' | 'right') => void; // 添加滑动回调
 }
 
-const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
+const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, onSwipe }) => {
   const chartRef = useRef<any>(null);
+  const touchStartXRef = useRef<number | null>(null);
+  const canvasRef = useRef<any>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -39,6 +42,7 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
       .exec((res) => {
         if (res[0]) {
           const canvas = res[0].node;
+          canvasRef.current = canvas; // 保存canvas引用
           const ctx = canvas.getContext('2d');
           
           // 清除之前的图表
@@ -62,6 +66,34 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
           initChart(canvas, ctx, res[0].width, res[0].height);
         }
       });
+  };
+
+  // 处理触摸开始事件
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    touchStartXRef.current = touch.clientX;
+  };
+
+  // 处理触摸结束事件
+  const handleTouchEnd = (e) => {
+    if (touchStartXRef.current === null || !onSwipe) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const diffX = touchEndX - touchStartXRef.current;
+    
+    // 如果滑动距离超过50px，则触发翻页
+    if (Math.abs(diffX) > 50) {
+      // 向左滑动 -> 查看下一页
+      if (diffX < 0) {
+        onSwipe('left');
+      } 
+      // 向右滑动 -> 查看上一页
+      else {
+        onSwipe('right');
+      }
+    }
+    
+    touchStartXRef.current = null;
   };
 
   // 处理日期或时间字符串
@@ -289,6 +321,8 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData }) => {
       id="bpChart"
       canvas-id="bpChart"
       className="charts"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     />
   );
 };

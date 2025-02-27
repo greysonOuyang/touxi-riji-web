@@ -106,16 +106,27 @@ export const useBPData = () => {
     clearData('week')
     
     try {
-      // 计算开始日期 (前6天)
-      const startDate = new Date(endDate)
-      startDate.setDate(endDate.getDate() - 6)
+      // 计算自然周的开始日期和结束日期
+      // 获取当前日期是星期几 (0是周日，1是周一，以此类推)
+      const day = endDate.getDay()
       
-      console.log("开始获取周视图数据，结束日期:", format(endDate, 'yyyy-MM-dd'))
+      // 计算本周的开始日期（周日）和结束日期（周六）
+      const startDate = new Date(endDate)
+      startDate.setDate(endDate.getDate() - day) // 设置为本周周日
+      
+      const endDateOfWeek = new Date(startDate)
+      endDateOfWeek.setDate(startDate.getDate() + 6) // 周日+6天=周六
+      
+      // 如果计算出的结束日期超过了当前日期，则使用当前日期作为结束日期
+      const today = new Date()
+      const actualEndDate = endDateOfWeek > today ? today : endDateOfWeek
+      
+      console.log("开始获取周视图数据，周日:", format(startDate, 'yyyy-MM-dd'), "周六:", format(actualEndDate, 'yyyy-MM-dd'))
       
       const params = {
         userId: Taro.getStorageSync("userId") || 1,
         startDate: format(startDate, 'yyyy-MM-dd'),
-        endDate: format(endDate, 'yyyy-MM-dd')
+        endDate: format(actualEndDate, 'yyyy-MM-dd')
       }
       
       console.log("周视图请求参数:", params)
@@ -146,7 +157,7 @@ export const useBPData = () => {
       } else {
         setBpData([])
         setIsLoading(false)
-        showToast(`${format(startDate, 'MM/dd')}-${format(endDate, 'MM/dd')}暂无数据记录`)
+        showToast(`${format(startDate, 'MM/dd')}-${format(actualEndDate, 'MM/dd')}暂无数据记录`)
         return false
       }
     } catch (error) {

@@ -43,6 +43,18 @@ const BPAnalysis: React.FC = () => {
     setCurrentDate(new Date())
   }, [])
   
+  // 处理图表滑动
+  const handleChartSwipe = useCallback((direction: 'left' | 'right') => {
+    // 左滑 -> 下一页
+    if (direction === 'left') {
+      navigateDate('next');
+    } 
+    // 右滑 -> 上一页
+    else if (direction === 'right') {
+      navigateDate('prev');
+    }
+  }, [navigateDate]);
+  
   // === 视图切换函数 ===
   const handleViewModeChange = useCallback((newMode: ViewMode) => {
     if (newMode === viewMode) return
@@ -110,6 +122,7 @@ const BPAnalysis: React.FC = () => {
         <BPChart
           viewMode={viewMode}
           bpData={bpData}
+          onSwipe={handleChartSwipe}
         />
       </View>
       
@@ -128,8 +141,21 @@ const calculateNewDate = (date: Date, mode: ViewMode, direction: 'prev' | 'next'
       newDate.setDate(date.getDate() + (direction === 'prev' ? -1 : 1))
       return newDate > today ? today : newDate
     case 'week':
-      newDate.setDate(date.getDate() + (direction === 'prev' ? -7 : 7))
-      return newDate > today ? today : newDate
+      // 获取当前日期是星期几 (0是周日，1是周一，以此类推)
+      const day = date.getDay()
+      
+      // 计算本周的周六
+      const currentWeekEnd = new Date(date)
+      currentWeekEnd.setDate(date.getDate() - day + 6) // 设置为本周周六
+      
+      // 计算上一周/下一周的周六
+      if (direction === 'prev') {
+        currentWeekEnd.setDate(currentWeekEnd.getDate() - 7)
+      } else {
+        currentWeekEnd.setDate(currentWeekEnd.getDate() + 7)
+      }
+      
+      return currentWeekEnd > today ? today : currentWeekEnd
     case 'month':
       newDate.setMonth(date.getMonth() + (direction === 'prev' ? -1 : 1))
       return newDate > today ? today : newDate

@@ -25,14 +25,22 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ mode, currentDate, onNavi
       case 'day':
         return format(validDate, 'yyyy年MM月dd日')
       case 'week': {
-        try {
-          const start = startOfWeek(validDate, { weekStartsOn: 1, locale: zhCN })
-          const end = endOfWeek(validDate, { weekStartsOn: 1, locale: zhCN })
-          return `${format(start, 'MM月dd日')} - ${format(end, 'MM月dd日')}`
-        } catch (error) {
-          console.error('周日期计算错误:', error)
-          return format(validDate, 'yyyy年MM月')
-        }
+        // 获取当前日期是星期几 (0是周日，1是周一，以此类推)
+        const day = validDate.getDay()
+        
+        // 计算本周的开始日期（周日）
+        const startDate = new Date(validDate)
+        startDate.setDate(validDate.getDate() - day)
+        
+        // 计算本周的结束日期（周六）
+        const endDate = new Date(startDate)
+        endDate.setDate(startDate.getDate() + 6)
+        
+        // 如果结束日期超过今天，则使用今天作为结束日期
+        const today = new Date()
+        const actualEndDate = endDate > today ? today : endDate
+        
+        return `${format(startDate, 'MM/dd')}-${format(actualEndDate, 'MM/dd')}`
       }
       case 'month':
         return format(validDate, 'yyyy年MM月')
@@ -43,15 +51,15 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({ mode, currentDate, onNavi
 
   return (
     <View className="date-navigation">
-      <View className="nav-button" onClick={() => onNavigate('prev')}>
-        <AtIcon value='chevron-left' size='16' color='#92A3FD'></AtIcon>
+      <View className="nav-button prev-button" onClick={() => onNavigate('prev')}>
+        {/* 使用CSS生成的箭头 */}
       </View>
       <View className="date-range-container" onClick={onReset}>
-        <AtIcon value='calendar' size='14' color='#92A3FD' className="calendar-icon"></AtIcon>
+        <AtIcon value='calendar' size='12' color='#92A3FD' className="calendar-icon"></AtIcon>
         <Text className="date-range">{getDateRangeText()}</Text>
       </View>
-      <View className="nav-button" onClick={() => onNavigate('next')}>
-        <AtIcon value='chevron-right' size='16' color='#92A3FD'></AtIcon>
+      <View className="nav-button next-button" onClick={() => onNavigate('next')}>
+        {/* 使用CSS生成的箭头 */}
       </View>
     </View>
   )
