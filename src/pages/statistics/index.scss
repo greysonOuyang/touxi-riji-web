@@ -8,7 +8,7 @@
 .content-scroll {
     flex: 1;
     overflow-y: auto;
-    padding-top: 70px; // Adjusted to accommodate the top tab bar
+    padding-top: 40px; // Adjusted to accommodate the top tab bar
     background: #f5f7fa;
 }
 
@@ -36,6 +36,9 @@
         padding: 4px;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        position: relative;
+        display: flex;
+        align-items: center;
     }
 
     .at-tabs__item {
@@ -44,15 +47,24 @@
         padding: 8px 0;
         border-radius: 8px;
         margin: 0 2px;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s;
 
         &--active {
-            background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
             color: #fff;
             font-weight: bold;
+            background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
+            box-shadow: 0 2px 6px rgba(197, 139, 242, 0.4);
         }
     }
 
     .at-tabs__item-underline {
+        display: none;
+    }
+    
+    // 移除滑动指示器，使用原来的背景高亮方式
+    .slider-indicator {
         display: none;
     }
 }
