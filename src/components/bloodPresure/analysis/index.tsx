@@ -9,8 +9,8 @@ import DateNavigator from "./DateNavigator"
 import ChartIndicators from "./ChartIndicators"
 import AbnormalValues from "./AbnormalValues"
 import BPChart from './BPChart'
-import { format } from "date-fns"
-import Taro from "@tarojs/taro"
+import BPStatistics from './BPStatistics'
+
 
 // 视图模式类型
 type ViewMode = "day" | "week" | "month"
@@ -27,7 +27,6 @@ const BPAnalysis: React.FC = () => {
   // === useBPData 钩子 ===
   const {
     bpData,
-    hasDailyData,
     isLoading,
     fetchData,
     clearData
@@ -38,7 +37,7 @@ const BPAnalysis: React.FC = () => {
   // 日期导航 - 前后切换
   const navigateDate = useCallback((direction: 'prev' | 'next') => {
     const newDate = calculateNewDate(currentDate, viewMode, direction)
-    setCurrentDate(newDate)
+    setCurrentDate(newDate) 
   }, [currentDate, viewMode])
   
   // 重置到今天
@@ -92,14 +91,14 @@ const BPAnalysis: React.FC = () => {
           clearData(viewMode)
         }
       }
-    }
+    } 
 
     loadData()
 
     return () => {
       // 取消未完成的请求
       if (currentRequestId === requestIdRef.current) {
-        clearData('soft') // 软清除保留loading状态
+          clearData('soft') // 软清除保留loading状态
       }
     }
   }, [viewMode, currentDate, fetchData, clearData])
@@ -152,6 +151,14 @@ const BPAnalysis: React.FC = () => {
           chartType={chartType}
         />
       </View>
+      
+      {/* 添加血压统计分析组件 */}
+      {!isLoading && bpData && bpData.length > 0 && (
+        <BPStatistics 
+          bpData={bpData}
+          viewMode={viewMode}
+        />
+      )}
       
       <AbnormalValues data={bpData} />
     </View>

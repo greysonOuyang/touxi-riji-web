@@ -13,6 +13,7 @@ import TimeSelector from "@/components/common/TimeSelector";
 import FormItem from "@/components/common/FormItem";
 import "./index.scss";
 import Button from "@/components/common/ConfirmButton";
+import { getBPCategory, BP_CATEGORIES } from "@/utils/bloodPressureUtils";
 
 interface BloodPressureData {
   systolic: string;
@@ -21,44 +22,6 @@ interface BloodPressureData {
   measureDateTime: string;
   note: string;
 }
-
-// 血压分类标准
-const BP_CATEGORIES = {
-  NORMAL: { name: "正常", color: "#4CAF50", className: "normal" },
-  ELEVATED: { name: "血压偏高", color: "#FFC107", className: "elevated" },
-  HYPERTENSION_1: { name: "高血压一级", color: "#FF9800", className: "hypertension-1" },
-  HYPERTENSION_2: { name: "高血压二级", color: "#F44336", className: "hypertension-2" },
-  HYPERTENSION_CRISIS: { name: "高血压危象", color: "#D32F2F", className: "hypertension-crisis" },
-  LOW: { name: "低血压", color: "#2196F3", className: "low" },
-};
-
-// 根据收缩压和舒张压判断血压分类
-const getBPCategory = (systolic: number, diastolic: number) => {
-  // 先判断高血压危象
-  if (systolic >= 180 || diastolic >= 120) {
-    return BP_CATEGORIES.HYPERTENSION_CRISIS;
-  } 
-  // 再判断高血压二级
-  else if (systolic >= 140 || diastolic >= 90) {
-    return BP_CATEGORIES.HYPERTENSION_2;
-  } 
-  // 再判断高血压一级
-  else if (systolic >= 130 || diastolic >= 80) {
-    return BP_CATEGORIES.HYPERTENSION_1;
-  } 
-  // 再判断血压偏高
-  else if (systolic >= 120 && diastolic < 80) {
-    return BP_CATEGORIES.ELEVATED;
-  } 
-  // 再判断低血压
-  else if (systolic < 90 || diastolic < 60) {
-    return BP_CATEGORIES.LOW;
-  } 
-  // 最后是正常血压
-  else {
-    return BP_CATEGORIES.NORMAL;
-  }
-};
 
 const BloodPressureInputPage: React.FC = () => {
   const initFormData = () => {

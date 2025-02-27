@@ -152,44 +152,24 @@
 
   .chart-container {
     position: relative;
-    width: 100%;
-    height: 220px;
-    margin: 0 auto;
-    padding: 0;
+    height: 240px;
+    margin: 0 15px;
     
-    .charts {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    
-    .chart-footer {
-      position: absolute;
-      bottom: -20px;
-      left: 0;
-      right: 0;
-      text-align: center;
-      font-size: 12px;
-      color: #999;
-      opacity: 0.7;
-      padding: 5px 0;
-    }
-
     .loading-overlay {
       position: absolute;
-      top: 10px;
+      top: 0;
       left: 0;
       right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.8);
       z-index: 10;
-      text-align: center;
       
       .loading-text {
-        display: inline-block;
-        padding: 4px 10px;
-        background: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        font-size: 12px;
-        border-radius: 12px;
+        font-size: 14px;
+        color: #666;
       }
     }
   }
@@ -309,31 +289,153 @@
     }
   }
 
-  .abnormal-values-container {
-    margin-top: 30px;
+  .abnormal-values {
+    margin: 16px;
     padding: 16px;
-    background: #FFF8F8;
+    background: #FFFFFF;
     border-radius: 12px;
-    border: 1px solid #FFDDDD;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     
-    .abnormal-title {
+    .title {
       font-size: 16px;
       font-weight: 600;
-      color: #FF4444;
-      margin-bottom: 8px;
+      color: #333333;
+      margin-bottom: 12px;
       display: block;
     }
     
-    .abnormal-list {
+    .abnormal-item {
+      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #F8F9FA;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      &.normal {
+        border-left: 3px solid #4CAF50;
+      }
+      
+      &.elevated {
+        border-left: 3px solid #FFC107;
+      }
+      
+      &.hypertension-1 {
+        border-left: 3px solid #FF9800;
+      }
+      
+      &.hypertension-2 {
+        border-left: 3px solid #F44336;
+      }
+      
+      &.hypertension-crisis {
+        border-left: 3px solid #D32F2F;
+      }
+      
+      &.low {
+        border-left: 3px solid #2196F3;
+      }
+      
+      .abnormal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .abnormal-time {
+          font-size: 12px;
+          color: #666666;
+        }
+        
+        .abnormal-category {
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+      
+      .abnormal-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        
+        .abnormal-value {
+          font-size: 14px;
+          color: #666666;
+          
+          .value {
+            font-weight: 500;
+            color: #333333;
+          }
+          
+          .abnormal-indicator {
+            font-size: 12px;
+            color: #F44336;
+            margin-left: 4px;
+          }
+        }
+      }
+    }
+  }
+
+  .bp-statistics {
+    margin: 16px;
+    margin-bottom: 0;
+  }
+
+  .date-navigator {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    
+    .date-display {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      
+      .date-text {
+        font-size: 16px;
+        font-weight: 500;
+        color: #333;
+      }
+      
+      .date-label {
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+      }
     }
     
-    .abnormal-item {
-      font-size: 14px;
-      color: #666;
-      line-height: 1.5;
+    .nav-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+      &:active {
+        background: #e5e5e5;
+      }
+      
+      &.disabled {
+        opacity: 0.5;
+      }
+    }
+    
+    .today-button {
+      font-size: 12px;
+      color: #92A3FD;
+      background: rgba(146, 163, 253, 0.1);
+      padding: 4px 8px;
+      border-radius: 12px;
+      
+      &:active {
+        background: rgba(146, 163, 253, 0.2);
+      }
     }
   }
 
@@ -375,70 +477,70 @@
     .chart-type-toggle {
       display: flex;
       background: #f5f5f5;
-      border-radius: 16px;
-      padding: 3px;
+      border-radius: 8px;
+      padding: 2px;
       
       .toggle-icon {
-        width: 28px;
-        height: 28px;
+        width: 24px;
+        height: 24px;
         display: flex;
         justify-content: center;
         align-items: center;
-        border-radius: 14px;
+        border-radius: 6px;
         margin: 0 2px;
         
         &.active {
           background: #fff;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .line-icon {
-          width: 16px;
+          width: 14px;
           height: 10px;
           position: relative;
           
           &:before {
             content: '';
             position: absolute;
-            width: 16px;
+            top: 2px;
+            left: 0;
+            width: 14px;
             height: 2px;
             background: #92A3FD;
-            top: 4px;
-            left: 0;
           }
           
           &:after {
             content: '';
             position: absolute;
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
+            bottom: 2px;
+            left: 0;
+            width: 14px;
+            height: 2px;
             background: #92A3FD;
-            top: 3px;
-            left: 6px;
           }
         }
         
         .column-icon {
-          width: 16px;
+          width: 14px;
           height: 10px;
           display: flex;
           justify-content: space-between;
-          align-items: flex-end;
-          
-          &:before, &:after {
-            content: '';
-            width: 4px;
-            background: #92A3FD;
-            border-radius: 2px 2px 0 0;
-          }
           
           &:before {
+            content: '';
+            width: 4px;
             height: 10px;
+            background: #92A3FD;
+            border-radius: 1px;
           }
           
           &:after {
+            content: '';
+            width: 4px;
             height: 6px;
+            background: #92A3FD;
+            border-radius: 1px;
+            align-self: flex-end;
           }
         }
       }
