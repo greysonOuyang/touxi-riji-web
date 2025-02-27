@@ -3,15 +3,18 @@ import { View, Text, Canvas } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import UCharts from "@qiun/ucharts";
 import { getBPCategory, BP_CATEGORIES } from "@/utils/bloodPressureUtils";
+import { BpTrendData, BpTrendMetadata } from "@/api/bloodPressureApi";
 import "./BPStatistics.scss";
 
 interface BPStatisticsProps {
-  bpData: any[];
+  bpData: BpTrendData[];
+  metadata: BpTrendMetadata | null;
   viewMode: "day" | "week" | "month";
 }
 
-const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
-  const chartRef = useRef<any>(null);
+const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, metadata, viewMode }) => {
+  const pieChartRef = useRef<any>(null);
+  const canvasId = "bp-distribution-chart";
   
   // 计算血压分布
   const distribution = useMemo(() => {
@@ -58,7 +61,7 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
     return dist;
   }, [bpData]);
 
-  // 计算统计数据
+  // 计算统计数据 - 优先使用元数据，如果没有则计算
   const stats = useMemo(() => {
     if (!bpData || bpData.length === 0) {
       return {
@@ -70,20 +73,67 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
         maxDiastolic: 0,
         minDiastolic: 0,
         abnormalCount: 0,
+        dataCoverage: 0,
+        totalMeasurements: 0
       };
     }
-
+    
+    // 筛选有效数据
+    const validData = bpData.filter(item => item.hasMeasurement);
+    
+    if (validData.length === 0) {
+      return {
+        avgSystolic: 0,
+        avgDiastolic: 0,
+        avgHeartRate: 0,
+        maxSystolic: 0,
+        minSystolic: 0,
+        maxDiastolic: 0,
+        minDiastolic: 0,
+        abnormalCount: 0,
+        dataCoverage: 0,
+        totalMeasurements: 0
+      };
+    }
+    
+    // 如果有元数据，优先使用
+    if (metadata) {
+      return {
+        avgSystolic: Math.round(metadata.avgSystolic),
+        avgDiastolic: Math.round(metadata.avgDiastolic),
+        avgHeartRate: Math.round(metadata.avgHeartRate),
+        maxSystolic: Math.max(...validData.map(item => item.maxSystolic || item.systolic)),
+        minSystolic: Math.min(...validData.map(item => item.minSystolic || item.systolic)),
+        maxDiastolic: Math.max(...validData.map(item => item.maxDiastolic || item.diastolic)),
+        minDiastolic: Math.min(...validData.map(item => item.minDiastolic || item.diastolic)),
+        abnormalCount: validData.filter(item => {
+          const category = getBPCategory(item.systolic, item.diastolic);
+          return (
+            category === BP_CATEGORIES.HYPERTENSION_1 ||
+            category === BP_CATEGORIES.HYPERTENSION_2 ||
+            category === BP_CATEGORIES.HYPERTENSION_CRISIS ||
+            category === BP_CATEGORIES.LOW
+          );
+        }).length,
+        dataCoverage: metadata.dataCoverage,
+        totalMeasurements: validData.reduce((sum, item) => sum + (item.measureCount || 1), 0)
+      };
+    }
+    
+    // 否则前端计算
     let totalSystolic = 0;
     let totalDiastolic = 0;
     let totalHeartRate = 0;
     let heartRateCount = 0;
-    let maxSystolic = bpData[0].systolic;
-    let minSystolic = bpData[0].systolic;
-    let maxDiastolic = bpData[0].diastolic;
-    let minDiastolic = bpData[0].diastolic;
+    let maxSystolic = validData[0].systolic;
+    let minSystolic = validData[0].systolic;
+    let maxDiastolic = validData[0].diastolic;
+    let minDiastolic = validData[0].diastolic;
     let abnormalCount = 0;
-
-    bpData.forEach((item) => {
+    let totalMeasurements = 0;
+    
+    validData.forEach(item => {
+      // 基本统计
       totalSystolic += item.systolic;
       totalDiastolic += item.diastolic;
       
@@ -92,11 +142,16 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
         heartRateCount++;
       }
       
-      maxSystolic = Math.max(maxSystolic, item.systolic);
-      minSystolic = Math.min(minSystolic, item.systolic);
-      maxDiastolic = Math.max(maxDiastolic, item.diastolic);
-      minDiastolic = Math.min(minDiastolic, item.diastolic);
+      // 极值统计
+      maxSystolic = Math.max(maxSystolic, item.maxSystolic || item.systolic);
+      minSystolic = Math.min(minSystolic, item.minSystolic || item.systolic);
+      maxDiastolic = Math.max(maxDiastolic, item.maxDiastolic || item.diastolic);
+      minDiastolic = Math.min(minDiastolic, item.minDiastolic || item.diastolic);
       
+      // 测量次数
+      totalMeasurements += item.measureCount || 1;
+      
+      // 异常统计
       const category = getBPCategory(item.systolic, item.diastolic);
       if (
         category === BP_CATEGORIES.HYPERTENSION_1 ||
@@ -107,171 +162,131 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
         abnormalCount++;
       }
     });
-
+    
+    // 计算数据覆盖率
+    const dataCoverage = viewMode === 'week' 
+      ? validData.length / 7 
+      : validData.length / (viewMode === 'month' ? 4 : 1);
+    
     return {
-      avgSystolic: Math.round(totalSystolic / bpData.length),
-      avgDiastolic: Math.round(totalDiastolic / bpData.length),
+      avgSystolic: Math.round(totalSystolic / validData.length),
+      avgDiastolic: Math.round(totalDiastolic / validData.length),
       avgHeartRate: heartRateCount > 0 ? Math.round(totalHeartRate / heartRateCount) : 0,
       maxSystolic,
       minSystolic,
       maxDiastolic,
       minDiastolic,
       abnormalCount,
+      dataCoverage,
+      totalMeasurements
     };
-  }, [bpData]);
+  }, [bpData, metadata, viewMode]);
+
+  // 初始化饼图 - 修改为与 BPChart 相同的方式
+  const initPieChart = (canvas, width, height) => {
+    const ctx = canvas.getContext("2d");
+    
+    // 准备饼图数据
+    const series = [];
+    const pieData: { name: string; value: number; color: string }[] = [];
+    
+    if (distribution.normal > 0) {
+      pieData.push({
+        name: '正常',
+        value: distribution.normal,
+        color: BP_CATEGORIES.NORMAL.color
+      });
+    }
+    
+    if (distribution.elevated > 0) {
+      pieData.push({
+        name: '血压偏高',
+        value: distribution.elevated,
+        color: BP_CATEGORIES.ELEVATED.color
+      });
+    }
+    
+    if (distribution.hypertension1 > 0) {
+      pieData.push({
+        name: '高血压一级',
+        value: distribution.hypertension1,
+        color: BP_CATEGORIES.HYPERTENSION_1.color
+      });
+    }
+    
+    if (distribution.hypertension2 > 0) {
+      pieData.push({
+        name: '高血压二级',
+        value: distribution.hypertension2,
+        color: BP_CATEGORIES.HYPERTENSION_2.color
+      });
+    }
+    
+    if (distribution.hypertensionCrisis > 0) {
+      pieData.push({
+        name: '高血压危象',
+        value: distribution.hypertensionCrisis,
+        color: BP_CATEGORIES.HYPERTENSION_CRISIS.color
+      });
+    }
+    
+    if (distribution.low > 0) {
+      pieData.push({
+        name: '低血压',
+        value: distribution.low,
+        color: BP_CATEGORIES.LOW.color
+      });
+    }
+    
+    series.push({
+      data: pieData
+    });
+    
+    pieChartRef.current = new UCharts({
+      type: "pie",
+      context: ctx,
+      width,
+      height,
+      series: series,
+      background: "#FFFFFF",
+      padding: [5, 5, 5, 5],
+      legend: {
+        show: true,
+        position: "bottom",
+        lineHeight: 18,
+        padding: 5
+      },
+      extra: {
+        pie: {
+          activeRadius: 10,
+          offsetAngle: 0,
+          labelWidth: 15,
+          border: false,
+          borderWidth: 2,
+          borderColor: "#FFFFFF"
+        }
+      }
+    });
+    
+    return pieChartRef.current;
+  };
 
   // 初始化饼图
   useEffect(() => {
     if (!bpData || bpData.length === 0) return;
     
-    const timer = setTimeout(() => {
-      renderPieChart();
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [distribution]);
-  
-  // 渲染饼图
-  const renderPieChart = () => {
-    try {
-      const query = Taro.createSelectorQuery();
-      query
-        .select('#bpDistributionChart')
-        .fields({ node: true, size: true })
-        .exec((res) => {
-          if (!res[0]) {
-            console.error('获取Canvas节点失败');
-            return;
-          }
-          
-          const canvas = res[0].node;
-          const ctx = canvas.getContext('2d');
-          const width = res[0].width || 300;
-          const height = res[0].height || 200;
-          
-          // 设置Canvas尺寸
-          const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
-          canvas.width = width * pixelRatio;
-          canvas.height = height * pixelRatio;
-          
-          // 设置canvas的样式尺寸
-          canvas._width = width;
-          canvas._height = height;
-          
-          // 缩放上下文以适应高DPI屏幕
-          ctx.scale(pixelRatio, pixelRatio);
-          
-          // 清除之前的图表
-          if (chartRef.current) {
-            chartRef.current = null;
-          }
-          
-          // 准备饼图数据
-          const series = [];
-          const pieData = [];
-          
-          if (distribution.normal > 0) {
-            pieData.push({
-              name: '正常',
-              value: distribution.normal,
-              color: BP_CATEGORIES.NORMAL.color
-            });
-          }
-          
-          if (distribution.elevated > 0) {
-            pieData.push({
-              name: '血压偏高',
-              value: distribution.elevated,
-              color: BP_CATEGORIES.ELEVATED.color
-            });
-          }
-          
-          if (distribution.hypertension1 > 0) {
-            pieData.push({
-              name: '高血压一级',
-              value: distribution.hypertension1,
-              color: BP_CATEGORIES.HYPERTENSION_1.color
-            });
-          }
-          
-          if (distribution.hypertension2 > 0) {
-            pieData.push({
-              name: '高血压二级',
-              value: distribution.hypertension2,
-              color: BP_CATEGORIES.HYPERTENSION_2.color
-            });
-          }
-          
-          if (distribution.hypertensionCrisis > 0) {
-            pieData.push({
-              name: '高血压危象',
-              value: distribution.hypertensionCrisis,
-              color: BP_CATEGORIES.HYPERTENSION_CRISIS.color
-            });
-          }
-          
-          if (distribution.low > 0) {
-            pieData.push({
-              name: '低血压',
-              value: distribution.low,
-              color: BP_CATEGORIES.LOW.color
-            });
-          }
-          
-          series.push({
-            data: pieData
-          });
-          
-          const config = {
-            type: 'pie',
-            canvasId: 'bpDistributionChart',
-            canvas2d: true,
-            context: ctx,
-            width,
-            height,
-            series,
-            animation: true,
-            background: '#FFFFFF',
-            padding: [5, 5, 5, 5],
-            legend: {
-              show: true,
-              position: 'right',
-              lineHeight: 15,
-              fontSize: 11,
-              fontColor: '#666666',
-              padding: 10,
-            },
-            extra: {
-              pie: {
-                activeRadius: 10,
-                offsetAngle: 0,
-                labelWidth: 15,
-                border: false,
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                linearType: 'custom',
-                customColor: pieData.map(item => item.color),
-              },
-              tooltip: {
-                showBox: true,
-                showArrow: true,
-                borderWidth: 0,
-                borderRadius: 4,
-                borderColor: '#92A3FD',
-                bgColor: '#FFFFFF',
-                bgOpacity: 0.9,
-                fontColor: '#333333',
-                fontSize: 11,
-              },
-            },
-          };
-          
-          chartRef.current = new UCharts(config);
-        });
-    } catch (error) {
-      console.error('初始化饼图失败:', error);
-    }
-  };
+    const query = Taro.createSelectorQuery();
+    query
+      .select(`#${canvasId}`)
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (res[0]) {
+          initPieChart(res[0].node, res[0].width, res[0].height);
+        } else {
+          console.error("获取Canvas节点失败");
+        }
+      });
+  }, [bpData]);
 
   // 获取血压状态提醒
   const getBPStatusAlert = () => {
@@ -371,10 +386,9 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
           <Text className="section-title">血压分布</Text>
           <Canvas
             type="2d"
-            id="bpDistributionChart"
-            canvas-id="bpDistributionChart"
+            id={canvasId}
+            canvasId={canvasId}
             className="distribution-chart"
-            style={{ width: '100%', height: '200px' }}
           />
           {renderDistributionList()}
         </View>
@@ -412,6 +426,23 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, viewMode }) => {
               <Text className="stats-value">{stats.abnormalCount}</Text>
               <Text className="stats-unit">次</Text>
             </View>
+          </View>
+          
+          {/* 数据可靠性指示 */}
+          {stats.dataCoverage < 0.7 && (
+            <View className="data-reliability">
+              <Text className="reliability-text">
+                数据覆盖: {Math.round(stats.dataCoverage * 100)}% 
+                {stats.dataCoverage < 0.5 ? " (数据较少，统计结果仅供参考)" : " (部分日期无数据)"}
+              </Text>
+            </View>
+          )}
+          
+          {/* 测量次数指示 */}
+          <View className="measurement-count">
+            <Text className="count-text">
+              共{stats.totalMeasurements}次测量
+            </Text>
           </View>
         </View>
       </View>

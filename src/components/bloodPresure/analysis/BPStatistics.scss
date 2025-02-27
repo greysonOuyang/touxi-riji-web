@@ -1,8 +1,8 @@
 .bp-statistics {
-  margin-top: 0;
-  background-color: #FFFFFF;
+  margin: 0 10px 16px;
+  padding: 16px 10px;
+  background: #ffffff;
   border-radius: 12px;
-  padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
   .statistics-header {
@@ -10,16 +10,16 @@
 
     .statistics-title {
       font-size: 16px;
-      font-weight: 600;
-      color: #333333;
+      font-weight: 500;
+      color: #333;
       display: block;
     }
 
     .statistics-subtitle {
-      font-size: 12px;
-      color: #666666;
-      margin-top: 4px;
+      font-size: 14px;
+      color: #666;
       display: block;
+      margin-top: 4px;
     }
   }
 
@@ -29,11 +29,10 @@
     gap: 20px;
 
     .section-title {
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 500;
-      color: #333333;
-      margin-bottom: 12px;
-      display: block;
+      color: #333;
+      margin-bottom: 16px;
     }
 
     .chart-section {
@@ -42,8 +41,9 @@
 
     .distribution-chart {
       width: 100%;
-      height: 200px;
-      margin-bottom: 10px;
+      height: 180px;
+      margin: 10px 0;
+      aspect-ratio: 1.5;
     }
 
     .distribution-list {
@@ -92,63 +92,88 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 16px 8px;
+      margin-bottom: 16px;
     }
 
     .stats-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 12px;
-      background-color: #F8F8F8;
-      border-radius: 8px;
     }
 
     .stats-label {
       font-size: 12px;
-      color: #666666;
+      color: #666;
       margin-bottom: 4px;
     }
 
     .stats-value {
       font-size: 18px;
-      font-weight: 600;
-      color: #333333;
+      font-weight: 500;
+      color: #333;
     }
 
     .stats-unit {
-      font-size: 11px;
-      color: #999999;
-      margin-top: 2px;
+      font-size: 12px;
+      color: #999;
+      margin-left: 2px;
+    }
+
+    .data-reliability {
+      margin-top: 8px;
+      padding: 8px;
+      background-color: #FFF9E6;
+      border-radius: 4px;
+      
+      .reliability-text {
+        font-size: 12px;
+        color: #FF9800;
+      }
+    }
+    
+    .measurement-count {
+      margin-top: 8px;
+      text-align: right;
+      
+      .count-text {
+        font-size: 12px;
+        color: #999;
+      }
     }
   }
 
   .bp-alert {
     margin-top: 16px;
     padding: 12px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-
+    border-radius: 4px;
+    
     &.warning {
-      background-color: rgba(244, 67, 54, 0.1);
-      border-left: 4px solid #F44336;
-    }
-
-    &.notice {
-      background-color: rgba(255, 152, 0, 0.1);
+      background-color: #FFF3E0;
       border-left: 4px solid #FF9800;
+      
+      .alert-message {
+        color: #E65100;
+      }
     }
-
-    &.good {
-      background-color: rgba(76, 175, 80, 0.1);
+    
+    &.danger {
+      background-color: #FFEBEE;
+      border-left: 4px solid #F44336;
+      
+      .alert-message {
+        color: #C62828;
+      }
+    }
+    
+    &.success {
+      background-color: #E8F5E9;
       border-left: 4px solid #4CAF50;
-    }
-
-    .alert-message {
-      font-size: 14px;
-      font-weight: 500;
+      
+      .alert-message {
+        color: #2E7D32;
+      }
     }
   }
 

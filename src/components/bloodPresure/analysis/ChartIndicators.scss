@@ -1,33 +1,37 @@
 .chart-indicators {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  justify-content: space-between;
   
   .indicators-group {
     display: flex;
-    gap: 12px;
-  }
-  
-  .indicator-item {
-    display: flex;
     align-items: center;
-    gap: 4px;
-  }
-  
-  .indicator-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-  }
-  
-  .indicator-text {
-    font-size: 12px;
-    color: #666666;
+    
+    .indicator-item {
+      display: flex;
+      align-items: center;
+      margin-right: 12px;
+      
+      &:last-child {
+        margin-right: 0;
+      }
+      
+      .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 4px;
+      }
+      
+      .indicator-text {
+        font-size: 12px;
+        color: #666;
+      }
+    }
   }
   
   .chart-unit {
     font-size: 12px;
-    color: #999999;
+    color: #999;
   }
 }

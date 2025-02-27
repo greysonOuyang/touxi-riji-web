@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react"
-import { format, subDays, addDays, subMonths, addMonths, isToday } from "date-fns"
+import { format, subDays, addDays, subMonths, addMonths } from "date-fns"
 
 type ViewMode = "day" | "week" | "month"
 
