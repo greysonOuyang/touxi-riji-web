@@ -44,7 +44,7 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ bpData = [], viewMode }
   const formatTime = (timestamp: string) => {
     try {
       const date = new Date(timestamp);
-      return `${date.getMonth() + 1}月${date.getDate()}日 ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+      return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
     } catch (e) {
       return "未知时间";
     }
@@ -67,6 +67,23 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ bpData = [], viewMode }
     return "血压异常";
   };
   
+  // 获取异常严重程度对应的样式类名
+  const getSeverityClass = (systolic: number, diastolic: number) => {
+    const category = getBPCategory(systolic, diastolic);
+    
+    if (category === BP_CATEGORIES.HYPERTENSION_CRISIS) {
+      return "severity-critical";
+    } else if (category === BP_CATEGORIES.HYPERTENSION_2) {
+      return "severity-high";
+    } else if (category === BP_CATEGORIES.HYPERTENSION_1) {
+      return "severity-medium";
+    } else if (category === BP_CATEGORIES.LOW) {
+      return "severity-low";
+    }
+    
+    return "";
+  };
+  
   return (
     <View className="abnormal-values">
       <View className="abnormal-card">
@@ -75,16 +92,18 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ bpData = [], viewMode }
         {abnormalValues.length > 0 ? (
           <View className="abnormal-list">
             {abnormalValues.map((item, index) => (
-              <View key={index} className="abnormal-item">
+              <View key={index} className={`abnormal-item ${getSeverityClass(item.systolic, item.diastolic)}`}>
                 <View className="abnormal-content">
-                  <Text className="abnormal-title">
-                    {item.systolic}/{item.diastolic} mmHg
-                  </Text>
+                  <View className="abnormal-header">
+                    <Text className="abnormal-title">
+                      {item.systolic}/{item.diastolic} mmHg
+                    </Text>
+                    <Text className="abnormal-time">
+                      {formatTime(item.timestamp)}
+                    </Text>
+                  </View>
                   <Text className="abnormal-description">
                     {getAbnormalDescription(item.systolic, item.diastolic)}
-                  </Text>
-                  <Text className="abnormal-time">
-                    {formatTime(item.timestamp)}
                   </Text>
                 </View>
               </View>
@@ -93,7 +112,7 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ bpData = [], viewMode }
         ) : (
           <View className="empty-abnormal">
             <Text className="empty-text">
-              {viewMode === "day" ? "今日" : viewMode === "week" ? "本周" : "本月"}暂无异常数值
+              今日暂无异常数值
             </Text>
           </View>
         )}

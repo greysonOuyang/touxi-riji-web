@@ -23,24 +23,43 @@
       .abnormal-item {
         display: flex;
         align-items: center;
-        padding: 10px 12px;
-        background-color: rgba(255, 138, 138, 0.1);
-        border-left: 4px solid #FF8A8A;
+        padding: 12px;
         border-radius: 8px;
         
-        .abnormal-icon {
-          margin-right: 12px;
-          color: #FF8A8A;
+        &.severity-critical {
+          background-color: rgba(255, 59, 48, 0.1);
+          border-left: 4px solid #FF3B30;
+        }
+        
+        &.severity-high {
+          background-color: rgba(255, 138, 138, 0.1);
+          border-left: 4px solid #FF8A8A;
+        }
+        
+        &.severity-medium {
+          background-color: rgba(255, 149, 0, 0.1);
+          border-left: 4px solid #FF9500;
+        }
+        
+        &.severity-low {
+          background-color: rgba(0, 122, 255, 0.1);
+          border-left: 4px solid #007AFF;
         }
         
         .abnormal-content {
           flex: 1;
           
+          .abnormal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+          }
+          
           .abnormal-title {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             color: #333;
-            margin-bottom: 4px;
           }
           
           .abnormal-description {
@@ -51,7 +70,6 @@
           .abnormal-time {
             font-size: 12px;
             color: #999;
-            margin-top: 4px;
           }
         }
       }

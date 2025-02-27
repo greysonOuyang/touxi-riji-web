@@ -159,8 +159,8 @@ const BPAnalysis: React.FC = () => {
         </View>
       </View>
       
-      {/* 异常值提醒 - 确保与其他卡片对齐 */}
-      {!isLoading && bpData && Array.isArray(bpData) && bpData.length > 0 && (
+      {/* 异常值提醒 - 仅在日视图模式下显示 */}
+      {!isLoading && bpData && Array.isArray(bpData) && bpData.length > 0 && viewMode === "day" && (
         <AbnormalValues bpData={bpData} viewMode={viewMode} />
       )}
       
