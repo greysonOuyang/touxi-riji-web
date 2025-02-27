@@ -1,202 +1,197 @@
 .bp-statistics {
-  margin: 0 10px 16px;
-  padding: 16px 10px;
-  background: #ffffff;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bp-card {
+  background-color: #ffffff;
   border-radius: 12px;
+  padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
 
-  .statistics-header {
-    margin-bottom: 16px;
+.card-header {
+  margin-bottom: 12px;
+}
 
-    .statistics-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: #333;
-      display: block;
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: #666;
+  display: block;
+}
+
+// 状态卡片样式
+.status-card {
+  .bp-alert {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    
+    &.warning {
+      background-color: rgba(255, 138, 138, 0.1);
+      border-left: 4px solid #FF8A8A;
     }
-
-    .statistics-subtitle {
+    
+    &.notice {
+      background-color: rgba(255, 193, 7, 0.1);
+      border-left: 4px solid #FFC107;
+    }
+    
+    &.good {
+      background-color: rgba(76, 175, 80, 0.1);
+      border-left: 4px solid #4CAF50;
+    }
+    
+    .alert-message {
       font-size: 14px;
-      color: #666;
-      display: block;
-      margin-top: 4px;
+      color: #333;
     }
   }
-
-  .statistics-content {
+  
+  .data-meta {
+    margin-top: 12px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 16px;
+    gap: 4px;
+    
+    .count-text, .reliability-text {
+      font-size: 13px;
+      color: #666;
     }
-
-    .chart-section {
-      flex: 1;
+    
+    .reliability-text {
+      color: #FF8A8A;
     }
+  }
+}
 
-    .chart-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto;
-      max-width: 300px;
-      aspect-ratio: 1/1;
-      position: relative;
-      padding: 10px;
-      
-      transform: translateZ(0);
-      backface-visibility: hidden;
-    }
-
-    .distribution-chart {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .distribution-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
+// 分布卡片样式
+.distribution-card {
+  .chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 300px;
+    aspect-ratio: 1/1;
+    position: relative;
+    padding: 10px;
+    
+    // 添加这个可以帮助解决某些设备上的渲染问题
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+  
+  .distribution-chart {
+    width: 100%;
+    height: 100%;
+    display: block; // 确保Canvas正确显示
+  }
+  
+  .distribution-list {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    
     .distribution-item {
       display: flex;
       align-items: center;
-      padding: 6px 0;
+      padding: 4px 0;
+      
+      .distribution-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      
+      .distribution-label {
+        flex: 1;
+        font-size: 14px;
+        color: #333;
+      }
+      
+      .distribution-value {
+        font-size: 14px;
+        color: #666;
+        margin-right: 8px;
+      }
+      
+      .distribution-percent {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        min-width: 40px;
+        text-align: right;
+      }
     }
+  }
+}
 
-    .distribution-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-      margin-right: 8px;
-    }
-
-    .distribution-label {
-      flex: 1;
-      font-size: 13px;
-      color: #333333;
-    }
-
-    .distribution-value {
-      font-size: 13px;
-      color: #666666;
-      margin-right: 8px;
-    }
-
-    .distribution-percent {
-      font-size: 13px;
-      font-weight: 500;
-      color: #333333;
-      width: 40px;
-      text-align: right;
-    }
-
-    .stats-section {
-      flex: 1;
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-gap: 16px 8px;
-      margin-bottom: 16px;
-    }
-
+// 统计卡片样式
+.stats-card {
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 12px;
+    
     .stats-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-
-    .stats-label {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 4px;
-    }
-
-    .stats-value {
-      font-size: 18px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .stats-unit {
-      font-size: 12px;
-      color: #999;
-      margin-left: 2px;
-    }
-
-    .data-reliability {
-      margin-top: 8px;
-      padding: 8px;
-      background-color: #FFF9E6;
-      border-radius: 4px;
+      padding: 12px 8px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
       
-      .reliability-text {
-        font-size: 12px;
-        color: #FF9800;
+      .stats-label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 4px;
       }
-    }
-    
-    .measurement-count {
-      margin-top: 8px;
-      text-align: right;
       
-      .count-text {
+      .stats-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .stats-unit {
         font-size: 12px;
         color: #999;
+        margin-top: 2px;
       }
     }
   }
+}
 
-  .bp-alert {
-    margin-top: 16px;
-    padding: 12px;
-    border-radius: 4px;
-    
-    &.warning {
-      background-color: #FFF3E0;
-      border-left: 4px solid #FF9800;
-      
-      .alert-message {
-        color: #E65100;
-      }
-    }
-    
-    &.danger {
-      background-color: #FFEBEE;
-      border-left: 4px solid #F44336;
-      
-      .alert-message {
-        color: #C62828;
-      }
-    }
-    
-    &.success {
-      background-color: #E8F5E9;
-      border-left: 4px solid #4CAF50;
-      
-      .alert-message {
-        color: #2E7D32;
-      }
-    }
-  }
-
-  .empty-state {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    color: #999999;
+// 空状态样式
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  text {
     font-size: 14px;
+    color: #999;
   }
 }
 

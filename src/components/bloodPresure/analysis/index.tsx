@@ -134,8 +134,6 @@ const BPAnalysis: React.FC = () => {
       <View className="chart-section">
         <View className="chart-controls">
           <ChartIndicators />
-          
-          {/* 移除图表类型切换按钮 */}
         </View>
         
         <View className="chart-container">

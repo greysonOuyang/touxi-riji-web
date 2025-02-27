@@ -421,87 +421,84 @@ const BPStatistics: React.FC<BPStatisticsProps> = ({ bpData, metadata, viewMode 
 
   return (
     <View className="bp-statistics">
-      <View className="statistics-header">
-        <Text className="statistics-title">血压统计分析</Text>
-        <Text className="statistics-subtitle">
-          {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}血压概览
-        </Text>
-      </View>
-
-      <View className="statistics-content">
-        <View className="chart-section">
-          <Text className="section-title">血压分布</Text>
-          <View className="chart-container">
-            <Canvas
-              type="2d"
-              id={canvasId}
-              canvasId={canvasId}
-              className="distribution-chart"
-              style={{ width: '100%', height: '100%' }}
-            />
-          </View>
-          {renderDistributionList()}
+      {/* 卡片1: 血压状态概览 */}
+      <View className="bp-card status-card">
+        <View className="card-header">
+          <Text className="card-title">血压统计分析</Text>
+          <Text className="card-subtitle">
+            {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}血压概览
+          </Text>
         </View>
-
-        <View className="stats-section">
-          <Text className="section-title">血压统计</Text>
-          <View className="stats-grid">
-            <View className="stats-item">
-              <Text className="stats-label">平均收缩压</Text>
-              <Text className="stats-value">{stats.avgSystolic}</Text>
-              <Text className="stats-unit">mmHg</Text>
-            </View>
-            <View className="stats-item">
-              <Text className="stats-label">平均舒张压</Text>
-              <Text className="stats-value">{stats.avgDiastolic}</Text>
-              <Text className="stats-unit">mmHg</Text>
-            </View>
-            <View className="stats-item">
-              <Text className="stats-label">平均心率</Text>
-              <Text className="stats-value">{stats.avgHeartRate}</Text>
-              <Text className="stats-unit">bpm</Text>
-            </View>
-            <View className="stats-item">
-              <Text className="stats-label">收缩压范围</Text>
-              <Text className="stats-value">{stats.minSystolic}-{stats.maxSystolic}</Text>
-              <Text className="stats-unit">mmHg</Text>
-            </View>
-            <View className="stats-item">
-              <Text className="stats-label">舒张压范围</Text>
-              <Text className="stats-value">{stats.minDiastolic}-{stats.maxDiastolic}</Text>
-              <Text className="stats-unit">mmHg</Text>
-            </View>
-            <View className="stats-item">
-              <Text className="stats-label">异常次数</Text>
-              <Text className="stats-value">{stats.abnormalCount}</Text>
-              <Text className="stats-unit">次</Text>
-            </View>
+        
+        {alert && (
+          <View className={`bp-alert ${alert.type}`}>
+            <Text className="alert-message">{alert.message}</Text>
           </View>
-          
-          {/* 数据可靠性指示 */}
+        )}
+        
+        {/* 测量次数和数据可靠性 */}
+        <View className="data-meta">
+          <Text className="count-text">共{stats.totalMeasurements}次测量</Text>
           {stats.dataCoverage < 0.7 && (
-            <View className="data-reliability">
-              <Text className="reliability-text">
-                数据覆盖: {Math.round(stats.dataCoverage * 100)}% 
-                {stats.dataCoverage < 0.5 ? " (数据较少，统计结果仅供参考)" : " (部分日期无数据)"}
-              </Text>
-            </View>
-          )}
-          
-          {/* 测量次数指示 */}
-          <View className="measurement-count">
-            <Text className="count-text">
-              共{stats.totalMeasurements}次测量
+            <Text className="reliability-text">
+              数据覆盖: {Math.round(stats.dataCoverage * 100)}% 
+              {stats.dataCoverage < 0.5 ? " (数据较少)" : " (部分日期无数据)"}
             </Text>
-          </View>
+          )}
         </View>
       </View>
 
-      {alert && (
-        <View className={`bp-alert ${alert.type}`}>
-          <Text className="alert-message">{alert.message}</Text>
+      {/* 卡片2: 血压分布 */}
+      <View className="bp-card distribution-card">
+        <Text className="card-title">血压分布</Text>
+        <View className="chart-container">
+          <Canvas
+            type="2d"
+            id={canvasId}
+            canvasId={canvasId}
+            className="distribution-chart"
+            style={{ width: '100%', height: '100%' }}
+          />
         </View>
-      )}
+        {renderDistributionList()}
+      </View>
+
+      {/* 卡片3: 血压统计数据 */}
+      <View className="bp-card stats-card">
+        <Text className="card-title">血压统计</Text>
+        <View className="stats-grid">
+          <View className="stats-item">
+            <Text className="stats-label">平均收缩压</Text>
+            <Text className="stats-value">{stats.avgSystolic}</Text>
+            <Text className="stats-unit">mmHg</Text>
+          </View>
+          <View className="stats-item">
+            <Text className="stats-label">平均舒张压</Text>
+            <Text className="stats-value">{stats.avgDiastolic}</Text>
+            <Text className="stats-unit">mmHg</Text>
+          </View>
+          <View className="stats-item">
+            <Text className="stats-label">平均心率</Text>
+            <Text className="stats-value">{stats.avgHeartRate}</Text>
+            <Text className="stats-unit">bpm</Text>
+          </View>
+          <View className="stats-item">
+            <Text className="stats-label">收缩压范围</Text>
+            <Text className="stats-value">{stats.minSystolic}-{stats.maxSystolic}</Text>
+            <Text className="stats-unit">mmHg</Text>
+          </View>
+          <View className="stats-item">
+            <Text className="stats-label">舒张压范围</Text>
+            <Text className="stats-value">{stats.minDiastolic}-{stats.maxDiastolic}</Text>
+            <Text className="stats-unit">mmHg</Text>
+          </View>
+          <View className="stats-item">
+            <Text className="stats-label">异常次数</Text>
+            <Text className="stats-value">{stats.abnormalCount}</Text>
+            <Text className="stats-unit">次</Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };
