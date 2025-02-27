@@ -14,10 +14,13 @@ import Taro from "@tarojs/taro"
 
 // 视图模式类型
 type ViewMode = "day" | "week" | "month"
+// 图表类型
+type ChartType = "line" | "column"
 
 const BPAnalysis: React.FC = () => {
   // === 状态管理 ===
   const [viewMode, setViewMode] = useState<ViewMode>("week")
+  const [chartType, setChartType] = useState<ChartType>("line") // 默认折线图
   const [currentDate, setCurrentDate] = useState<Date>(new Date())
   const requestIdRef = useRef<number>(0) // 请求ID用于防止竞态条件
   
@@ -60,9 +63,18 @@ const BPAnalysis: React.FC = () => {
     if (newMode === viewMode) return
     
     setViewMode(newMode)
+    // 日视图默认使用柱状图，其他视图使用折线图
+    setChartType(newMode === 'day' ? 'column' : 'line')
     setCurrentDate(getInitialDateForMode(newMode))
     clearData(newMode)
   }, [viewMode, clearData])
+  
+  // 图表类型切换函数 - 仅在日视图下可用
+  const toggleChartType = useCallback(() => {
+    if (viewMode === 'day') {
+      setChartType(prevType => prevType === 'line' ? 'column' : 'line')
+    }
+  }, [viewMode])
   
   // === 数据加载副作用 ===
   useEffect(() => {
@@ -110,7 +122,21 @@ const BPAnalysis: React.FC = () => {
         onReset={resetToToday}
       />
       
-      <ChartIndicators />
+      <View className="chart-controls">
+        <ChartIndicators />
+        
+        {/* 日视图下显示图表类型切换按钮 */}
+        {viewMode === 'day' && (
+          <View className="chart-type-toggle" onClick={toggleChartType}>
+            <View className={`toggle-icon ${chartType === 'line' ? 'active' : ''}`}>
+              <View className="line-icon"></View>
+            </View>
+            <View className={`toggle-icon ${chartType === 'column' ? 'active' : ''}`}>
+              <View className="column-icon"></View>
+            </View>
+          </View>
+        )}
+      </View>
       
       <View className="chart-container">
         {isLoading && (
@@ -123,6 +149,7 @@ const BPAnalysis: React.FC = () => {
           viewMode={viewMode}
           bpData={bpData}
           onSwipe={handleChartSwipe}
+          chartType={chartType}
         />
       </View>
       

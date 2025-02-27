@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { Canvas } from "@tarojs/components";
+import React, { useEffect, useRef, useState } from 'react';
+import { Canvas, View, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import UCharts from "@qiun/ucharts";
 import { format, isValid, parse } from "date-fns";
@@ -7,6 +7,7 @@ import { zhCN } from 'date-fns/locale';
 
 // 直接在文件中定义类型
 type ViewMode = "day" | "week" | "month";
+type ChartType = "line" | "column";
 
 interface BPDataPoint {
   systolic: number;
@@ -18,10 +19,16 @@ interface BPDataPoint {
 interface BPChartProps {
   viewMode: ViewMode;
   bpData: BPDataPoint[];
-  onSwipe?: (direction: 'left' | 'right') => void; // 添加滑动回调
+  onSwipe?: (direction: 'left' | 'right') => void;
+  chartType?: ChartType;
 }
 
-const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, onSwipe }) => {
+const BPChart: React.FC<BPChartProps> = ({ 
+  viewMode, 
+  bpData, 
+  onSwipe,
+  chartType = viewMode === 'day' ? 'column' : 'line'
+}) => {
   const chartRef = useRef<any>(null);
   const touchStartXRef = useRef<number | null>(null);
   const canvasRef = useRef<any>(null);
@@ -32,46 +39,11 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, onSwipe }) => {
     }, 100);
     
     return () => clearTimeout(timer);
-  }, [bpData, viewMode]);
-
-  const renderChart = () => {
-    const query = Taro.createSelectorQuery();
-    query
-      .select('#bpChart')
-      .fields({ node: true, size: true })
-      .exec((res) => {
-        if (res[0]) {
-          const canvas = res[0].node;
-          canvasRef.current = canvas; // 保存canvas引用
-          const ctx = canvas.getContext('2d');
-          
-          // 清除之前的图表
-          if (chartRef.current) {
-            // 清除画布而不是调用dispose
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            chartRef.current = null;
-          }
-          
-          // 获取设备像素比
-          const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 2;
-          
-          // 设置canvas尺寸，考虑设备像素比
-          canvas.width = res[0].width * pixelRatio;
-          canvas.height = res[0].height * pixelRatio;
-          
-          // 缩放上下文以匹配设备像素比
-          ctx.scale(pixelRatio, pixelRatio);
-          
-          // 初始化图表
-          initChart(canvas, ctx, res[0].width, res[0].height);
-        }
-      });
-  };
+  }, [bpData, viewMode, chartType]);
 
   // 处理触摸开始事件
   const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    touchStartXRef.current = touch.clientX;
+    touchStartXRef.current = e.touches[0].clientX;
   };
 
   // 处理触摸结束事件
@@ -96,14 +68,168 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, onSwipe }) => {
     touchStartXRef.current = null;
   };
 
-  // 处理日期或时间字符串
-  const processTimestamp = (timestamp: string, viewMode: ViewMode): string => {
+  const renderChart = () => {
+    const query = Taro.createSelectorQuery();
+    query
+      .select('#bpChart')
+      .fields({ node: true, size: true })
+      .exec((res) => {
+        if (res[0]) {
+          const canvas = res[0].node;
+          canvasRef.current = canvas;
+          const ctx = canvas.getContext('2d');
+          
+          // 获取设备像素比
+          const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
+          
+          // 设置canvas的实际渲染尺寸
+          canvas.width = res[0].width * pixelRatio;
+          canvas.height = res[0].height * pixelRatio;
+          
+          // 设置canvas的样式尺寸
+          canvas._width = res[0].width;
+          canvas._height = res[0].height;
+          
+          // 缩放上下文以适应高DPI屏幕
+          ctx.scale(pixelRatio, pixelRatio);
+          
+          // 清除之前的图表
+          if (chartRef.current) {
+            ctx.clearRect(0, 0, canvas._width, canvas._height);
+          }
+          
+          initChart(canvas, ctx, canvas._width, canvas._height);
+        }
+      });
+  };
+
+  const initChart = (canvas: any, ctx: any, width: number, height: number) => {
     try {
-      // 检查是否是纯时间格式 (HH:mm:ss 或 HH:mm)
-      if (viewMode === "day" && /^\d{1,2}:\d{1,2}(:\d{1,2})?$/.test(timestamp)) {
-        // 直接提取小时和分钟
-        const timeParts = timestamp.split(':');
-        return `${timeParts[0]}:${timeParts[1]}`;
+      // 处理数据为空的情况
+      if (!bpData || bpData.length === 0) {
+        drawEmptyChart(ctx, width, height);
+        return;
+      }
+      
+      // 准备X轴类别数据
+      const categories = bpData.map(item => formatTimestamp(item.timestamp, viewMode));
+      
+      // 准备系列数据
+      const series = [
+        {
+          name: "收缩压",
+          data: bpData.map(item => item.systolic),
+          color: "#FF8A8A",
+          lineWidth: 2,
+          pointStyle: {
+            size: 4,
+          }
+        },
+        {
+          name: "舒张压",
+          data: bpData.map(item => item.diastolic),
+          color: "#92A3FD",
+          lineWidth: 2,
+          pointStyle: {
+            size: 4,
+          }
+        },
+        {
+          name: "心率",
+          data: bpData.map(item => item.heartRate || 0),
+          color: "#4CAF50",
+          lineWidth: 2,
+          pointStyle: {
+            size: 4,
+          }
+        },
+      ];
+      
+      const config = {
+        type: chartType,
+        canvasId: 'bpChart',
+        canvas2d: true,
+        context: ctx,
+        width,
+        height,
+        categories,
+        series,
+        animation: true,
+        background: "#FFFFFF",
+        padding: [15, 15, 30, 15],
+        enableScroll: true,
+        legend: {
+          show: false
+        },
+        xAxis: {
+          disableGrid: true,
+          scrollShow: true,
+          itemCount: viewMode === "day" ? 6 : (viewMode === "week" ? 7 : 5),
+          fontSize: 11,
+          fontColor: "#666666",
+        },
+        yAxis: {
+          gridType: "dash",
+          dashLength: 4,
+          data: [
+            {
+              min: 0,
+              max: 200,
+              fontSize: 11,
+              fontColor: "#666666",
+              format: (val) => val.toFixed(0)
+            },
+          ],
+        },
+        extra: {
+          line: {
+            type: "straight",
+            width: 2,
+            activeType: "hollow",
+            linearType: "custom",
+            activeOpacity: 0.8,
+          },
+          column: {
+            width: viewMode === "day" ? 12 : 8,
+            activeBgColor: "#000000",
+            activeBgOpacity: 0.08,
+            barBorderRadius: [3, 3, 0, 0],
+          },
+          tooltip: {
+            showBox: true,
+            showArrow: true,
+            showCategory: true,
+            borderWidth: 0,
+            borderRadius: 4,
+            borderColor: "#92A3FD",
+            bgColor: "#FFFFFF",
+            bgOpacity: 0.9,
+            fontColor: "#333333",
+            fontSize: 11,
+          },
+        },
+      };
+      
+      chartRef.current = new UCharts(config);
+      
+    } catch (error) {
+      console.error("初始化图表失败:", error);
+      // 出错时也显示空图表
+      drawEmptyChart(ctx, width, height);
+    }
+  };
+
+  // 处理日期或时间字符串
+  const formatTimestamp = (timestamp: string, mode: ViewMode): string => {
+    try {
+      // 检查是否已经是格式化的时间字符串 (如 "12:30")
+      if (/^\d{1,2}:\d{2}$/.test(timestamp)) {
+        return timestamp;
+      }
+      
+      // 检查是否已经是格式化的日期字符串 (如 "02/23")
+      if (/^\d{1,2}\/\d{1,2}$/.test(timestamp)) {
+        return timestamp;
       }
       
       // 尝试解析为日期对象
@@ -125,160 +251,6 @@ const BPChart: React.FC<BPChartProps> = ({ viewMode, bpData, onSwipe }) => {
       console.error(`日期格式化错误: ${error}`, timestamp);
       return viewMode === "day" ? "00:00" : "00/00";
     }
-  };
-
-  // 统一的图表初始化方法
-  const initChart = (canvas: any, ctx: any, width: number, height: number) => {
-    try {
-      // 即使没有数据也创建图表，显示坐标轴
-      const categories = bpData && bpData.length > 0 
-        ? bpData.map(item => processTimestamp(item.timestamp, viewMode))
-        : viewMode === "day" 
-          ? generateEmptyTimeCategories() 
-          : generateEmptyDateCategories(viewMode);
-      
-      const series = [
-        {
-          name: "收缩压",
-          data: bpData && bpData.length > 0 
-            ? bpData.map(item => item.systolic)
-            : [],
-          color: "#FF8A8A",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-        {
-          name: "舒张压",
-          data: bpData && bpData.length > 0 
-            ? bpData.map(item => item.diastolic)
-            : [],
-          color: "#92A3FD",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-        {
-          name: "心率",
-          data: bpData && bpData.length > 0 
-            ? bpData.map(item => item.heartRate || 0)  // 使用 || 0 处理可能的 undefined
-            : [],
-          color: "#4CAF50",
-          lineWidth: 3,
-          pointStyle: {
-            size: 5,
-          }
-        },
-      ];
-      
-      const config = {
-        type: "line",
-        canvasId: 'bpChart',
-        canvas2d: true,
-        context: ctx,
-        width,
-        height,
-        categories,
-        series,
-        animation: true,
-        background: "#FFFFFF",
-        padding: [15, 15, 30, 15],
-        enableScroll: true,
-        legend: {
-          show: false
-        },
-        xAxis: {
-          disableGrid: true,
-          scrollShow: true,
-          itemCount: viewMode === "week" ? 7 : 5,
-          fontSize: 12,
-          fontColor: "#333333",
-        },
-        yAxis: {
-          gridType: "dash",
-          dashLength: 4,
-          data: [
-            {
-              min: 0,
-              max: 200,
-              fontSize: 12,
-              fontColor: "#333333",
-            },
-          ],
-        },
-        extra: {
-          line: {
-            type: "straight",
-            width: 3,
-            activeType: "hollow",
-            linearType: "custom",
-            activeOpacity: 0.8,
-          },
-          tooltip: {
-            showBox: true,
-            showArrow: true,
-            showCategory: true,
-            borderWidth: 1,
-            borderRadius: 4,
-            borderColor: "#92A3FD",
-            bgColor: "#FFFFFF",
-            bgOpacity: 0.9,
-            fontColor: "#333333",
-            fontSize: 12,
-          },
-          empty: {
-            content: "暂无数据",
-            fontSize: 14,
-            fontColor: "#999999",
-          }
-        },
-      };
-      
-      chartRef.current = new UCharts(config);
-      
-      // 如果没有数据，在图表中心显示"暂无数据"
-      if (!bpData || bpData.length === 0) {
-        drawNoDataText(ctx, width, height);
-      }
-    } catch (error) {
-      console.error("初始化图表失败:", error);
-      // 出错时也显示空图表
-      drawEmptyChart(ctx, width, height);
-    }
-  };
-
-  // 生成空的时间类别（用于日视图）
-  const generateEmptyTimeCategories = () => {
-    const hours: string[] = [];
-    for (let i = 0; i < 24; i += 4) {
-      hours.push(`${i.toString().padStart(2, '0')}:00`);
-    }
-    return hours;
-  };
-
-  // 生成空的日期类别（用于周视图和月视图）
-  const generateEmptyDateCategories = (mode: ViewMode) => {
-    const today = new Date();
-    const dates: string[] = [];
-    
-    if (mode === "week") {
-      // 生成最近7天的日期，确保正好显示7天
-      for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        dates.push(format(date, 'MM/dd'));
-      }
-    } else if (mode === "month") {
-      // 生成当月的几个日期点
-      const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
-      for (let i = 1; i <= daysInMonth; i += 5) {
-        dates.push(`${(today.getMonth() + 1).toString().padStart(2, '0')}/${i.toString().padStart(2, '0')}`);
-      }
-    }
-    
-    return dates;
   };
 
   // 在图表中心绘制"暂无数据"文本
