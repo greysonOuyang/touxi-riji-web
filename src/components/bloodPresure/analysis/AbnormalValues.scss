@@ -1,0 +1,72 @@
+.abnormal-values {
+  margin: 16px 0; // 保持上下边距
+  padding: 0; // 移除左右内边距，与其他卡片保持一致
+  
+  .abnormal-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px; // 与其他卡片使用相同的内边距
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+    
+    .abnormal-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      
+      .abnormal-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        background-color: rgba(255, 138, 138, 0.1);
+        border-left: 4px solid #FF8A8A;
+        border-radius: 8px;
+        
+        .abnormal-icon {
+          margin-right: 12px;
+          color: #FF8A8A;
+        }
+        
+        .abnormal-content {
+          flex: 1;
+          
+          .abnormal-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+          }
+          
+          .abnormal-description {
+            font-size: 13px;
+            color: #666;
+          }
+          
+          .abnormal-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+          }
+        }
+      }
+    }
+    
+    .empty-abnormal {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 0;
+      
+      .empty-text {
+        font-size: 14px;
+        color: #999;
+      }
+    }
+  }
+} 

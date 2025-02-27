@@ -138,29 +138,40 @@ const BPAnalysis: React.FC = () => {
         
         <View className="chart-container">
           {isLoading && (
-            <View className="loading-overlay">
-              <Text className="loading-text">加载中...</Text>
+            <View className="loading-container">
+              <Text>加载中...</Text>
             </View>
           )}
           
-          <BPChart
-            viewMode={viewMode}
-            bpData={bpData}
-            onSwipe={handleChartSwipe}
-          />
+          {!isLoading && bpData && bpData.length > 0 && (
+            <BPChart
+              viewMode={viewMode}
+              bpData={bpData}
+              onSwipe={handleChartSwipe}
+            />
+          )}
+          
+          {!isLoading && (!bpData || bpData.length === 0) && (
+            <View className="empty-container">
+              <Text>暂无数据</Text>
+            </View>
+          )}
         </View>
       </View>
       
-      {/* 添加血压统计分析组件 - 新增传递 metadata */}
-      {!isLoading && bpData && bpData.length > 0 && (
+      {/* 异常值提醒 - 确保与其他卡片对齐 */}
+      {!isLoading && bpData && Array.isArray(bpData) && bpData.length > 0 && (
+        <AbnormalValues bpData={bpData} viewMode={viewMode} />
+      )}
+      
+      {/* 血压统计分析 */}
+      {!isLoading && bpData && Array.isArray(bpData) && bpData.length > 0 && (
         <BPStatistics 
           bpData={bpData}
-          metadata={metadata}  // 传递元数据
+          metadata={metadata}
           viewMode={viewMode}
         />
       )}
-      
-      <AbnormalValues data={bpData} />
     </View>
   )
 }
