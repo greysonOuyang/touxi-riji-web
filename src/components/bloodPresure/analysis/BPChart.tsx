@@ -9,19 +9,20 @@ interface BPChartProps {
   viewMode: "day" | "week" | "month";
   bpData: BpTrendData[];
   onSwipe?: (direction: "left" | "right") => void;
-  chartType?: "line" | "column";
 }
 
-const BPChart: React.FC<BPChartProps> = ({ 
-  viewMode, 
-  bpData, 
+const BPChart: React.FC<BPChartProps> = ({
+  viewMode,
+  bpData,
   onSwipe,
-  chartType = "line" 
 }) => {
   const chartRef = useRef<any>(null);
   const canvasId = "bp-chart";
   const [scrolling, setScrolling] = useState(false);
   const startX = useRef(0);
+  
+  // 所有模式下都使用折线图
+  const chartType = "line";
   
   // 初始化图表 - 使用更可靠的方式获取Canvas
   const initChart = (canvas, width, height) => {
@@ -38,11 +39,11 @@ const BPChart: React.FC<BPChartProps> = ({
     const systolicData = [];
     const diastolicData = [];
     const heartRateData = [];
-    
+      
     // 根据数据类型格式化
     bpData.forEach(item => {
       let label = "";
-      
+        
       try {
         const date = new Date(item.timestamp);
         
@@ -77,14 +78,22 @@ const BPChart: React.FC<BPChartProps> = ({
       {
         name: "收缩压",
         data: systolicData,
+        type: "line",
         color: "#FF8A8A",
-        type: chartType === "column" ? "column" : undefined
+        pointShape: "circle",
+        pointSize: 3,
+        lineWidth: 2,
+        format: (val) => { return val ? val.toFixed(0) : '-' }
       },
       {
         name: "舒张压",
         data: diastolicData,
+        type: "line",
         color: "#92A3FD",
-        type: chartType === "column" ? "column" : undefined
+        pointShape: "circle",
+        pointSize: 3,
+        lineWidth: 2,
+        format: (val) => { return val ? val.toFixed(0) : '-' }
       }
     ];
     
@@ -96,16 +105,16 @@ const BPChart: React.FC<BPChartProps> = ({
         color: "#4CAF50",
         type: "line",
         disableLegend: true,
-        addPoint: true,
-        pointColor: "#4CAF50",
         pointShape: "circle",
-        pointSize: 3
+        pointSize: 3,
+        lineWidth: 2,
+        format: (val) => { return val ? val.toFixed(0) : '-' }
       });
     }
     
     // 图表配置
     chartRef.current = new UCharts({
-      type: chartType,
+      type: "line", // 固定使用折线图
       context: ctx,
       width,
       height,
@@ -113,8 +122,8 @@ const BPChart: React.FC<BPChartProps> = ({
       series,
       animation: true,
       background: "#FFFFFF",
-      padding: [15, 10, 15, 25], // 减少左右内边距
-      enableScroll: true, // 启用图表内滚动
+      padding: [15, 15, 15, 15], // 增加左侧内边距到50，确保第一个点不在Y轴上
+      enableScroll: false, // 禁用滚动功能
       dataLabel: true, // 显示数据标签
       legend: {
         show: false
@@ -123,58 +132,60 @@ const BPChart: React.FC<BPChartProps> = ({
         disableGrid: true,
         fontColor: "#999999",
         fontSize: 12,
-        scrollShow: true, // 显示滚动条
-        scrollAlign: "left", // 滚动条位置
-        scrollBackgroundColor: "#EEEEEE", // 滚动条背景色
-        scrollColor: "#A0A0A0", // 滚动条颜色
-        scrollHeight: 4, // 滚动条高度
-        itemCount: 3, // 强制限制显示数量，确保需要滚动
-        boundaryGap: "center" // 边界间隙设置
+        boundaryGap: "center", // 修改为center，确保点更好地对齐
+        axisLine: true, // 显示坐标轴线
+        calibration: true, // 显示刻度线
+        marginLeft: 5, // 增加左侧边距到25
+        itemCount: 7, // 固定显示7个数据点
+        scrollShow: false, // 禁用滚动条
+        labelCount: 7, // 设置标签数量为7
+        formatter: (item, index) => {
+          return categories[index]; // 使用完整的categories数组确保标签正确
+        }
       },
       yAxis: {
         data: [
           {
             position: "left",
-            title: "mmHg",
+            title: "mmHg", // 单位放在Y轴顶部
+            titleFontColor: "#999999",
             titleFontSize: 12,
-            min: chartType === "column" ? 0 : 40, // 柱状图时从0开始
-            max: 200,
+            titleOffsetY: -5,
+            titleOffsetX: -25,
+            min: 40, // 最小值设为40，适合血压数据
+            max: 200, // 最大值设为200，适合血压数据
+            format: (val) => { return val.toFixed(0) }, // 格式化Y轴数值，去除小数点
             fontColor: "#999999",
             fontSize: 12,
-            format: (val) => val.toFixed(0),
-            splitNumber: chartType === "column" ? 5 : 4 // 柱状图时增加垂直网格线数量
+            lineColor: "#EEEEEE",
+            dashLength: 4,
+            gridType: "dash",
+            splitNumber: 5,
+            showTitle: true,
+            tofix: 0
           }
-        ],
-        showTitle: true,
-        gridType: "dash",
-        dashLength: 4,
-        gridColor: "#EEEEEE"
+        ]
       },
       extra: {
         line: {
-          type: "straight",
-          width: 2.5,
-          activeType: "hollow",
-          linearType: "none",
-          connectNulls: false,
-          labelShow: true, // 显示数据标签
-          labelFontSize: 10,
-          labelColor: "#666666",
-          labelBgColor: "rgba(255, 255, 255, 0.8)",
-          labelBgOpacity: 0.8,
-          labelPadding: 4
-        },
-        column: {
-          width: viewMode === 'day' ? 20 : 30,
-          barWidth: viewMode === 'day' ? 20 : 30,
-          categoryGap: 10,
-          barBorderRadius: [4, 4, 0, 0],
-          activeBgColor: "#000000",
-          activeBgOpacity: 0.1,
-          labelShow: true, // 显示数据标签
-          labelFontSize: 10,
-          labelColor: "#666666",
-          labelPosition: "top"
+          type: "straight", // 直线型
+          width: 2,
+          activeType: "hollow", // 点击后空心效果
+          linearType: "none", // 不使用渐变
+          activeLine: true, // 显示指示线
+          activeLineWidth: 1, // 指示线宽度
+          activeLineColor: "#999999", // 指示线颜色
+          activeAreaOpacity: 0.1, // 指示区域透明度
+          point: {
+            size: 3, // 数据点大小
+            activeSize: 5, // 激活时数据点大小
+            activeColor: "#FFFFFF", // 激活时数据点颜色
+            activeBorderWidth: 2, // 激活时数据点边框宽度
+            borderWidth: 1, // 数据点边框宽度
+            borderColor: "#FFFFFF", // 数据点边框颜色
+            fillColor: "#FFFFFF", // 数据点填充颜色
+            strokeWidth: 2, // 数据点描边宽度
+          }
         },
         tooltip: {
           showBox: true,
@@ -190,7 +201,9 @@ const BPChart: React.FC<BPChartProps> = ({
           dashLength: 4,
           gridColor: "#CCCCCC",
           fontColor: "#FFFFFF",
-          horizentalLine: false,
+          fontSize: 12,
+          lineHeight: 20,
+          padding: 10,
           xAxisLabel: true,
           yAxisLabel: false,
           labelBgColor: "#000000",
@@ -208,9 +221,9 @@ const BPChart: React.FC<BPChartProps> = ({
               labelText: "高压140",
               labelPosition: "left",
               labelAlign: "top",
-              labelOffsetX: chartType === "column" ? 5 : 8,
+              labelOffsetX: 8,
               labelFontSize: 12,
-              labelBgColor: "#F0F8FF",
+              labelBgColor: "#FFF0F0",
               labelBgOpacity: 0.7,
               labelFontColor: "#FF8A8A"
             },
@@ -221,7 +234,7 @@ const BPChart: React.FC<BPChartProps> = ({
               labelText: "低压90",
               labelPosition: "left",
               labelAlign: "bottom",
-              labelOffsetX: chartType === "column" ? 5 : 8,
+              labelOffsetX: 8,
               labelFontSize: 12,
               labelBgColor: "#F0F8FF",
               labelBgOpacity: 0.7,
@@ -232,15 +245,6 @@ const BPChart: React.FC<BPChartProps> = ({
       }
     });
     
-    // 显式设置滚动选项并初始化滚动功能
-    if (chartRef.current) {
-      chartRef.current.opts.enableScroll = true;
-      // 如果有提供滚动初始化方法，调用它
-      if (typeof chartRef.current.initScroll === 'function') {
-        chartRef.current.initScroll();
-      }
-    }
-    
     return chartRef.current;
   };
   
@@ -249,18 +253,15 @@ const BPChart: React.FC<BPChartProps> = ({
     if (chartRef.current) {
       // 记录初始触摸位置
       startX.current = e.touches[0].clientX;
-      // 调用UCharts的正确方法
-      chartRef.current.scrollStart(e);
-      chartRef.current.touchLegend(e);
-      chartRef.current.showToolTip(e);
+      // 使用标准的触摸事件方法
+      chartRef.current.touchStart(e);
     }
   };
   
   const handleTouchMove = (e) => {
     if (chartRef.current) {
-      // 调用UCharts的正确方法
-      chartRef.current.scrollMove(e);
-      chartRef.current.showToolTip(e);
+      // 使用标准的触摸事件方法
+      chartRef.current.touchMove(e);
       // 设置正在滚动标志
       setScrolling(true);
     }
@@ -268,9 +269,8 @@ const BPChart: React.FC<BPChartProps> = ({
   
   const handleTouchEnd = (e) => {
     if (chartRef.current) {
-      // 调用UCharts的正确方法
-      chartRef.current.scrollEnd(e);
-      chartRef.current.touchLegend(e);
+      // 使用标准的触摸事件方法
+      chartRef.current.touchEnd(e);
     }
     
     // 如果不是滚动状态，检查是否需要触发翻页
@@ -308,7 +308,7 @@ const BPChart: React.FC<BPChartProps> = ({
           }
         });
     }
-  }, [bpData, viewMode, chartType]);
+  }, [bpData, viewMode]);
   
   // 监听窗口大小变化
   useEffect(() => {
@@ -331,13 +331,6 @@ const BPChart: React.FC<BPChartProps> = ({
     };
   }, [bpData]);
   
-  // 调试信息
-  useEffect(() => {
-    if (chartRef.current) {
-      console.log("Chart initialized with scroll enabled:", chartRef.current.opts.enableScroll);
-    }
-  }, [chartRef.current]);
-  
   return (
     <View className="chart-container">
       <Canvas
@@ -345,7 +338,6 @@ const BPChart: React.FC<BPChartProps> = ({
         id={canvasId}
         canvasId={canvasId}
         className="bp-chart"
-        disableScroll={false}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
