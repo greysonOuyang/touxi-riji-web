@@ -13,9 +13,13 @@ import useDateNavigation from "@/components/common/useDateNavigation"
 import { useBPData } from "./useBPData"
 import ChartIndicators from "./ChartIndicators"
 
-const BPAnalysis: React.FC = () => {
-  // 视图模式状态
-  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week")
+interface BPAnalysisProps {
+  initialViewMode?: "day" | "week" | "month";
+}
+
+const BPAnalysis: React.FC<BPAnalysisProps> = ({ initialViewMode = "day" }) => {
+  // 视图模式状态，默认为日模式
+  const [viewMode, setViewMode] = useState<"day" | "week" | "month">(initialViewMode);
   
   // 使用自定义钩子管理日期导航
   const {
@@ -119,6 +123,6 @@ const BPAnalysis: React.FC = () => {
       )}
     </View>
   )
-}
+};
 
-export default BPAnalysis
+export default BPAnalysis;

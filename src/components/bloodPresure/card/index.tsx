@@ -65,12 +65,19 @@ const BloodPressureCard: React.FC<BloodPressureCardProps> = ({
     }
   }, [refreshTrigger]);
 
-  const onAddClick = () => {
+  const onAddClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // 阻止事件冒泡
     Taro.navigateTo({ url: "/pages/bloodPresure/input/index" });
   };
 
   const onViewClick = () => {
-    Taro.navigateTo({ url: "/pages/statistics/index?tab=4" });
+    // 修改为switchTab方法跳转到统计页面的血压tab
+    Taro.switchTab({ 
+      url: "/pages/statistics/index"
+    });
+    
+    // 设置全局状态，表示需要显示血压tab
+    Taro.setStorageSync('statistics_current_tab', 4);
   };
 
   if (loading) {
@@ -87,7 +94,10 @@ const BloodPressureCard: React.FC<BloodPressureCardProps> = ({
   }
 
   return (
-    <View className="blood-pressure-card">
+    <View 
+      className="blood-pressure-card"
+      onClick={onViewClick}  // 添加点击事件
+    >
       {/* 头部：标题和添加按钮 */}
       <View className="small-card-header">
         <Text className="small-card-title">血压</Text>
@@ -147,6 +157,7 @@ const BloodPressureCard: React.FC<BloodPressureCardProps> = ({
       <Text className="update-time">
         {bpData.formattedMeasurementTime || "暂无数据"}
       </Text>
+      
       <Image src="../../assets/images/heart_icon.png" className="heart-icon" />
     </View>
   );

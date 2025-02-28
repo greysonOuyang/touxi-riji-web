@@ -8,9 +8,22 @@ import PdAnalysis from "@/components/pdAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
+  // 血压视图模式默认为日模式
+  const [bpViewMode, setBpViewMode] = useState<"day" | "week" | "month">("day");
 
   useDidShow(() => {
-    // 检查是否有传入的tab参数
+    // 检查本地存储中是否有当前tab的设置
+    const storedTab = Taro.getStorageSync('statistics_current_tab');
+    if (storedTab !== '' && !isNaN(Number(storedTab))) {
+      const tabIndex = Number(storedTab);
+      if (tabIndex >= 0 && tabIndex < 5) {
+        setCurrent(tabIndex);
+        // 使用后清除存储，避免下次自动跳转
+        Taro.removeStorageSync('statistics_current_tab');
+      }
+    }
+    
+    // 检查是否有传入的tab参数（兼容旧的跳转方式）
     const params = Taro.getCurrentInstance().router?.params;
     if (params && params.tab) {
       const tabIndex = parseInt(params.tab);
@@ -89,7 +102,7 @@ const StatisticsReportPage: React.FC = () => {
 
           <AtTabsPane current={current} index={4}>
             <View className="tab-content">
-              <BPAnalysis />
+              <BPAnalysis initialViewMode={bpViewMode} />
             </View>
           </AtTabsPane>
         </View>
