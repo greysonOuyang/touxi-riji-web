@@ -1,4 +1,7 @@
 export default definePageConfig({
-  navigationStyle: "custom",
-  navigationBarTitleText: "历史数据",
+  navigationBarTitleText: "腹透记录",
+  navigationBarBackgroundColor: "#ffffff",
+  navigationBarTextStyle: "black",
+  backgroundColor: "#f8f9fa",
+  backgroundTextStyle: "light"
 });

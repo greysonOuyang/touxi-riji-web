@@ -1,241 +1,813 @@
 .historical-data-more {
-    padding: 0;
-    background: linear-gradient(180deg, rgba(146, 163, 253, 0.3) 0%, rgba(157, 206, 255, 0.1) 60%, #fcfcfc 50%);
-    padding-top: 88px;
+    position: relative;
     min-height: 100vh;
+    background-color: #f8f9fa;
+    padding-bottom: 30px;
 
-    .custom-nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 60px;
-        z-index: 1000;
-        transition: background-color 0.3s ease;
+    .content-area {
+        height: 100vh;
+        padding-top: 16px;
+        padding-bottom: 65px;
+    }
 
-        &::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            backdrop-filter: blur(10px);
-            z-index: -1;
-        }
+    .section-container {
+        padding: 0 16px;
+    }
 
-        .nav-content {
-            position: relative;
-            z-index: 1;
+    // 加载状态样式
+    .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 0;
+        background-color: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    // 今日指标部分样式
+    .today-section {
+        .today-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 100%;
-            padding: 0 15px;
-            padding-top: 35px;
-        }
-
-        .back-button {
-            width: 18px;
-            height: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-
-
-        .view-modes {
-            display: flex;
-            background: #fcfcfc;
-            border-radius: 18px;
-            padding: 2px 10px;
-
-            .view-mode {
-                padding: 6px 20px;
-                /* 增加内边距以增加宽度 */
-                font-size: 14px;
-                /* 稍微增加字体大小 */
-                color: #666;
-                border-radius: 20px;
-                transition: all 0.3s ease;
-
-                &.active {
-                    background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
-                    color: #fff;
-                }
-            }
-        }
-
-        .placeholder {
-            width: 24px;
-        }
-    }
-
-    .calendar {
-        margin: 0 15px;
-    }
-
-    .statistics-card,
-    .card {
-        margin: 15px 15px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .statistics-card {
-        background: #fff;
-        margin: 15px;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-
-        .card-header {
             margin-bottom: 16px;
 
-            .card-title {
-                font-size: 16px;
+            .today-title {
+                font-size: 18px;
                 font-weight: 600;
                 color: #333;
             }
-        }
 
-        .statistics-grid {
-            display: flex;
-            justify-content: space-between;
-
-            .stat-item {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-
-                .stat-label {
-                    font-size: 12px;
-                    font-weight: 300;
-                    color: #666;
-                    margin-bottom: 4px;
-                }
-
-                .stat-value {
-                    font-size: 16px;
-                    font-weight: 400;
-                    color: #92A3FD;
-
-
-                }
-            }
-        }
-
-        .view-more-stats {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 16px;
-            padding: 10px;
-            border-top: 1px solid #f0f0f0;
-            
-            .view-more-text {
-                font-size: 14px;
-                color: #92A3FD;
-                margin-right: 4px;
-            }
-        }
-    }
-
-
-
-
-    .data-list {
-        margin-top: 20px;
-        transition: all 0.3s ease;
-
-        &.card {
-            background: #fff;
-            margin: 16px 15px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            cursor: pointer;
-
-            .title-container {
-                display: flex;
-                align-items: center;
-            }
-
-            .card-title {
-                font-size: 14px;
-                font-weight: normal;
-                color: #92A3FD;
-                margin-right: 8px;
-            }
-        }
-
-        .column-headers {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 16px;
-            border-bottom: 1px solid #f0f0f0;
-
-            .header-ultrafiltration,
-            .header-time {
+            .today-date {
                 font-size: 14px;
                 color: #666;
             }
         }
 
-        .data-records {
-            max-height: calc(100vh - 600px);
-            overflow-y: auto;
+        .metrics-card {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
 
-            .data-item {
+            .ultrafiltration-display {
                 display: flex;
-                justify-content: space-between;
+                flex-direction: column;
                 align-items: center;
-                padding: 12px 16px;
-                border-bottom: 1px solid #f0f0f0;
+                margin-bottom: 20px;
 
-                &:last-child {
-                    border-bottom: none;
-                }
-
-                .ultrafiltration {
-                    font-size: 16px;
-                    font-weight: 500;
-                    color: #92A3FD;
-                }
-
-                .time-info {
+                .ultrafiltration-circle {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 60px;
+                    background: linear-gradient(135deg, #92A3FD, #9DCEFF);
                     display: flex;
+                    flex-direction: column;
+                    justify-content: center;
                     align-items: center;
-                    gap: 8px;
+                    margin-bottom: 10px;
+                    box-shadow: 0 4px 15px rgba(146, 163, 253, 0.2);
 
-                    .date,
-                    .time {
+                    .ultrafiltration-value {
+                        font-size: 28px;
+                        font-weight: 700;
+                        color: #fff;
+
+                        &.negative {
+                            color: #FFE2E2;
+                        }
+                    }
+
+                    .ultrafiltration-unit {
+                        font-size: 14px;
+                        color: #fff;
+                        opacity: 0.8;
+                    }
+                }
+
+                .ultrafiltration-label {
+                    font-size: 16px;
+                    color: #666;
+                }
+            }
+
+            .metrics-details {
+                .metric-item {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 12px;
+
+                    .metric-label {
                         font-size: 14px;
                         color: #666;
+                    }
+
+                    .metric-value {
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #333;
+                    }
+                }
+
+                .progress-bar {
+                    height: 8px;
+                    background-color: #F0F0F0;
+                    border-radius: 4px;
+                    margin-bottom: 16px;
+                    overflow: hidden;
+
+                    .progress-fill {
+                        height: 100%;
+                        background: linear-gradient(90deg, #92A3FD, #9DCEFF);
+                        border-radius: 4px;
+                        transition: width 0.3s ease;
+
+                        &.negative {
+                            background: linear-gradient(90deg, #FF6B6B, #FFB6B6);
+                        }
                     }
                 }
             }
         }
 
-        &.collapsed {
-            height: auto;
+        .warning-message {
+            display: flex;
+            align-items: center;
+            background-color: #FFF5F5;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
 
-            .card-header {
-                padding: 12px 16px;
+            .at-icon {
+                margin-right: 8px;
+            }
+
+            text {
+                font-size: 14px;
+                color: #FF6B6B;
+            }
+        }
+
+        .quick-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+            .action-button {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 8px 0;
+                flex: 1;
+                position: relative;
+
+                &:not(:last-child)::after {
+                    content: '';
+                    position: absolute;
+                    right: 0;
+                    top: 20%;
+                    height: 60%;
+                    width: 1px;
+                    background-color: #f0f0f0;
+                }
+
+                .at-icon {
+                    margin-bottom: 4px;
+                }
+
+                text {
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+        }
+
+        // 今日详细记录
+        .today-records {
+            margin-top: 20px;
+            
+            .records-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                
+                .records-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                }
+                
+                .record-count {
+                    font-size: 14px;
+                    color: #666;
+                }
+            }
+            
+            .records-list {
+                background-color: #fff;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+                .record-item {
+                    display: flex;
+                    margin-bottom: 24px;
+
+                    &:last-child {
+                        margin-bottom: 0;
+
+                        .record-time-container .time-line {
+                            display: none;
+                        }
+                    }
+
+                    .record-time-container {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        width: 60px;
+                        position: relative;
+
+                        .time-dot {
+                            width: 12px;
+                            height: 12px;
+                            border-radius: 50%;
+                            background-color: #92A3FD;
+                            margin-bottom: 4px;
+                            z-index: 1;
+                        }
+
+                        .time-line {
+                            position: absolute;
+                            top: 12px;
+                            width: 2px;
+                            height: calc(100% + 12px);
+                            background-color: #E0E0E0;
+                        }
+
+                        .record-time {
+                            font-size: 14px;
+                            color: #666;
+                        }
+                    }
+
+                    .record-details {
+                        flex: 1;
+                        background-color: #F8F9FA;
+                        border-radius: 12px;
+                        padding: 16px;
+
+                        .record-main-info {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 12px;
+                            padding-bottom: 12px;
+                            border-bottom: 1px solid #E0E0E0;
+
+                            .record-label {
+                                font-size: 14px;
+                                color: #666;
+                            }
+
+                            .record-value {
+                                font-size: 16px;
+                                font-weight: 600;
+                                color: #333;
+
+                                &.negative {
+                                    color: #FF6B6B;
+                                }
+                            }
+                        }
+
+                        .record-secondary-info {
+                            display: flex;
+                            flex-wrap: wrap;
+                            gap: 12px;
+
+                            .info-item {
+                                flex: 1;
+                                min-width: calc(33% - 8px);
+
+                                .info-label {
+                                    font-size: 12px;
+                                    color: #999;
+                                    margin-bottom: 4px;
+                                    display: block;
+                                }
+
+                                .info-value {
+                                    font-size: 14px;
+                                    color: #333;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            .empty-records {
+                background-color: #fff;
+                border-radius: 16px;
+                padding: 40px 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+                .at-icon {
+                    margin-bottom: 16px;
+                }
+
+                .empty-text {
+                    font-size: 16px;
+                    color: #999;
+                }
             }
         }
     }
 
+    // 历史记录部分样式
+    .history-section {
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
 
+            .history-title-container {
+                display: flex;
+                flex-direction: column;
+
+                .history-title {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 4px;
+
+                    .today-tag {
+                        font-size: 12px;
+                        color: #fff;
+                        background-color: #92A3FD;
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        margin-left: 8px;
+                    }
+                }
+
+                .date-actions {
+                    display: flex;
+                    align-items: center;
+                    
+                    .today-link {
+                        display: flex;
+                        align-items: center;
+                        font-size: 12px;
+                        color: #92A3FD;
+                        
+                        .at-icon {
+                            margin-right: 4px;
+                        }
+                    }
+                }
+            }
+
+            .record-count {
+                font-size: 14px;
+                color: #666;
+            }
+        }
+
+        .records-list {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+            .record-item {
+                display: flex;
+                margin-bottom: 24px;
+
+                &:last-child {
+                    margin-bottom: 0;
+
+                    .record-time-container .time-line {
+                        display: none;
+                    }
+                }
+
+                .record-time-container {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    width: 60px;
+                    position: relative;
+
+                    .time-dot {
+                        width: 12px;
+                        height: 12px;
+                        border-radius: 50%;
+                        background-color: #92A3FD;
+                        margin-bottom: 4px;
+                        z-index: 1;
+                    }
+
+                    .time-line {
+                        position: absolute;
+                        top: 12px;
+                        width: 2px;
+                        height: calc(100% + 12px);
+                        background-color: #E0E0E0;
+                    }
+
+                    .record-time {
+                        font-size: 14px;
+                        color: #666;
+                    }
+                }
+
+                .record-details {
+                    flex: 1;
+                    background-color: #F8F9FA;
+                    border-radius: 12px;
+                    padding: 16px;
+
+                    .record-main-info {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 12px;
+                        padding-bottom: 12px;
+                        border-bottom: 1px solid #E0E0E0;
+
+                        .record-label {
+                            font-size: 14px;
+                            color: #666;
+                        }
+
+                        .record-value {
+                            font-size: 16px;
+                            font-weight: 600;
+                            color: #333;
+
+                            &.negative {
+                                color: #FF6B6B;
+                            }
+                        }
+                    }
+
+                    .record-secondary-info {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 12px;
+
+                        .info-item {
+                            flex: 1;
+                            min-width: calc(33% - 8px);
+
+                            .info-label {
+                                font-size: 12px;
+                                color: #999;
+                                margin-bottom: 4px;
+                                display: block;
+                            }
+
+                            .info-value {
+                                font-size: 14px;
+                                color: #333;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        .empty-records {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+
+            .at-icon {
+                margin-bottom: 16px;
+            }
+
+            .empty-text {
+                font-size: 16px;
+                color: #999;
+                margin-bottom: 16px;
+            }
+
+            .go-today-button {
+                padding: 8px 16px;
+                background-color: #F0F0F0;
+                border-radius: 20px;
+                
+                text {
+                    font-size: 14px;
+                    color: #666;
+                }
+
+                &:active {
+                    background-color: #E0E0E0;
+                }
+            }
+        }
+
+        .calendar-section {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            
+            .calendar-container {
+                max-height: 280px;
+            }
+        }
+        
+        .selected-date-records {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+    }
+
+    // 日历部分样式
+    .calendar-section {
+        background-color: #fff;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        margin-bottom: 24px;
+
+        .calendar-header {
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            .month-navigator {
+                display: flex;
+                align-items: center;
+
+                .nav-button {
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    background-color: #F0F0F0;
+                }
+
+                .current-month {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #333;
+                    margin: 0 12px;
+                }
+            }
+
+            .today-button {
+                display: flex;
+                align-items: center;
+                padding: 6px 12px;
+                background-color: #F0F0F0;
+                border-radius: 16px;
+                
+                .at-icon {
+                    margin-right: 4px;
+                }
+                
+                text {
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+        }
+
+        .calendar-container {
+            max-height: 320px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+
+            .calendar-weekday {
+                text-align: center;
+                padding: 8px 0;
+                font-size: 14px;
+                color: #999;
+            }
+
+            .calendar-day {
+                aspect-ratio: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                position: relative;
+                
+                &.empty {
+                    background-color: transparent;
+                }
+
+                &.has-record {
+                    background-color: #F8F9FA;
+                    cursor: pointer;
+                    
+                    &:active {
+                        background-color: #EAEAEA;
+                    }
+                }
+
+                &.selected {
+                    background-color: #92A3FD;
+                    
+                    .day-number {
+                        color: #fff;
+                    }
+                }
+
+                &.today {
+                    border: 2px solid #92A3FD;
+                    
+                    &:not(.selected) .day-number {
+                        color: #92A3FD;
+                        font-weight: 600;
+                    }
+                }
+
+                .day-number {
+                    font-size: 14px;
+                    color: #333;
+                }
+
+                .record-indicator {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                    margin-top: 4px;
+
+                    &.positive {
+                        background-color: #4CAF50;
+                    }
+
+                    &.negative {
+                        background-color: #FF6B6B;
+                    }
+                }
+            }
+        }
+
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #F0F0F0;
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+
+                .legend-indicator {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    margin-right: 6px;
+
+                    &.positive {
+                        background-color: #4CAF50;
+                    }
+
+                    &.negative {
+                        background-color: #FF6B6B;
+                    }
+
+                    &.selected {
+                        background-color: #92A3FD;
+                    }
+                }
+
+                .legend-text {
+                    font-size: 12px;
+                    color: #666;
+                }
+            }
+        }
+    }
+
+    // 底部空白区域
+    .bottom-space {
+        height: 65px;
+    }
+
+    // 底部导航样式
+    .bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        background-color: #fff;
+        box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.04);
+        padding: 4px 0 6px;
+        z-index: 100;
+        border-top: 1px solid rgba(0, 0, 0, 0.03);
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3px 0;
+            position: relative;
+            transition: opacity 0.2s ease;
+
+            &:active {
+                opacity: 0.7;
+            }
+
+            &.active {
+                .nav-text {
+                    color: #92A3FD;
+                    font-weight: 500;
+                }
+            }
+
+            &.add-button {
+                margin-top: -16px;
+                
+                .add-text {
+                    background: linear-gradient(135deg, #92A3FD, #9DCEFF);
+                    color: #FFFFFF;
+                    font-size: 14px;
+                    font-weight: 500;
+                    padding: 8px 20px;
+                    border-radius: 20px;
+                    box-shadow: 0 4px 10px rgba(146, 163, 253, 0.25);
+                    position: relative;
+                    z-index: 2;
+                    transition: transform 0.2s ease;
+                    
+                    &:active {
+                        transform: scale(0.95);
+                    }
+                }
+
+                &::before {
+                    content: '';
+                    position: absolute;
+                    top: -4px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 100px;
+                    height: 40px;
+                    background-color: #fff;
+                    border-radius: 20px;
+                    z-index: 1;
+                    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.02);
+                }
+
+                .nav-text {
+                    display: none;
+                }
+            }
+
+            .at-icon {
+                font-size: 12px;
+            }
+
+            .nav-text {
+                font-size: 10px;
+                color: #666;
+                margin-top: 2px;
+            }
+        }
+    }
 }
 
 .popup-content-wrapper {
@@ -248,70 +820,75 @@
 }
 
 .detail-records {
-    .detail-item {
+    .detail-header {
         display: flex;
-        margin-bottom: 16px;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f0f0f0;
 
-        .time-line {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
-            width: 20px;
-            margin-right: 16px;
-
-            &::before {
-                content: '';
-                position: absolute;
-                top: 12px;
-                bottom: -24px;
-                left: 50%;
-                width: 1px;
-                background-color: #e8e8e8;
-            }
-
-            .time-dot {
-                width: 8px;
-                height: 8px;
-                border-radius: 50%;
-                background-color: #92A3FD;
-                position: relative;
-                z-index: 1;
-                margin-top: 8px;
-            }
+        .detail-date {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
         }
 
-        .record-content {
-            flex: 1;
-
-            .record-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 4px;
-
-                .time {
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #333;
-                }
-
-                .ultrafiltration {
-                    font-size: 14px;
-                    font-weight: 500;
-                    color: #92A3FD;
-                }
-
-                .details {
-                    font-size: 12px;
-                    color: #666;
-                }
-            }
+        .detail-count {
+            font-size: 14px;
+            color: #999;
         }
+    }
+
+    .detail-item {
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f0f0f0;
 
         &:last-child {
-            .time-line::before {
-                display: none;
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-time {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+
+            .time-text {
+                font-size: 16px;
+                font-weight: 500;
+                color: #333;
+            }
+
+            .sequence-text {
+                font-size: 14px;
+                color: #92A3FD;
+            }
+        }
+
+        .detail-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+
+            .value-item {
+                .value-label {
+                    font-size: 12px;
+                    color: #999;
+                    margin-bottom: 4px;
+                    display: block;
+                }
+
+                .value-text {
+                    font-size: 16px;
+                    color: #333;
+
+                    &.negative {
+                        color: #F44336;
+                    }
+                }
             }
         }
     }
