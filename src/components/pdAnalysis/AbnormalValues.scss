@@ -1,0 +1,81 @@
+.abnormal-values {
+  margin: 16px 0;
+}
+
+.abnormal-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    display: block;
+  }
+  
+  .empty-abnormal, .normal-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    
+    .empty-text, .normal-text {
+      font-size: 14px;
+      color: #999;
+      margin-left: 8px;
+    }
+  }
+  
+  .normal-status {
+    color: #4CAF50;
+    
+    .normal-text {
+      color: #4CAF50;
+    }
+  }
+  
+  .abnormal-list {
+    .abnormal-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .abnormal-icon {
+        margin-right: 12px;
+      }
+      
+      .abnormal-content {
+        flex: 1;
+        
+        .abnormal-message {
+          font-size: 14px;
+          color: #333;
+          display: block;
+        }
+        
+        .abnormal-value {
+          font-size: 14px;
+          color: #FF8A8A;
+          font-weight: 500;
+          display: block;
+          margin-top: 4px;
+        }
+      }
+      
+      .abnormal-time {
+        .time-text {
+          font-size: 12px;
+          color: #999;
+        }
+      }
+    }
+  }
+} 

@@ -1,0 +1,164 @@
+.pd-statistics {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.pd-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.card-header {
+  margin-bottom: 12px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.card-subtitle {
+  font-size: 14px;
+  color: #666;
+  display: block;
+}
+
+// 状态卡片样式
+.status-card {
+  .pd-alert {
+    margin: 12px 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    
+    &.warning {
+      background-color: rgba(255, 138, 138, 0.1);
+      border-left: 4px solid #FF8A8A;
+    }
+    
+    &.notice {
+      background-color: rgba(255, 193, 7, 0.1);
+      border-left: 4px solid #FFC107;
+    }
+    
+    &.good {
+      background-color: rgba(76, 175, 80, 0.1);
+      border-left: 4px solid #4CAF50;
+    }
+    
+    .alert-message {
+      font-size: 14px;
+      color: #333;
+    }
+  }
+  
+  .data-meta {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .count-text, .reliability-text {
+      font-size: 13px;
+      color: #666;
+    }
+    
+    .reliability-text {
+      color: #FF8A8A;
+    }
+  }
+}
+
+// 分布卡片样式
+.distribution-card {
+  .distribution-list {
+    margin-top: 16px;
+    
+    .distribution-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .distribution-color {
+        width: 12px;
+        height: 12px;
+        border-radius: 2px;
+        margin-right: 8px;
+      }
+      
+      .distribution-label {
+        flex: 1;
+        font-size: 14px;
+        color: #333;
+      }
+      
+      .distribution-value {
+        font-size: 14px;
+        color: #666;
+        margin-right: 8px;
+      }
+      
+      .distribution-percent {
+        font-size: 14px;
+        font-weight: 500;
+        color: #92A3FD;
+        min-width: 40px;
+        text-align: right;
+      }
+    }
+  }
+}
+
+// 统计数据卡片样式
+.stats-card {
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+    
+    .stats-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .stats-label {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 4px;
+      }
+      
+      .stats-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+      }
+      
+      .stats-unit {
+        font-size: 12px;
+        color: #999;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.empty-state {
+  padding: 40px 0;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+} 

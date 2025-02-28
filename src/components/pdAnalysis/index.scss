@@ -1,0 +1,60 @@
+.pd-analysis {
+  padding: 0;
+  background-color: transparent;
+  min-height: 100%;
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+  
+  .chart-section {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .chart-controls {
+      margin-bottom: 16px;
+    }
+    
+    .chart-container {
+      height: 240px;
+      position: relative;
+      
+      .loading-container, .empty-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        
+        text {
+          color: #999;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+  
+  // 确保所有卡片组件使用相同的外边距
+  .abnormal-values,
+  .pd-statistics {
+    margin: 16px 0;
+  }
+  
+  // 响应式调整
+  @media screen and (max-width: 375px) {
+    .chart-section .chart-container {
+      height: 180px;
+    }
+  }
+} 

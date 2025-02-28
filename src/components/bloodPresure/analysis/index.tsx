@@ -1,117 +1,62 @@
 "use client"
 
-import React, { useState, useEffect, useCallback, useRef } from "react"
+import React, { useState, useEffect } from "react"
 import { View, Text } from "@tarojs/components"
 import Taro from "@tarojs/taro"
 import "./index.scss"
-import { useBPData, ViewMode, ChartType, calculateNewDate, getInitialDateForMode } from "./useBPData"
-import ViewModeSelector from "./ViewModeSelector"
-import DateNavigator from "./DateNavigator"
-import ChartIndicators from "./ChartIndicators"
+import ViewModeSelector from "@/components/common/ViewModeSelector"
+import DateNavigator from "@/components/common/DateNavigator"
+import BPChart from "./BPChart"
+import BPStatistics from "./BPStatistics"
 import AbnormalValues from "./AbnormalValues"
-import BPChart from './BPChart'
-import BPStatistics from './BPStatistics'
+import useDateNavigation from "@/components/common/useDateNavigation"
+import { useBPData } from "./useBPData"
+import ChartIndicators from "./ChartIndicators"
 
 const BPAnalysis: React.FC = () => {
-  // === 状态管理 ===
-  const pageActive = useRef(true);
-  const [viewMode, setViewMode] = useState<ViewMode>("week")
-  const [currentDate, setCurrentDate] = useState<Date>(new Date())
-  const requestIdRef = useRef<number>(0) // 请求ID用于防止竞态条件
+  // 视图模式状态
+  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week")
   
-  // === useBPData 钩子 ===
+  // 使用自定义钩子管理日期导航
+  const {
+    currentEndDate,
+    handleDateChange,
+    resetToCurrentDate
+  } = useDateNavigation(viewMode, (date) => {
+    fetchData(viewMode, date);
+  });
+  
+  // 使用自定义钩子获取血压数据
   const {
     bpData,
-    metadata,  // 添加元数据
+    metadata,
     isLoading,
-    fetchData,
-    clearData
+    fetchData
   } = useBPData()
-  
-  // === 日期操作函数 ===
-  
-  // 在组件挂载和卸载时设置页面状态
+
+  // 当视图模式或日期变化时，重新获取数据
   useEffect(() => {
-    pageActive.current = true;
-    
-    return () => {
-      pageActive.current = false;
-    }
-  }, []);
+    fetchData(viewMode, currentEndDate)
+  }, [viewMode, currentEndDate, fetchData])
   
-  // 安全的请求数据方法
-  const safelyFetchData = useCallback((mode: ViewMode, date: Date) => {
-    if (pageActive.current) {
-      fetchData(mode, date);
-    }
-  }, [fetchData]);
-  
-  // 日期导航 - 前后切换
-  const navigateDate = useCallback((direction: 'prev' | 'next') => {
-    if (!pageActive.current) return;
-    
-    const newDate = calculateNewDate(currentDate, viewMode, direction)
-    setCurrentDate(newDate)
-    
-    // 使用安全的数据请求方法
-    safelyFetchData(viewMode, newDate)
-  }, [currentDate, viewMode, safelyFetchData])
-  
-  // 重置到今天
-  const resetToToday = useCallback(() => {
-    if (!pageActive.current) return;
-    
-    const today = new Date()
-    setCurrentDate(today)
-    
-    // 使用安全的数据请求方法
-    safelyFetchData(viewMode, today)
-  }, [viewMode, safelyFetchData])
+  // 处理视图模式变更
+  const handleViewModeChange = (mode: "day" | "week" | "month") => {
+    setViewMode(mode)
+    // 切换视图模式时重置为当天
+    resetToCurrentDate()
+  }
   
   // 处理图表滑动
-  const handleChartSwipe = useCallback((direction: 'left' | 'right') => {
-    if (!pageActive.current) return;
-    
-    if (direction === 'left') {
-      navigateDate('next');
-    } else if (direction === 'right') {
-      navigateDate('prev');
-    }
-  }, [navigateDate])
-  
-  // === 视图切换函数 ===
-  const handleViewModeChange = useCallback((mode: ViewMode) => {
-    if (!pageActive.current) return;
-    
-    // 清除当前数据，避免闪烁
-    clearData();
-    
-    // 设置新的视图模式
-    setViewMode(mode);
-    
-    // 根据新的视图模式获取初始日期
-    const initialDate = getInitialDateForMode(mode);
-    setCurrentDate(initialDate);
-    
-    // 请求新的数据
-    safelyFetchData(mode, initialDate);
-  }, [clearData, safelyFetchData])
-  
-  // 初始数据加载
-  useEffect(() => {
-    if (pageActive.current) {
-      safelyFetchData(viewMode, currentDate);
-    }
-    
-    // 添加错误处理
-    Taro.onError((err) => {
-      console.error("Taro error:", err);
-    });
-    
-    return () => {
-      Taro.offError();
-    }
-  }, [])
+  const handleChartSwipe = (direction: "left" | "right") => {
+    handleDateChange(direction === "left" ? "next" : "prev")
+  }
+
+  // 图表指示器数据
+  const chartIndicators = [
+    { label: "收缩压", color: "#92A3FD" },
+    { label: "舒张压", color: "#C58BF2" },
+    { label: "心率", color: "#EEA4CE" }
+  ]
   
   // === 渲染 ===
   return (
@@ -126,9 +71,9 @@ const BPAnalysis: React.FC = () => {
       
       <DateNavigator
         mode={viewMode}
-        currentDate={currentDate}
-        onNavigate={navigateDate}
-        onReset={resetToToday}
+        currentDate={currentEndDate}
+        onNavigate={handleDateChange}
+        onReset={resetToCurrentDate}
       />
       
       <View className="chart-section">

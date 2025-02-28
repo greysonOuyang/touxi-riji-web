@@ -222,6 +222,14 @@ const HistoricalDataMore: React.FC = () => {
             </Text>
           </View>
         </View>
+        
+        <View 
+          className="view-more-stats" 
+          onClick={() => Taro.navigateTo({ url: "/pages/statistics/index?tab=0" })}
+        >
+          <Text className="view-more-text">查看更多统计分析</Text>
+          <AtIcon value="chevron-right" size="14" color="#92A3FD" />
+        </View>
       </View>
 
       <View className={`data-list card ${!isDataExpanded ? "collapsed" : ""}`}>

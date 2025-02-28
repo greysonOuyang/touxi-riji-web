@@ -1,0 +1,29 @@
+.view-mode-selector {
+  display: flex;
+  background-color: #f5f7fa;
+  border-radius: 8px;
+  padding: 2px;
+  
+  .mode-option {
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin: 0 2px;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    
+    &.active {
+      background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+      color: #fff;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(146, 163, 253, 0.3);
+    }
+    
+    &:not(.active):hover {
+      background-color: #e8eaed;
+    }
+  }
+} 

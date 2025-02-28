@@ -4,11 +4,21 @@ import { AtTabs, AtTabsPane } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 import BPAnalysis from "@/components/bloodPresure/analysis";
+import PdAnalysis from "@/components/pdAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
 
   useDidShow(() => {
+    // 检查是否有传入的tab参数
+    const params = Taro.getCurrentInstance().router?.params;
+    if (params && params.tab) {
+      const tabIndex = parseInt(params.tab);
+      if (!isNaN(tabIndex) && tabIndex >= 0 && tabIndex < 5) {
+        setCurrent(tabIndex);
+      }
+    }
+    
     Taro.setNavigationBarTitle({
       title: "统计报告",
     });
@@ -60,7 +70,9 @@ const StatisticsReportPage: React.FC = () => {
       <ScrollView scrollY className="content-scroll">
         <View className="content-wrapper">
           <AtTabsPane current={current} index={0}>
-            {renderOtherTabContent("腹透")}
+            <View className="tab-content">
+              <PdAnalysis />
+            </View>
           </AtTabsPane>
 
           <AtTabsPane current={current} index={1}>
