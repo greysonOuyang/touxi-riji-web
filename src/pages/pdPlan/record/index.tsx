@@ -206,10 +206,22 @@ const pdPlanRecord: React.FC = () => {
     hideNumericKeyboard();
   };
 
+  // 添加格式化输入值的函数
+  const formatInputValue = (value: string | number | undefined) => {
+    if (value === undefined || value === '') return '点击输入';
+    return value;
+  };
+
+  // 检查值是否为空
+  const isEmptyValue = (value: string | number | undefined) => {
+    return value === undefined || value === '';
+  };
+
   return (
     <View className="pd-record-page">
       <View className="form-container">
-        <View className="form-group concentration-group">
+        {/* 浓度选择器 */}
+        <View className="form-group">
           <Text className="label">浓度</Text>
           <CapsuleSelector
             options={["1.5%", "2.5%", "4.25%"]}
@@ -218,31 +230,36 @@ const pdPlanRecord: React.FC = () => {
           />
         </View>
 
-        <View className="form-item-wrapper">
-          <View className="form-item">
-            <View className="left-section">
-              <Text className="label">引入量</Text>
-            </View>
-            <View className="right-section" onClick={() => showNumericKeyboard("infusion")}>
-              <View className="input-box">
-                {infusionVolume || "点击输入"}
-              </View>
-              <View className="unit-box">ml</View>
-            </View>
+        {/* 引入量 */}
+        <View className="form-group">
+          <Text className="label">引入量</Text>
+          <View className="value-container">
+            <Text 
+              className={`value-text ${isEmptyValue(infusionVolume) ? 'empty-value' : ''}`}
+              onClick={() => showNumericKeyboard("infusion")}
+              data-placeholder="点击输入"
+            >
+              {formatInputValue(infusionVolume)}
+            </Text>
+            <View className="unit-box">ml</View>
           </View>
         </View>
 
+        {/* 引流量 */}
         {!isFirstTime && (
-          <View className="form-item-wrapper">
-            <View className="form-item">
-              <View className="left-section">
-                <Text className="label">引流量</Text>
-              </View>
-              <View className="right-section" onClick={() => showNumericKeyboard("drainage")}>
-                <View className="input-box">
-                  {drainageVolume || "点击输入"}
-                </View>
-                <View className="unit-box" onClick={(e) => {
+          <View className="form-group">
+            <Text className="label">引流量</Text>
+            <View className="value-container">
+              <Text 
+                className={`value-text ${isEmptyValue(drainageVolume) ? 'empty-value' : ''}`}
+                onClick={() => showNumericKeyboard("drainage")}
+                data-placeholder="点击输入"
+              >
+                {formatInputValue(drainageVolume)}
+              </Text>
+              <View 
+                className="unit-box" 
+                onClick={(e) => {
                   e.stopPropagation(); // 阻止事件冒泡
                   const newUnit = drainageUnit === "ml" ? "kg" : "ml";
                   setDrainageUnit(newUnit);
@@ -250,17 +267,18 @@ const pdPlanRecord: React.FC = () => {
                     const newValue = handleDrainageUnitChange(drainageVolume, newUnit);
                     setDrainageVolume(newValue);
                   }
-                }}>
-                  {drainageUnit}
-                </View>
+                }}
+              >
+                {drainageUnit}
               </View>
             </View>
           </View>
         )}
         
-        <View className="time-selector-container">
-          <View className="time-item">
-            <Text className="label">记录时间</Text>
+        {/* 记录时间 */}
+        <View className="form-group">
+          <Text className="label">记录时间</Text>
+          <View className="time-container">
             <TimeSelector
               showLabel={false}
               value={recordDateTime}
