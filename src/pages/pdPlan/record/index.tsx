@@ -5,6 +5,9 @@ import { addPdRecord, NewPdRecord, isFirstTimeUser } from "@/api/pdRecordApi";
 import Taro, { useDidShow } from "@tarojs/taro";
 import FormItem from "@/components/common/FormItem";
 import CapsuleSelector from "@/components/common/CapsuleSelector";
+import NumericInput from "@/components/common/NumericInputProps";
+import Popup from "@/components/common/Popup";
+import TimeSelector from "@/components/common/TimeSelector";
 import "./index.scss";
 import Button from "@/components/common/ConfirmButton";
 
@@ -16,6 +19,12 @@ const pdPlanRecord: React.FC = () => {
   const [drainageVolume, setDrainageVolume] = useState("");
   const [drainageUnit, setDrainageUnit] = useState("ml");
   const [isFirstTime, setIsFirstTime] = useState(false);
+  const [recordDateTime, setRecordDateTime] = useState("");
+  
+  // 添加数字键盘相关状态
+  const [showKeyboard, setShowKeyboard] = useState(false);
+  const [activeField, setActiveField] = useState<"infusion" | "drainage" | null>(null);
+  const [activeFieldLabel, setActiveFieldLabel] = useState("");
 
   console.log("pdPlan/record rendering");
 
@@ -23,6 +32,10 @@ const pdPlanRecord: React.FC = () => {
     console.log("useEffect hook triggered");
     fetchPdPlan();
     checkFirstTimeUser();
+    // 设置当前时间
+    const now = new Date();
+    setRecordDateTime(now.toISOString());
+    
     Taro.setNavigationBarTitle({
       title: "记录腹透数据",
     });
@@ -104,24 +117,31 @@ const pdPlanRecord: React.FC = () => {
       !plan ||
       !concentration ||
       !infusionVolume ||
-      (!isFirstTime && !drainageVolume)
+      (!isFirstTime && !drainageVolume) ||
+      !recordDateTime
     ) {
       Taro.showToast({ title: "请填写所有必填字段", icon: "none" });
       return;
     }
 
-    const now = new Date();
-    const newRecord: NewPdRecord = {
-      userId: Taro.getStorageSync("userId"),
-      recordDate: now.toISOString().split("T")[0],
-      recordTime: now.toTimeString().split(" ")[0],
-      dialysateType: concentration,
-      infusionVolume: parseInt(infusionVolume),
-      drainageVolume: isFirstTime
+    const recordDate = new Date(recordDateTime);
+    const drainageVolumeValue = isFirstTime
         ? 0
         : drainageUnit === "kg"
         ? Math.round(parseFloat(drainageVolume) * 1000)
-        : parseInt(drainageVolume),
+        : parseInt(drainageVolume);
+    
+    const infusionVolumeValue = parseInt(infusionVolume);
+    const ultrafiltrationValue = drainageVolumeValue - infusionVolumeValue;
+    
+    const newRecord: NewPdRecord = {
+      userId: Taro.getStorageSync("userId"),
+      recordDate: recordDate.toISOString().split("T")[0],
+      recordTime: recordDate.toTimeString().split(" ")[0],
+      dialysateType: concentration,
+      infusionVolume: infusionVolumeValue,
+      drainageVolume: drainageVolumeValue,
+      ultrafiltration: ultrafiltrationValue,
     };
 
     try {
@@ -140,8 +160,9 @@ const pdPlanRecord: React.FC = () => {
     }
   };
 
+  // 修改处理输入值的函数
   const handleInfusionVolumeChange = (value: string) => {
-    setInfusionVolume(value.replace(/\D/g, ""));
+    setInfusionVolume(value);
   };
 
   const handleDrainageVolumeChange = (value: string) => {
@@ -161,6 +182,29 @@ const pdPlanRecord: React.FC = () => {
       return Math.round(numValue * 1000).toString();
     }
   };
+  
+  // 添加处理日期时间变化的函数
+  const handleDateTimeChange = (value: string) => {
+    setRecordDateTime(value);
+  };
+  
+  // 添加显示数字键盘的函数
+  const showNumericKeyboard = (field: "infusion" | "drainage") => {
+    setActiveField(field);
+    setActiveFieldLabel(field === "infusion" ? "引入量" : "引流量");
+    setShowKeyboard(true);
+  };
+  
+  // 添加隐藏数字键盘的函数
+  const hideNumericKeyboard = () => {
+    setShowKeyboard(false);
+    setActiveField(null);
+  };
+  
+  // 添加数字键盘完成回调
+  const handleNumericInputComplete = () => {
+    hideNumericKeyboard();
+  };
 
   return (
     <View className="pd-record-page">
@@ -174,29 +218,80 @@ const pdPlanRecord: React.FC = () => {
           />
         </View>
 
-        <FormItem
-          label="引入量"
-          value={infusionVolume}
-          units={["ml"]}
-          onChange={handleInfusionVolumeChange}
-          placeholder="点击输入"
-        />
+        <View className="form-item-wrapper">
+          <View className="form-item">
+            <View className="left-section">
+              <Text className="label">引入量</Text>
+            </View>
+            <View className="right-section" onClick={() => showNumericKeyboard("infusion")}>
+              <View className="input-box">
+                {infusionVolume || "点击输入"}
+              </View>
+              <View className="unit-box">ml</View>
+            </View>
+          </View>
+        </View>
 
         {!isFirstTime && (
-          <FormItem
-            label="引流量"
-            value={drainageVolume}
-            units={["ml", "kg"]}
-            onChange={handleDrainageVolumeChange}
-            onUnitChange={handleDrainageUnitChange}
-            placeholder="点击输入"
-          />
+          <View className="form-item-wrapper">
+            <View className="form-item">
+              <View className="left-section">
+                <Text className="label">引流量</Text>
+              </View>
+              <View className="right-section" onClick={() => showNumericKeyboard("drainage")}>
+                <View className="input-box">
+                  {drainageVolume || "点击输入"}
+                </View>
+                <View className="unit-box" onClick={(e) => {
+                  e.stopPropagation(); // 阻止事件冒泡
+                  const newUnit = drainageUnit === "ml" ? "kg" : "ml";
+                  setDrainageUnit(newUnit);
+                  if (drainageVolume) {
+                    const newValue = handleDrainageUnitChange(drainageVolume, newUnit);
+                    setDrainageVolume(newValue);
+                  }
+                }}>
+                  {drainageUnit}
+                </View>
+              </View>
+            </View>
+          </View>
         )}
+        
+        <View className="time-selector-container">
+          <View className="time-item">
+            <Text className="label">记录时间</Text>
+            <TimeSelector
+              showLabel={false}
+              value={recordDateTime}
+              onChange={handleDateTimeChange}
+              allowFuture={false}
+              mode="datetime"
+              defaultToCurrent={true}
+            />
+          </View>
+        </View>
       </View>
 
       <View className="button-container">
         <Button text="确认" type="primary" onClick={handleSubmit} />
       </View>
+      
+      <Popup 
+        visible={showKeyboard} 
+        onClose={hideNumericKeyboard}
+        title={activeFieldLabel}
+      >
+        <View className="numeric-keyboard-wrapper">
+          <NumericInput
+            value={activeField === "infusion" ? infusionVolume : drainageVolume}
+            onChange={activeField === "infusion" ? handleInfusionVolumeChange : handleDrainageVolumeChange}
+            unit={activeField === "infusion" ? "ml" : drainageUnit}
+            onComplete={handleNumericInputComplete}
+          />
+          <View className="safe-area-bottom" />
+        </View>
+      </Popup>
     </View>
   );
 };
