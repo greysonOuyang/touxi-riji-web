@@ -204,6 +204,19 @@ const HistoricalDataMore: React.FC = () => {
     Taro.navigateTo({ url: "/pages/statistics/index?tab=4" });
   };
 
+  // 根据时间获取时间段（早中晚）
+  const getTimeOfDay = (timeStr: string) => {
+    const hour = parseInt(timeStr.substring(0, 2), 10);
+    
+    if (hour >= 5 && hour < 12) {
+      return "morning";
+    } else if (hour >= 12 && hour < 18) {
+      return "afternoon";
+    } else {
+      return "evening";
+    }
+  };
+
   // 渲染日历网格
   const renderCalendarGrid = () => {
     const monthStart = startOfMonth(currentDate);
@@ -269,6 +282,7 @@ const HistoricalDataMore: React.FC = () => {
   // 渲染今日指标部分
   const renderTodaySection = () => {
     const isNegativeUltrafiltration = (todayRecord?.totalUltrafiltration || 0) < 0;
+    const isZeroUltrafiltration = (todayRecord?.totalUltrafiltration || 0) === 0;
     const progressPercentage = Math.min(
       Math.max(
         ((todayRecord?.totalCount || 0) / (todayRecord?.dailyFrequency || 1)) * 100,
@@ -286,11 +300,11 @@ const HistoricalDataMore: React.FC = () => {
 
         <View className="metrics-card">
           <View className="ultrafiltration-display">
-            <View className="ultrafiltration-circle">
+            <View className={`ultrafiltration-circle ${isZeroUltrafiltration ? 'zero' : (isNegativeUltrafiltration ? 'negative' : '')}`}>
               <Text className={`ultrafiltration-value ${isNegativeUltrafiltration ? 'negative' : ''}`}>
                 {todayRecord?.totalUltrafiltration || 0}
+                <Text className="ultrafiltration-unit">ml</Text>
               </Text>
-              <Text className="ultrafiltration-unit">ml</Text>
             </View>
             <Text className="ultrafiltration-label">今日超滤量</Text>
           </View>
@@ -342,7 +356,7 @@ const HistoricalDataMore: React.FC = () => {
               {detailedData.map((record, index) => (
                 <View key={index} className="record-item">
                   <View className="record-time-container">
-                    <View className="time-dot" />
+                    <View className={`time-dot ${getTimeOfDay(record.recordTime)}`} />
                     <View className="time-line" />
                     <Text className="record-time">{record.recordTime.substring(0, 5)}</Text>
                   </View>
@@ -407,7 +421,7 @@ const HistoricalDataMore: React.FC = () => {
             
             {!isSameDay(currentDate, new Date()) && (
               <View className="today-button" onClick={goToToday}>
-                <AtIcon value="clock" size="14" color="#92A3FD" />
+                <AtIcon value="clock" size="14" color="#666666" />
                 <Text>返回今日</Text>
               </View>
             )}
@@ -418,51 +432,19 @@ const HistoricalDataMore: React.FC = () => {
               <AtActivityIndicator size={32} color="#92A3FD" />
             </View>
           ) : (
-            <ScrollView 
-              scrollY 
-              className="calendar-container"
-              ref={calendarRef}
-            >
+            <ScrollView className="calendar-container" scrollY>
               {renderCalendarGrid()}
             </ScrollView>
           )}
-          
-          <View className="calendar-legend">
-            <View className="legend-item">
-              <View className="legend-indicator positive" />
-              <Text className="legend-text">正超滤</Text>
-            </View>
-            <View className="legend-item">
-              <View className="legend-indicator negative" />
-              <Text className="legend-text">负超滤</Text>
-            </View>
-            <View className="legend-item">
-              <View className="legend-indicator selected" />
-              <Text className="legend-text">选中日期</Text>
-            </View>
-          </View>
         </View>
         
         {/* 选中日期的记录 */}
-        <View className="selected-date-records">
-          <View className="history-header">
-            <View className="history-title-container">
-              <Text className="history-title">
-                {format(selectedDate, "MM月dd日")}记录
-                {isSelectedToday && <Text className="today-tag">今天</Text>}
-              </Text>
-              {!isSelectedToday && (
-                <View className="date-actions">
-                  <View className="today-link" onClick={() => {
-                    setSelectedDate(new Date());
-                    fetchDayDetails(format(new Date(), "yyyy-MM-dd"));
-                  }}>
-                    <AtIcon value="clock" size="14" color="#92A3FD" />
-                    <Text>查看今日</Text>
-                  </View>
-                </View>
-              )}
-            </View>
+        <View className="today-records">
+          <View className="records-header">
+            <Text className="records-title">
+              {format(selectedDate, "MM月dd日")}记录
+              {isSelectedToday && <Text className="today-tag">今天</Text>}
+            </Text>
             <Text className="record-count">共 {detailedData.length} 条记录</Text>
           </View>
 
@@ -475,7 +457,7 @@ const HistoricalDataMore: React.FC = () => {
               {detailedData.map((record, index) => (
                 <View key={index} className="record-item">
                   <View className="record-time-container">
-                    <View className="time-dot" />
+                    <View className={`time-dot ${getTimeOfDay(record.recordTime)}`} />
                     <View className="time-line" />
                     <Text className="record-time">{record.recordTime.substring(0, 5)}</Text>
                   </View>

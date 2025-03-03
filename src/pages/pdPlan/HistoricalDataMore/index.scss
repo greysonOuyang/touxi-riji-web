@@ -22,7 +22,7 @@
         padding: 40px 0;
         background-color: #fff;
         border-radius: 16px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
     }
 
     // 今日指标部分样式
@@ -49,7 +49,7 @@
             background-color: #fff;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
             margin-bottom: 16px;
             display: flex;
             flex-direction: column;
@@ -70,22 +70,37 @@
                     justify-content: center;
                     align-items: center;
                     margin-bottom: 10px;
-                    box-shadow: 0 4px 15px rgba(146, 163, 253, 0.2);
+                    box-shadow: 0 4px 15px rgba(146, 163, 253, 0.15);
+                    
+                    &.zero {
+                        background: linear-gradient(135deg, #9DCEFF, #92A3FD);
+                        opacity: 0.5;
+                        box-shadow: 0 4px 15px rgba(146, 163, 253, 0.1);
+                    }
+                    
+                    &.negative {
+                        background: linear-gradient(135deg, #FF6B6B, #FFB6B6);
+                    }
 
                     .ultrafiltration-value {
                         font-size: 28px;
                         font-weight: 700;
                         color: #fff;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
 
                         &.negative {
                             color: #FFE2E2;
                         }
-                    }
-
-                    .ultrafiltration-unit {
-                        font-size: 14px;
-                        color: #fff;
-                        opacity: 0.8;
+                        
+                        .ultrafiltration-unit {
+                            font-size: 16px;
+                            color: #fff;
+                            opacity: 0.9;
+                            margin-left: 4px;
+                            font-weight: 600;
+                        }
                     }
                 }
 
@@ -159,7 +174,7 @@
             background-color: #fff;
             border-radius: 12px;
             padding: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
 
             .action-button {
                 display: flex;
@@ -216,7 +231,7 @@
                 background-color: #fff;
                 border-radius: 16px;
                 padding: 20px;
-                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
 
                 .record-item {
                     display: flex;
@@ -238,17 +253,22 @@
                         position: relative;
 
                         .time-dot {
-                            width: 12px;
-                            height: 12px;
+                            width: 14px;
+                            height: 14px;
                             border-radius: 50%;
                             background-color: #92A3FD;
                             margin-bottom: 4px;
                             z-index: 1;
+                            box-shadow: 0 0 0 4px rgba(146, 163, 253, 0.15);
+                            
+                            &.morning { background-color: #FFD166; }
+                            &.afternoon { background-color: #92A3FD; }
+                            &.evening { background-color: #6B66FF; }
                         }
 
                         .time-line {
                             position: absolute;
-                            top: 12px;
+                            top: 14px;
                             width: 2px;
                             height: calc(100% + 12px);
                             background-color: #E0E0E0;
@@ -257,34 +277,55 @@
                         .record-time {
                             font-size: 14px;
                             color: #666;
+                            font-weight: 500;
                         }
                     }
 
                     .record-details {
                         flex: 1;
                         background-color: #F8F9FA;
-                        border-radius: 12px;
-                        padding: 16px;
+                        border-radius: 16px;
+                        padding: 18px;
+                        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+                        border: 1px solid rgba(0, 0, 0, 0.03);
 
                         .record-main-info {
                             display: flex;
                             justify-content: space-between;
-                            margin-bottom: 12px;
-                            padding-bottom: 12px;
-                            border-bottom: 1px solid #E0E0E0;
+                            margin-bottom: 14px;
+                            padding-bottom: 14px;
+                            border-bottom: 1px solid rgba(224, 224, 224, 0.5);
 
                             .record-label {
-                                font-size: 14px;
+                                font-size: 15px;
                                 color: #666;
                             }
 
                             .record-value {
-                                font-size: 16px;
+                                font-size: 18px;
                                 font-weight: 600;
                                 color: #333;
 
                                 &.negative {
                                     color: #FF6B6B;
+                                    position: relative;
+                                    
+                                    &::before {
+                                        content: '↓';
+                                        margin-right: 2px;
+                                        font-size: 16px;
+                                    }
+                                }
+                                
+                                &:not(.negative) {
+                                    position: relative;
+                                    
+                                    &::before {
+                                        content: '↑';
+                                        margin-right: 2px;
+                                        color: #4CAF50;
+                                        font-size: 16px;
+                                    }
                                 }
                             }
                         }
@@ -297,6 +338,9 @@
                             .info-item {
                                 flex: 1;
                                 min-width: calc(33% - 8px);
+                                background-color: rgba(255, 255, 255, 0.6);
+                                padding: 8px;
+                                border-radius: 8px;
 
                                 .info-label {
                                     font-size: 12px;
@@ -308,6 +352,7 @@
                                 .info-value {
                                     font-size: 14px;
                                     color: #333;
+                                    font-weight: 500;
                                 }
                             }
                         }
@@ -323,7 +368,7 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+                box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
 
                 .at-icon {
                     margin-bottom: 16px;
@@ -394,7 +439,7 @@
             background-color: #fff;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
 
             .record-item {
                 display: flex;
@@ -416,17 +461,22 @@
                     position: relative;
 
                     .time-dot {
-                        width: 12px;
-                        height: 12px;
+                        width: 14px;
+                        height: 14px;
                         border-radius: 50%;
                         background-color: #92A3FD;
                         margin-bottom: 4px;
                         z-index: 1;
+                        box-shadow: 0 0 0 4px rgba(146, 163, 253, 0.15);
+                        
+                        &.morning { background-color: #FFD166; }
+                        &.afternoon { background-color: #92A3FD; }
+                        &.evening { background-color: #6B66FF; }
                     }
 
                     .time-line {
                         position: absolute;
-                        top: 12px;
+                        top: 14px;
                         width: 2px;
                         height: calc(100% + 12px);
                         background-color: #E0E0E0;
@@ -435,34 +485,55 @@
                     .record-time {
                         font-size: 14px;
                         color: #666;
+                        font-weight: 500;
                     }
                 }
 
                 .record-details {
                     flex: 1;
                     background-color: #F8F9FA;
-                    border-radius: 12px;
-                    padding: 16px;
+                    border-radius: 16px;
+                    padding: 18px;
+                    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+                    border: 1px solid rgba(0, 0, 0, 0.03);
 
                     .record-main-info {
                         display: flex;
                         justify-content: space-between;
-                        margin-bottom: 12px;
-                        padding-bottom: 12px;
-                        border-bottom: 1px solid #E0E0E0;
+                        margin-bottom: 14px;
+                        padding-bottom: 14px;
+                        border-bottom: 1px solid rgba(224, 224, 224, 0.5);
 
                         .record-label {
-                            font-size: 14px;
+                            font-size: 15px;
                             color: #666;
                         }
 
                         .record-value {
-                            font-size: 16px;
+                            font-size: 18px;
                             font-weight: 600;
                             color: #333;
 
                             &.negative {
                                 color: #FF6B6B;
+                                position: relative;
+                                
+                                &::before {
+                                    content: '↓';
+                                    margin-right: 2px;
+                                    font-size: 16px;
+                                }
+                            }
+                            
+                            &:not(.negative) {
+                                position: relative;
+                                
+                                &::before {
+                                    content: '↑';
+                                    margin-right: 2px;
+                                    color: #4CAF50;
+                                    font-size: 16px;
+                                }
                             }
                         }
                     }
@@ -475,6 +546,9 @@
                         .info-item {
                             flex: 1;
                             min-width: calc(33% - 8px);
+                            background-color: rgba(255, 255, 255, 0.6);
+                            padding: 8px;
+                            border-radius: 8px;
 
                             .info-label {
                                 font-size: 12px;
@@ -486,6 +560,7 @@
                             .info-value {
                                 font-size: 14px;
                                 color: #333;
+                                font-weight: 500;
                             }
                         }
                     }
@@ -501,7 +576,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
 
             .at-icon {
                 margin-bottom: 16px;
@@ -533,7 +608,7 @@
             background-color: #fff;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
             margin-bottom: 20px;
             
             .calendar-container {
@@ -545,7 +620,7 @@
             background-color: #fff;
             border-radius: 16px;
             padding: 20px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
             margin-bottom: 20px;
         }
     }
@@ -555,7 +630,7 @@
         background-color: #fff;
         border-radius: 16px;
         padding: 20px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
         margin-bottom: 24px;
 
         .calendar-header {
@@ -569,20 +644,27 @@
                 align-items: center;
 
                 .nav-button {
-                    width: 32px;
-                    height: 32px;
+                    width: 36px;
+                    height: 36px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     border-radius: 50%;
                     background-color: #F0F0F0;
+                    transition: background-color 0.2s;
+                    
+                    &:active {
+                        background-color: #E5E5E5;
+                    }
                 }
 
                 .current-month {
-                    font-size: 16px;
+                    font-size: 18px;
                     font-weight: 600;
                     color: #333;
-                    margin: 0 12px;
+                    margin: 0 16px;
+                    min-width: 120px;
+                    text-align: center;
                 }
             }
 
@@ -592,13 +674,18 @@
                 padding: 6px 12px;
                 background-color: #F0F0F0;
                 border-radius: 16px;
+                transition: background-color 0.2s;
+                
+                &:active {
+                    background-color: #E5E5E5;
+                }
                 
                 .at-icon {
                     margin-right: 4px;
                 }
                 
                 text {
-                    font-size: 12px;
+                    font-size: 14px;
                     color: #666;
                 }
             }
@@ -732,8 +819,8 @@
         left: 0;
         right: 0;
         display: flex;
-        background-color: #fff;
-        box-shadow: 0 -1px 6px rgba(0, 0, 0, 0.04);
+        background-color: #f8f9fa;
+        box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.02);
         padding: 4px 0 6px;
         z-index: 100;
         border-top: 1px solid rgba(0, 0, 0, 0.03);
@@ -768,7 +855,7 @@
                     font-weight: 500;
                     padding: 8px 20px;
                     border-radius: 20px;
-                    box-shadow: 0 4px 10px rgba(146, 163, 253, 0.25);
+                    box-shadow: 0 4px 10px rgba(146, 163, 253, 0.2);
                     position: relative;
                     z-index: 2;
                     transition: transform 0.2s ease;
@@ -786,10 +873,10 @@
                     transform: translateX(-50%);
                     width: 100px;
                     height: 40px;
-                    background-color: #fff;
+                    background-color: #f8f9fa;
                     border-radius: 20px;
                     z-index: 1;
-                    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.02);
+                    box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.01);
                 }
 
                 .nav-text {
