@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import usePdData from "./usePdData";
-import useDateNavigation from "./useDateNavigation";
-import ViewModeSelector from "./ViewModeSelector";
-import DateNavigator from "./DateNavigator";
+import ViewModeSelector from "@/components/common/ViewModeSelector";
+import DateNavigator from "@/components/common/DateNavigator";
+import useDateNavigation from "@/components/common/useDateNavigation";
 import PdChart from "./PdChart";
 import PdStatistics from "./PdStatistics";
 import AbnormalValues from "./AbnormalValues";
@@ -15,7 +15,16 @@ const PdAnalysis: React.FC = () => {
   // 视图模式状态
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("day");
   
-  // 使用自定义钩子获取腹透数据和日期导航
+  // 使用公共的日期导航钩子
+  const { 
+    currentEndDate,
+    handleDateChange,
+    resetToCurrentDate
+  } = useDateNavigation(viewMode, (date) => {
+    refreshData(viewMode, date);
+  });
+  
+  // 使用自定义钩子获取腹透数据
   const { 
     pdData, 
     metadata, 
@@ -23,37 +32,23 @@ const PdAnalysis: React.FC = () => {
     isLoading, 
     error 
   } = usePdData();
-  
-  const { 
-    currentDate, 
-    navigateDate, 
-    formatDateRange,
-    resetToCurrentDate
-  } = useDateNavigation(viewMode);
 
   // 处理视图模式变化
   const handleViewModeChange = (mode: "day" | "week" | "month") => {
     setViewMode(mode);
-  };
-
-  // 处理日期导航
-  const handleDateChange = (direction: "prev" | "next") => {
-    navigateDate(direction);
+    // 切换视图模式时重置为当天
+    resetToCurrentDate();
   };
 
   // 处理图表滑动
   const handleChartSwipe = (direction: "left" | "right") => {
-    if (direction === "left") {
-      navigateDate("next");
-    } else {
-      navigateDate("prev");
-    }
+    handleDateChange(direction === "left" ? "next" : "prev");
   };
 
   // 当视图模式或日期变化时刷新数据
   useEffect(() => {
-    refreshData(viewMode, currentDate);
-  }, [viewMode, currentDate, refreshData]);
+    refreshData(viewMode, currentEndDate);
+  }, [viewMode, currentEndDate, refreshData]);
 
   // 设置页面标题
   useEffect(() => {
@@ -61,19 +56,6 @@ const PdAnalysis: React.FC = () => {
       title: "腹透分析"
     });
   }, []);
-
-  // 渲染图表指示器
-  const renderChartIndicators = () => {
-    return (
-      <ChartIndicators 
-        indicators={[
-          { label: "超滤量", color: "#92A3FD" },
-          { label: "引流量", color: "#C58BF2" },
-          { label: "注入量", color: "#EEA4CE" }
-        ]} 
-      />
-    );
-  };
 
   // 如果发生错误，显示错误信息
   if (error) {
@@ -83,7 +65,7 @@ const PdAnalysis: React.FC = () => {
         <Text className="error-message">{error}</Text>
         <View 
           className="retry-button"
-          onClick={() => refreshData(viewMode, currentDate)}
+          onClick={() => refreshData(viewMode, currentEndDate)}
         >
           <Text className="retry-text">重试</Text>
         </View>
@@ -93,53 +75,73 @@ const PdAnalysis: React.FC = () => {
 
   return (
     <View className="pd-analysis">
-      {/* 头部区域 */}
-      <View className="pd-header">
-        <Text className="pd-title">腹透分析</Text>
-        <Text className="pd-subtitle">查看您的腹透数据统计和趋势</Text>
+      {/* 头部容器 - 与血压分析保持一致 */}
+      <View className="header-container">
+        <Text className="chart-title">腹透趋势</Text>
+        <ViewModeSelector 
+          viewMode={viewMode} 
+          onViewModeChange={handleViewModeChange} 
+        />
       </View>
-      
-      {/* 视图模式选择器 */}
-      <ViewModeSelector 
-        viewMode={viewMode} 
-        onViewModeChange={handleViewModeChange} 
-      />
       
       {/* 日期导航器 */}
       <DateNavigator 
-        currentDate={currentDate}
         mode={viewMode}
+        currentDate={currentEndDate}
         onNavigate={handleDateChange}
         onReset={resetToCurrentDate}
       />
       
       {/* 图表区域 */}
       <View className="chart-section">
-        <PdChart 
-          viewMode={viewMode} 
-          pdData={pdData} 
-          onSwipe={handleChartSwipe}
-          isLoading={isLoading}
-        />
-        {renderChartIndicators()}
+        <View className="chart-controls">
+          <ChartIndicators />
+        </View>
+        
+        <View className="chart-container">
+          {isLoading && (
+            <View className="loading-container">
+              <Text>加载中...</Text>
+            </View>
+          )}
+          
+          {!isLoading && pdData && pdData.length > 0 && (
+            <PdChart 
+              viewMode={viewMode} 
+              pdData={pdData} 
+              onSwipe={handleChartSwipe}
+              isLoading={false}
+            />
+          )}
+          
+          {!isLoading && (!pdData || pdData.length === 0) && (
+            <View className="empty-container">
+              <Text>暂无数据</Text>
+            </View>
+          )}
+        </View>
       </View>
       
-      {/* 统计区域 */}
-      <PdStatistics 
-        pdData={pdData} 
-        metadata={metadata} 
-        viewMode={viewMode}
-        isLoading={isLoading}
-      />
+      {/* 异常值分析 - 仅在日视图模式下显示 */}
+      {!isLoading && pdData && Array.isArray(pdData) && pdData.length > 0 && viewMode === "day" && (
+        <AbnormalValues 
+          pdData={pdData} 
+          viewMode={viewMode}
+          isLoading={false}
+        />
+      )}
       
-      {/* 异常值区域 */}
-      <AbnormalValues 
-        pdData={pdData} 
-        viewMode={viewMode}
-        isLoading={isLoading}
-      />
+      {/* 腹透统计分析 */}
+      {!isLoading && pdData && Array.isArray(pdData) && pdData.length > 0 && (
+        <PdStatistics 
+          pdData={pdData} 
+          metadata={metadata} 
+          viewMode={viewMode}
+          isLoading={false}
+        />
+      )}
     </View>
   );
 };
 
-export default PdAnalysis; 
+export default PdAnalysis;

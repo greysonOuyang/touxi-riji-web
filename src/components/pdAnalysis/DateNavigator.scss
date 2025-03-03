@@ -1,46 +1,100 @@
 .date-navigator {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin: 12px 0;
+  align-items: center;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
-  .nav-button {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background-color: #f5f7fa;
+  .date-controls {
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
     
-    &:active {
-      background-color: #e8eaed;
+    .date-arrow {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 16px;
+      background-color: #f5f5f5;
+      margin-right: 12px;
+      
+      &:last-child {
+        margin-right: 0;
+      }
+      
+      .arrow-icon {
+        width: 16px;
+        height: 16px;
+      }
+      
+      &:active {
+        background-color: #e8e8e8;
+      }
     }
   }
   
   .date-display {
     flex: 1;
     text-align: center;
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
     
-    text {
+    .date-text {
       font-size: 16px;
-      font-weight: 500;
-      color: #333;
+      font-weight: 600;
+      color: #333333;
     }
+  }
+  
+  .date-reset {
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: linear-gradient(to right, #92A3FD, #9DCEFF);
     
-    .today-indicator {
-      font-size: 12px;
-      color: #92A3FD;
-      margin-top: 4px;
-      opacity: 0.8;
+    .reset-text {
+      font-size: 14px;
+      color: #ffffff;
     }
     
     &:active {
-      background-color: #f5f7fa;
+      opacity: 0.9;
+    }
+  }
+}
+
+// 响应式调整
+@media screen and (max-width: 375px) {
+  .date-navigator {
+    padding: 10px 12px;
+    
+    .date-controls {
+      .date-arrow {
+        width: 28px;
+        height: 28px;
+        border-radius: 14px;
+        margin-right: 10px;
+        
+        .arrow-icon {
+          width: 14px;
+          height: 14px;
+        }
+      }
+    }
+    
+    .date-display {
+      .date-text {
+        font-size: 14px;
+      }
+    }
+    
+    .date-reset {
+      padding: 4px 10px;
+      
+      .reset-text {
+        font-size: 12px;
+      }
     }
   }
 } 

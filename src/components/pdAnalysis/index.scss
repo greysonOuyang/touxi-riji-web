@@ -2,7 +2,68 @@
   padding: 0;
   background-color: transparent;
   min-height: 100%;
+  padding: 0 16px;
   
+  // 错误状态
+  &.error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    
+    .error-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    
+    .error-message {
+      font-size: 14px;
+      color: #FF8A8A;
+      margin-bottom: 24px;
+      text-align: center;
+      max-width: 80%;
+    }
+    
+    .retry-button {
+      padding: 8px 24px;
+      background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+      border-radius: 20px;
+      
+      .retry-text {
+        font-size: 14px;
+        color: #FFFFFF;
+      }
+    }
+  }
+  
+  // 头部区域 - 与血压分析保持一致的间距
+  .pd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .pd-title-container {
+      .pd-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        display: block;
+        margin-bottom: 4px;
+      }
+      
+      .pd-subtitle {
+        font-size: 14px;
+        color: #666;
+        display: block;
+      }
+    }
+  }
+  
+  // 头部容器 - 与血压分析保持一致
   .header-container {
     display: flex;
     justify-content: space-between;
@@ -10,12 +71,23 @@
     margin-bottom: 16px;
     
     .chart-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       color: #333;
     }
   }
   
+  // 控制区域 - 与血压分析保持一致的间距
+  .pd-controls {
+    margin-bottom: 16px;
+    
+    // 确保视图模式选择器和日期导航器之间有适当间距
+    .view-mode-selector {
+      margin-bottom: 12px;
+    }
+  }
+  
+  // 图表区域 - 与血压分析保持一致的样式
   .chart-section {
     background-color: #ffffff;
     border-radius: 12px;
@@ -25,7 +97,7 @@
     overflow: hidden;
     
     .chart-controls {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     
     .chart-container {
@@ -46,6 +118,16 @@
     }
   }
   
+  // 统计区域 - 移除多余的标题，直接使用组件内部标题
+  .statistics-section {
+    margin-bottom: 16px;
+  }
+  
+  // 异常值区域 - 移除多余的标题，直接使用组件内部标题
+  .abnormal-section {
+    margin-bottom: 16px;
+  }
+  
   // 确保所有卡片组件使用相同的外边距
   .abnormal-values,
   .pd-statistics {
@@ -54,8 +136,14 @@
   
   // 响应式调整
   @media screen and (max-width: 375px) {
-    .chart-section .chart-container {
-      height: 180px;
+    padding: 0 12px;
+    
+    .chart-section {
+      padding: 12px;
+      
+      .chart-container {
+        height: 200px;
+      }
     }
   }
 } 

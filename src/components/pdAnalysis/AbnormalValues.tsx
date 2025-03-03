@@ -139,8 +139,11 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({
   return (
     <View className="abnormal-values">
       <View className="abnormal-header">
-        <Text className="abnormal-title">异常值警报</Text>
-        <Text className="abnormal-count">共 {abnormalValues.length} 条</Text>
+        <View className="abnormal-title">
+          异常值警报
+          <Text className="abnormal-badge">{abnormalValues.length}</Text>
+        </View>
+        <Text className="abnormal-count">需要关注</Text>
       </View>
       
       <View className="abnormal-list">

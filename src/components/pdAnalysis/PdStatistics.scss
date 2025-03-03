@@ -1,17 +1,18 @@
 .pd-statistics {
-  width: 100%;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  margin-bottom: 16px;
-  padding: 16px;
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   
   &.loading, &.empty {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 200px;
+    height: 180px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     
     .loading-text {
       font-size: 16px;
@@ -29,188 +30,6 @@
       color: #999999;
     }
   }
-  
-  .statistics-header {
-    margin-bottom: 16px;
-    
-    .statistics-title {
-      font-size: 18px;
-      font-weight: 600;
-      color: #333333;
-      margin-bottom: 4px;
-      display: block;
-    }
-    
-    .statistics-subtitle {
-      font-size: 14px;
-      color: #666666;
-      display: block;
-    }
-  }
-  
-  .status-card {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-radius: 12px;
-    margin-bottom: 16px;
-    
-    &.success {
-      background: linear-gradient(to right, #ADE792, #BFEAA6);
-    }
-    
-    &.info {
-      background: linear-gradient(to right, #9DCEFF, #92A3FD);
-    }
-    
-    &.warning {
-      background: linear-gradient(to right, #FFCF86, #FFAA85);
-    }
-    
-    .status-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 20px;
-      background-color: rgba(255, 255, 255, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-right: 12px;
-      
-      .icon {
-        width: 24px;
-        height: 24px;
-      }
-    }
-    
-    .status-content {
-      flex: 1;
-      
-      .status-title {
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.7);
-        margin-bottom: 4px;
-        display: block;
-      }
-      
-      .status-message {
-        font-size: 16px;
-        font-weight: 500;
-        color: rgba(0, 0, 0, 0.8);
-        display: block;
-      }
-    }
-  }
-  
-  .statistics-card {
-    background-color: #ffffff;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 16px;
-    border: 1px solid #f0f0f0;
-    
-    .card-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333333;
-      margin-bottom: 16px;
-      display: block;
-    }
-    
-    .statistics-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      
-      .statistics-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        
-        .item-value {
-          font-size: 18px;
-          font-weight: 600;
-          color: #333333;
-          margin-bottom: 4px;
-        }
-        
-        .item-label {
-          font-size: 12px;
-          color: #666666;
-          text-align: center;
-        }
-      }
-    }
-    
-    .concentration-distribution {
-      .concentration-item {
-        margin-bottom: 12px;
-        
-        &:last-child {
-          margin-bottom: 0;
-        }
-        
-        .concentration-bar-container {
-          height: 12px;
-          background-color: #f5f5f5;
-          border-radius: 6px;
-          overflow: hidden;
-          margin-bottom: 4px;
-          
-          .concentration-bar {
-            height: 100%;
-            background: linear-gradient(to right, #92A3FD, #9DCEFF);
-            border-radius: 6px;
-          }
-        }
-        
-        .concentration-info {
-          display: flex;
-          justify-content: space-between;
-          
-          .concentration-type {
-            font-size: 12px;
-            color: #666666;
-          }
-          
-          .concentration-percentage {
-            font-size: 12px;
-            color: #333333;
-            font-weight: 500;
-          }
-        }
-      }
-    }
-    
-    .health-tips {
-      .health-tip {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 12px;
-        
-        &:last-child {
-          margin-bottom: 0;
-        }
-        
-        .tip-bullet {
-          width: 8px;
-          height: 8px;
-          border-radius: 4px;
-          background-color: #92A3FD;
-          margin-top: 6px;
-          margin-right: 8px;
-          flex-shrink: 0;
-        }
-        
-        .tip-text {
-          font-size: 14px;
-          color: #333333;
-          line-height: 1.5;
-          flex: 1;
-        }
-      }
-    }
-  }
 }
 
 .pd-card {
@@ -219,154 +38,238 @@
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
-}
-
-.card-header {
-  margin-bottom: 12px;
-}
-
-.card-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #333;
-  display: block;
-  margin-bottom: 4px;
-}
-
-.card-subtitle {
-  font-size: 14px;
-  color: #666;
-  display: block;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .card-header {
+    margin-bottom: 12px;
+  }
+  
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .card-subtitle {
+    font-size: 14px;
+    color: #666;
+    display: block;
+  }
 }
 
 // 状态卡片样式
 .status-card {
-  .pd-alert {
-    margin: 12px 0;
-    padding: 10px 12px;
-    border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  &.success {
+    background: linear-gradient(to right, #ADE792, #BFEAA6);
+  }
+  
+  &.info {
+    background: linear-gradient(to right, #9DCEFF, #92A3FD);
+  }
+  
+  &.warning {
+    background: linear-gradient(to right, #FFCF86, #FFAA85);
+  }
+  
+  .status-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.8);
     display: flex;
+    justify-content: center;
     align-items: center;
+    margin-right: 12px;
+    flex-shrink: 0;
     
-    &.warning {
-      background-color: rgba(255, 138, 138, 0.1);
-      border-left: 4px solid #FF8A8A;
-    }
-    
-    &.notice {
-      background-color: rgba(255, 193, 7, 0.1);
-      border-left: 4px solid #FFC107;
-    }
-    
-    &.good {
-      background-color: rgba(76, 175, 80, 0.1);
-      border-left: 4px solid #4CAF50;
-    }
-    
-    .alert-message {
-      font-size: 14px;
-      color: #333;
+    .icon {
+      width: 20px;
+      height: 20px;
     }
   }
   
-  .data-meta {
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  .status-content {
+    flex: 1;
+    overflow: hidden;
     
-    .count-text, .reliability-text {
+    .status-title {
       font-size: 13px;
-      color: #666;
+      color: rgba(0, 0, 0, 0.7);
+      margin-bottom: 2px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
-    .reliability-text {
-      color: #FF8A8A;
+    .status-message {
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.8);
+      display: block;
+      line-height: 1.3;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
   }
 }
 
-// 分布卡片样式
-.distribution-card {
-  .distribution-list {
-    margin-top: 16px;
+.statistics-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #f0f0f0;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 12px;
+    display: block;
+  }
+  
+  .statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
     
-    .distribution-item {
+    .statistics-item {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      margin-bottom: 12px;
+      padding: 10px 8px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      
+      .item-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 4px;
+      }
+      
+      .item-label {
+        font-size: 12px;
+        color: #666666;
+        text-align: center;
+        line-height: 1.2;
+      }
+    }
+  }
+  
+  .concentration-distribution {
+    .concentration-item {
+      margin-bottom: 10px;
       
       &:last-child {
         margin-bottom: 0;
       }
       
-      .distribution-color {
-        width: 12px;
-        height: 12px;
-        border-radius: 2px;
-        margin-right: 8px;
-      }
-      
-      .distribution-label {
-        flex: 1;
-        font-size: 14px;
-        color: #333;
-      }
-      
-      .distribution-value {
-        font-size: 14px;
-        color: #666;
-        margin-right: 8px;
-      }
-      
-      .distribution-percent {
-        font-size: 14px;
-        font-weight: 500;
-        color: #92A3FD;
-        min-width: 40px;
-        text-align: right;
-      }
-    }
-  }
-}
-
-// 统计数据卡片样式
-.stats-card {
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 16px;
-    
-    .stats-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      
-      .stats-label {
-        font-size: 13px;
-        color: #666;
+      .concentration-bar-container {
+        height: 10px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        overflow: hidden;
         margin-bottom: 4px;
+        
+        .concentration-bar {
+          height: 100%;
+          background: linear-gradient(to right, #92A3FD, #9DCEFF);
+          border-radius: 5px;
+        }
       }
       
-      .stats-value {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
+      .concentration-info {
+        display: flex;
+        justify-content: space-between;
+        
+        .concentration-type {
+          font-size: 12px;
+          color: #666666;
+        }
+        
+        .concentration-percentage {
+          font-size: 12px;
+          color: #333333;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+  
+  .health-tips {
+    .health-tip {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      
+      &:last-child {
+        margin-bottom: 0;
       }
       
-      .stats-unit {
-        font-size: 12px;
-        color: #999;
-        margin-top: 2px;
+      .tip-bullet {
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background-color: #92A3FD;
+        margin-top: 6px;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+      
+      .tip-text {
+        font-size: 13px;
+        color: #333333;
+        line-height: 1.4;
+        flex: 1;
       }
     }
   }
 }
 
-.empty-state {
-  padding: 40px 0;
-  text-align: center;
-  color: #999;
-  font-size: 14px;
+// 响应式调整
+@media screen and (max-width: 375px) {
+  .pd-card {
+    padding: 12px;
+  }
+  
+  .statistics-card {
+    padding: 10px;
+    
+    .statistics-grid {
+      gap: 8px;
+      
+      .statistics-item {
+        padding: 8px 6px;
+        
+        .item-value {
+          font-size: 14px;
+        }
+        
+        .item-label {
+          font-size: 11px;
+        }
+      }
+    }
+  }
 } 

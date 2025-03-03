@@ -1,35 +1,50 @@
 .chart-indicators {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0 6px;
   
-  .indicator-item {
+  .indicators-group {
     display: flex;
-    align-items: center;
-    gap: 4px;
+    gap: 8px;
+    flex-wrap: wrap;
     
-    .indicator-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
+    .indicator-item {
+      display: flex;
+      align-items: center;
       
-      &.ultrafiltration {
-        background: linear-gradient(274.42deg, #92A3FD 0%, #9DCEFF 124.45%);
+      .indicator-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 4px;
+        margin-right: 4px;
       }
       
-      &.drainage {
-        background: #C58BF2;
+      .indicator-text {
+        font-size: 12px;
+        color: #666666;
       }
+    }
+  }
+  
+  .chart-unit {
+    font-size: 11px;
+    color: #999999;
+  }
+  
+  // 响应式调整
+  @media screen and (max-width: 375px) {
+    .indicators-group {
+      gap: 6px;
       
-      &.target {
-        background: #EEA4CE;
-        border: 1px dashed #D18CE0;
+      .indicator-item .indicator-text {
+        font-size: 11px;
       }
     }
     
-    .indicator-label {
-      font-size: 12px;
-      color: #666;
+    .chart-unit {
+      font-size: 10px;
     }
   }
 } 

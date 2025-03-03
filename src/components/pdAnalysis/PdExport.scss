@@ -1,0 +1,33 @@
+.pd-export {
+  display: flex;
+  justify-content: flex-end;
+  margin: 12px 0;
+  
+  .export-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 12px;
+    height: 28px;
+    border-radius: 14px;
+    background-color: #f5f7fa;
+    border: 1px solid #e8eaed;
+    box-shadow: none;
+    
+    .export-icon {
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
+    }
+    
+    .button-text {
+      font-size: 13px;
+      color: #333;
+      font-weight: 500;
+    }
+    
+    &:active {
+      background-color: #e8eaed;
+    }
+  }
+} 
