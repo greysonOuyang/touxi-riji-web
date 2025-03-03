@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from "react";
-import { Canvas, View, Text } from "@tarojs/components";
+import React, { useEffect, useRef, useState } from "react";
+import { View, Text, Canvas } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { format, parseISO } from "date-fns";
 import { PdDataPoint } from "./usePdData";
@@ -11,412 +11,310 @@ import UCharts from "@qiun/ucharts";
 interface PdChartProps {
   viewMode: "day" | "week" | "month";
   pdData: PdDataPoint[];
-  onSwipe?: (direction: "left" | "right") => void;
   isLoading?: boolean;
 }
 
 const PdChart: React.FC<PdChartProps> = ({
   viewMode,
   pdData,
-  onSwipe,
   isLoading = false
 }) => {
   const chartRef = useRef<any>(null);
+
   const canvasId = "pd-chart";
-  const [chartType, setChartType] = useState<"line" | "column">("line");
-  let startX = 0;
-
-  // 处理触摸开始事件
-  const handleTouchStart = (e) => {
-    startX = e.touches[0].x;
-  };
-
-  // 处理触摸结束事件
-  const handleTouchEnd = (e) => {
-    if (!onSwipe) return;
-    
-    const endX = e.changedTouches[0].x;
-    const diffX = endX - startX;
-    
-    // 判断滑动方向
-    if (Math.abs(diffX) > 50) {
-      if (diffX > 0) {
-        onSwipe("right"); // 右滑
-      } else {
-        onSwipe("left"); // 左滑
-      }
-    }
-  };
-
-  // 切换图表类型
-  const toggleChartType = () => {
-    const newType = chartType === "line" ? "column" : "line";
-    setChartType(newType);
-  };
-
-  // 初始化图表
-  const initChart = (canvas, width, height) => {
-    if (!canvas) {
-      console.error("Canvas节点不存在");
-      return null;
-    }
-    
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      console.error("无法获取Canvas上下文");
-      return null;
-    }
-    
-    const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
-    
-    // 设置Canvas尺寸
-    canvas.width = width * pixelRatio;
-    canvas.height = height * pixelRatio;
-    ctx.scale(pixelRatio, pixelRatio);
-    
-    // 准备数据
-    const categories: string[] = [];
-    const ultrafiltrationData: number[] = [];
-    const drainageData: number[] = [];
-    const infusionData: number[] = [];
-    const balanceData: number[] = []; // 平衡 = 引流 - 注入
-    
-    try {
-      // 根据视图模式处理数据
-      if (viewMode === "day") {
-        // 日视图：按时间排序
-        const sortedData = [...pdData].sort((a, b) => 
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
-        
-        sortedData.forEach(item => {
-          categories.push(item.recordTime.substring(0, 5));
-          ultrafiltrationData.push(item.ultrafiltration);
-          drainageData.push(item.drainageVolume);
-          infusionData.push(item.infusionVolume);
-          balanceData.push(item.drainageVolume - item.infusionVolume);
-        });
-      } else if (viewMode === "week") {
-        // 周视图：按日期分组
-        const weekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-        const dayData = new Map<number, { 
-          ultrafiltration: number; 
-          drainage: number; 
-          infusion: number;
-          count: number 
-        }>();
-        
-        // 初始化每天的数据
-        for (let i = 0; i < 7; i++) {
-          dayData.set(i, { ultrafiltration: 0, drainage: 0, infusion: 0, count: 0 });
-        }
-        
-        // 累加每天的数据
-        pdData.forEach(item => {
-          try {
-            const date = parseISO(item.date);
-            const dayIndex = (date.getDay() + 6) % 7; // 转换为周一为0
-            
-            const dayStats = dayData.get(dayIndex)!;
-            dayStats.ultrafiltration += item.ultrafiltration;
-            dayStats.drainage += item.drainageVolume;
-            dayStats.infusion += item.infusionVolume;
-            dayStats.count += 1;
-          } catch (e) {
-            console.error("日期解析错误:", e);
-          }
-        });
-        
-        // 计算每天的平均值
-        for (let i = 0; i < 7; i++) {
-          categories.push(weekDays[i]);
-          const stats = dayData.get(i)!;
-          
-          if (stats.count > 0) {
-            ultrafiltrationData.push(Math.round(stats.ultrafiltration / stats.count));
-            drainageData.push(Math.round(stats.drainage / stats.count));
-            infusionData.push(Math.round(stats.infusion / stats.count));
-            balanceData.push(Math.round((stats.drainage - stats.infusion) / stats.count));
-          } else {
-            ultrafiltrationData.push(0);
-            drainageData.push(0);
-            infusionData.push(0);
-            balanceData.push(0);
-          }
-        }
-      } else {
-        // 月视图：按日期分组
-        const daysInMonth = 31; // 假设最多31天
-        const dayData = new Map<number, { 
-          ultrafiltration: number; 
-          drainage: number; 
-          infusion: number;
-          count: number 
-        }>();
-        
-        // 初始化每天的数据
-        for (let i = 1; i <= daysInMonth; i++) {
-          dayData.set(i, { ultrafiltration: 0, drainage: 0, infusion: 0, count: 0 });
-        }
-        
-        // 累加每天的数据
-        pdData.forEach(item => {
-          try {
-            const date = parseISO(item.date);
-            const day = date.getDate();
-            
-            const dayStats = dayData.get(day)!;
-            dayStats.ultrafiltration += item.ultrafiltration;
-            dayStats.drainage += item.drainageVolume;
-            dayStats.infusion += item.infusionVolume;
-            dayStats.count += 1;
-          } catch (e) {
-            console.error("日期解析错误:", e);
-          }
-        });
-        
-        // 计算每天的平均值，只添加有数据的日期
-        for (let i = 1; i <= daysInMonth; i++) {
-          const stats = dayData.get(i)!;
-          
-          if (stats.count > 0) {
-            categories.push(`${i}日`);
-            ultrafiltrationData.push(Math.round(stats.ultrafiltration / stats.count));
-            drainageData.push(Math.round(stats.drainage / stats.count));
-            infusionData.push(Math.round(stats.infusion / stats.count));
-            balanceData.push(Math.round((stats.drainage - stats.infusion) / stats.count));
-          }
-        }
-      }
-      
-      // 如果没有数据，添加默认值
-      if (categories.length === 0) {
-        categories.push("无数据");
-        ultrafiltrationData.push(0);
-        drainageData.push(0);
-        infusionData.push(0);
-        balanceData.push(0);
-      }
-      
-      // 准备图表数据
-      const series = [
-        {
-          name: "超滤量",
-          data: ultrafiltrationData,
-          color: "#92A3FD",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
-          pointShape: "circle",
-          pointColor: "#92A3FD",
-          pointSelectedColor: "#92A3FD",
-          lineWidth: 3,
-          barWidth: 15,
-        },
-        {
-          name: "引流量",
-          data: drainageData,
-          color: "#C58BF2",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
-          pointShape: "circle",
-          pointColor: "#C58BF2",
-          pointSelectedColor: "#C58BF2",
-          lineWidth: 3,
-          barWidth: 15,
-        },
-        {
-          name: "注入量",
-          data: infusionData,
-          color: "#EEA4CE",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
-          pointShape: "circle",
-          pointColor: "#EEA4CE",
-          pointSelectedColor: "#EEA4CE",
-          lineWidth: 3,
-          barWidth: 15,
-        }
-      ];
-      
-      // 计算Y轴范围
-      const allValues = [...ultrafiltrationData, ...drainageData, ...infusionData];
-      const maxValue = Math.max(...allValues) * 1.2 || 2000;
-      
-      // 图表配置
-      chartRef.current = new UCharts({
-        type: chartType,
-        context: ctx,
-        width,
-        height,
-        categories,
-        series,
-        animation: true,
-        background: "#FFFFFF",
-        padding: [15, 15, 15, 15],
-        enableScroll: true,
-        dataLabel: false,
-        legend: {
-          show: false
-        },
-        xAxis: {
-          disableGrid: true,
-          fontColor: "#999999",
-          fontSize: 12,
-          boundaryGap: "center",
-          axisLine: true,
-          calibration: true,
-          marginLeft: 5,
-          itemCount: Math.min(7, categories.length), // 限制显示的项目数量
-          scrollShow: categories.length > 7,
-          labelCount: Math.min(7, categories.length), // 限制标签数量
-          formatter: (item, index) => {
-            return categories[index];
-          }
-        },
-        yAxis: {
-          data: [
-            {
-              position: "left",
-              title: "ml",
-              titleFontColor: "#999999",
-              titleFontSize: 12,
-              titleOffsetY: -5,
-              titleOffsetX: -25,
-              min: 0,
-              max: maxValue,
-              format: (val) => { return val.toFixed(0) },
-              fontColor: "#999999",
-              fontSize: 12,
-              lineColor: "#EEEEEE",
-              dashLength: 4,
-              gridType: "dash",
-              splitNumber: 5,
-              showTitle: true,
-              tofix: 0
-            }
-          ]
-        },
-        extra: {
-          line: {
-            type: "curve",
-            width: 3
-          },
-          column: {
-            width: 15,
-            barBorderRadius: [5, 5, 0, 0],
-            linearType: "custom",
-            linearOpacity: 1,
-            customColor: [
-              {
-                series: 0,
-                color: [
-                  { stop: 0, color: "#92A3FD" },
-                  { stop: 1, color: "#9DCEFF" }
-                ]
-              },
-              {
-                series: 1,
-                color: [
-                  { stop: 0, color: "#C58BF2" },
-                  { stop: 1, color: "#EEA4CE" }
-                ]
-              },
-              {
-                series: 2,
-                color: [
-                  { stop: 0, color: "#EEA4CE" },
-                  { stop: 1, color: "#FFCF86" }
-                ]
-              }
-            ]
-          },
-          tooltip: {
-            showBox: true,
-            showArrow: true,
-            showCategory: true,
-            borderWidth: 0,
-            borderRadius: 4,
-            borderColor: "#000000",
-            borderOpacity: 0.7,
-            bgColor: "#000000",
-            bgOpacity: 0.7,
-            gridType: "dash",
-            dashLength: 4,
-            gridColor: "#CCCCCC",
-            fontColor: "#FFFFFF",
-            fontSize: 12,
-            lineHeight: 20,
-            padding: 10,
-            xAxisLabel: true,
-            yAxisLabel: false,
-            labelBgColor: "#000000",
-            labelBgOpacity: 0.7,
-            labelFontColor: "#FFFFFF"
-          }
-        }
-      });
-      
-      return chartRef.current;
-    } catch (error) {
-      console.error("图表初始化错误:", error);
-      return null;
-    }
-  };
-
-  // 组件挂载和更新时初始化图表
-  useEffect(() => {
-    if (pdData && pdData.length > 0 && !isLoading) {
-      Taro.nextTick(() => {
-        try {
-          Taro.createSelectorQuery()
-            .select(`#${canvasId}`)
-            .fields({ node: true, size: true })
-            .exec((res) => {
-              if (res && res[0]) {
-                initChart(res[0].node, res[0].width, res[0].height);
-              } else {
-                console.error("获取Canvas节点失败");
-              }
-            });
-        } catch (error) {
-          console.error("初始化图表错误:", error);
-        }
-      });
-    }
-    
-    return () => {
-      if (chartRef.current) {
-        chartRef.current = null;
-      }
-    };
-  }, [pdData, viewMode, chartType, isLoading]);
+  const chartType = "line"; // 固定为折线图
+  const [dataView, setDataView] = useState<"ultrafiltration" | "drainage">("ultrafiltration");
   
-  // 监听窗口大小变化
-  useEffect(() => {
-    const handleResize = () => {
-      if (pdData && pdData.length > 0 && !isLoading) {
-        try {
-          Taro.createSelectorQuery()
-            .select(`#${canvasId}`)
-            .fields({ node: true, size: true })
-            .exec((res) => {
-              if (res && res[0]) {
-                initChart(res[0].node, res[0].width, res[0].height);
+  // 切换数据视图
+  const toggleDataView = () => {
+    setDataView(prev => prev === "ultrafiltration" ? "drainage" : "ultrafiltration");
+  };
+  
+  // 初始化图表
+  const initChart = () => {
+    try {
+      Taro.createSelectorQuery()
+        .select(`#${canvasId}`)
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (res && res[0]) {
+            const canvas = res[0].node;
+            const ctx = canvas.getContext("2d");
+            const width = res[0].width;
+            const height = res[0].height;
+            
+            if (!canvas || !ctx) {
+              console.error("Canvas节点不存在或无法获取上下文");
+              return null;
+            }
+            
+            const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
+            
+            // 设置Canvas尺寸
+            canvas.width = width * pixelRatio;
+            canvas.height = height * pixelRatio;
+            ctx.scale(pixelRatio, pixelRatio);
+            
+            // 准备数据
+            const categories: string[] = [];
+            const ultrafiltrationData: number[] = [];
+            const drainageData: number[] = [];
+            
+            // 根据视图模式处理数据
+            if (viewMode === "day") {
+              // 日视图：按时间排序
+              const sortedData = [...pdData].sort((a, b) => 
+                new Date(a.recordTime).getTime() - new Date(b.recordTime).getTime()
+              );
+              
+              sortedData.forEach(item => {
+                // 只提取时间部分 HH:mm
+                const timeStr = item.recordTime.substring(11, 16);
+                categories.push(timeStr);
+                ultrafiltrationData.push(item.ultrafiltration);
+                drainageData.push(item.drainageVolume);
+              });
+            } else if (viewMode === "week") {
+              // 周视图：按日期分组
+              const dateMap = new Map<string, {
+                ultrafiltration: number[],
+                drainage: number[],
+                count: number
+              }>();
+              
+              pdData.forEach(item => {
+                // 提取日期部分 MM-DD
+                const dateStr = item.recordTime.substring(5, 10);
+                if (!dateMap.has(dateStr)) {
+                  dateMap.set(dateStr, {
+                    ultrafiltration: [],
+                    drainage: [],
+                    count: 0
+                  });
+                }
+                
+                const dateData = dateMap.get(dateStr)!;
+                dateData.ultrafiltration.push(item.ultrafiltration);
+                dateData.drainage.push(item.drainageVolume);
+                dateData.count++;
+              });
+              
+              // 按日期排序
+              const sortedDates = Array.from(dateMap.keys()).sort();
+              
+              sortedDates.forEach(dateStr => {
+                const dateData = dateMap.get(dateStr)!;
+                categories.push(dateStr.replace("-", "/"));
+                
+                // 计算平均值
+                const avgUltrafiltration = dateData.ultrafiltration.reduce((sum, val) => sum + val, 0) / dateData.count;
+                const avgDrainage = dateData.drainage.reduce((sum, val) => sum + val, 0) / dateData.count;
+                
+                ultrafiltrationData.push(Math.round(avgUltrafiltration));
+                drainageData.push(Math.round(avgDrainage));
+              });
+            } else if (viewMode === "month") {
+              // 月视图：按周分组
+              const weekMap = new Map<string, {
+                ultrafiltration: number[],
+                drainage: number[],
+                count: number,
+                startDate: Date
+              }>();
+              
+              pdData.forEach(item => {
+                // 从记录时间中提取日期
+                const date = new Date(item.recordTime);
+                // 获取日期所在的周
+                const weekNumber = Math.floor(date.getDate() / 7) + 1;
+                const weekKey = `第${weekNumber}周`;
+                
+                if (!weekMap.has(weekKey)) {
+                  weekMap.set(weekKey, {
+                    ultrafiltration: [],
+                    drainage: [],
+                    count: 0,
+                    startDate: date
+                  });
+                }
+                
+                const weekData = weekMap.get(weekKey)!;
+                if (date < weekData.startDate) {
+                  weekData.startDate = date;
+                }
+                
+                weekData.ultrafiltration.push(item.ultrafiltration);
+                weekData.drainage.push(item.drainageVolume);
+                weekData.count++;
+              });
+              
+              // 按周排序
+              const sortedWeeks = Array.from(weekMap.keys()).sort((a, b) => {
+                const weekA = parseInt(a.replace(/[^0-9]/g, ""));
+                const weekB = parseInt(b.replace(/[^0-9]/g, ""));
+                return weekA - weekB;
+              });
+              
+              sortedWeeks.forEach(weekKey => {
+                const weekData = weekMap.get(weekKey)!;
+                categories.push(weekKey);
+                
+                // 计算平均值
+                const avgUltrafiltration = weekData.ultrafiltration.reduce((sum, val) => sum + val, 0) / weekData.count;
+                const avgDrainage = weekData.drainage.reduce((sum, val) => sum + val, 0) / weekData.count;
+                
+                ultrafiltrationData.push(Math.round(avgUltrafiltration));
+                drainageData.push(Math.round(avgDrainage));
+              });
+            }
+            
+            // 创建图表配置
+            const chartConfig: any = {
+              type: chartType,
+              canvasId,
+              canvas2d: true,
+              context: ctx,
+              width,
+              height,
+              categories,
+              animation: true,
+              timing: "easeOut",
+              duration: 500,
+              dataLabel: true, // 显示数值
+              dataPointShape: true,
+              enableScroll: false,
+              legend: {
+                show: false
+              },
+              xAxis: {
+                disableGrid: true,
+                scrollShow: false,
+                itemCount: 5,
+                fontSize: 10,
+                color: "#666666"
+              },
+              extra: {
+                line: {
+                  type: "straight",
+                  width: 2,
+                  activeType: "hollow",
+                  linearType: "none",
+                  onShadow: false,
+                  animation: "vertical"
+                },
+                tooltip: {
+                  showBox: true,
+                  showArrow: true,
+                  showCategory: true,
+                  borderWidth: 0,
+                  borderRadius: 4,
+                  borderColor: "#000000",
+                  borderOpacity: 0.7,
+                  bgColor: "#000000",
+                  bgOpacity: 0.7,
+                  gridType: "dash",
+                  dashLength: 4,
+                  gridColor: "#CCCCCC",
+                  fontColor: "#FFFFFF",
+                  horizentalLine: false,
+                  xAxisLabel: true,
+                  yAxisLabel: false,
+                  labelBgColor: "#FFFFFF",
+                  labelBgOpacity: 0.7,
+                  labelFontColor: "#666666"
+                }
               }
-            });
-        } catch (error) {
-          console.error("窗口大小变化时初始化图表错误:", error);
-        }
-      }
-    };
+            };
+            
+            // 根据数据视图类型设置不同的系列和Y轴
+            if (dataView === "ultrafiltration") {
+              // 超滤量视图
+              chartConfig.series = [
+                {
+                  name: "超滤量",
+                  data: ultrafiltrationData,
+                  color: "#92A3FD",
+                  format: (val) => `${val}mL`
+                }
+              ];
+              
+              const minUF = Math.min(...ultrafiltrationData);
+              const maxUF = Math.max(...ultrafiltrationData);
+              const range = Math.max(Math.abs(minUF), Math.abs(maxUF)) * 1.2;
+              
+              // 如果有负值，则Y轴从负值开始
+              const minValue = minUF < 0 ? -range : 0;
+              const maxValue = Math.max(range, 500); // 确保有足够的显示空间
+              
+              chartConfig.yAxis = {
+                gridType: "dash",
+                dashLength: 4,
+                data: [
+                  {
+                    min: minValue,
+                    max: maxValue,
+                    format: (val) => `${val}mL`
+                  }
+                ]
+              };
+            } else {
+              // 引流量视图
+              chartConfig.series = [
+                {
+                  name: "引流量",
+                  data: drainageData,
+                  color: "#C58BF2",
+                  format: (val) => `${val}mL`
+                }
+              ];
+              
+              // 计算Y轴范围 - 引流量
+              const maxValue = Math.max(...drainageData) * 1.2 || 3000;
+              chartConfig.yAxis = {
+                gridType: "dash",
+                dashLength: 4,
+                data: [
+                  {
+                    min: 0,
+                    max: maxValue,
+                    format: (val) => `${val}mL`
+                  }
+                ]
+              };
+            }
+            
+            // 创建图表实例
+            chartRef.current = new UCharts(chartConfig);
+          } else {
+            console.error("获取Canvas节点失败");
+          }
+        });
+    } catch (error) {
+      console.error("图表初始化失败:", error);
+    }
+  };
+  
+  // 处理窗口大小变化
+  const handleResize = () => {
+    if (chartRef.current) {
+      chartRef.current.resize();
+    }
+  };
+  
+  // 初始化图表
+  useEffect(() => {
+    if (!isLoading && pdData && pdData.length > 0) {
+      initChart();
+    }
     
+    // 监听窗口大小变化
     Taro.onWindowResize(handleResize);
+    
     return () => {
       Taro.offWindowResize(handleResize);
     };
-  }, [pdData, viewMode, chartType, isLoading]);
-
-  // 如果正在加载，显示加载状态
+  }, [pdData, viewMode, dataView, isLoading]);
+  
   if (isLoading) {
     return (
       <View className="pd-chart loading">
@@ -424,51 +322,40 @@ const PdChart: React.FC<PdChartProps> = ({
       </View>
     );
   }
-
-  // 如果没有数据，显示空状态
+  
   if (!pdData || pdData.length === 0) {
     return (
       <View className="pd-chart empty">
-        <Text className="empty-text">暂无腹透数据</Text>
+        <Text className="empty-text">暂无数据</Text>
         <Text className="empty-hint">请先记录腹透数据</Text>
       </View>
     );
   }
-
+  
   return (
     <View className="pd-chart">
       <View className="chart-header">
-        <Text className="chart-title">腹透数据趋势</Text>
-        <View className="chart-actions">
-          <Text 
-            className={`chart-type-toggle ${chartType === "line" ? "active" : ""}`}
-            onClick={() => setChartType("line")}
-          >
-            折线图
-          </Text>
-          <Text 
-            className={`chart-type-toggle ${chartType === "column" ? "active" : ""}`}
-            onClick={() => setChartType("column")}
-          >
-            柱状图
-          </Text>
+        <Text className="chart-title">
+          {dataView === "ultrafiltration" ? "超滤量趋势" : "引流量趋势"}
+        </Text>
+        <View className="view-toggle" onClick={toggleDataView}>
+          <Text>查看{dataView === "ultrafiltration" ? "引流量" : "超滤量"}</Text>
         </View>
       </View>
       
-      <Canvas
-        type="2d"
-        id={canvasId}
-        canvasId={canvasId}
-        className="chart-canvas"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-      />
+      <View className="chart-unit">
+        <Text>单位: mL</Text>
+      </View>
       
-      <View className="chart-footer">
-        <Text className="chart-note">左右滑动可切换日期</Text>
+      <View className="chart-canvas">
+        <Canvas
+          type="2d"
+          id={canvasId}
+          canvasId={canvasId}
+        />
       </View>
     </View>
   );
 };
 
-export default PdChart; 
+export default PdChart;

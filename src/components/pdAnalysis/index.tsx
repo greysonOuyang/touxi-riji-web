@@ -8,7 +8,6 @@ import useDateNavigation from "@/components/common/useDateNavigation";
 import PdChart from "./PdChart";
 import PdStatistics from "./PdStatistics";
 import AbnormalValues from "./AbnormalValues";
-import ChartIndicators from "./ChartIndicators";
 import "./index.scss";
 
 const PdAnalysis: React.FC = () => {
@@ -38,11 +37,6 @@ const PdAnalysis: React.FC = () => {
     setViewMode(mode);
     // 切换视图模式时重置为当天
     resetToCurrentDate();
-  };
-
-  // 处理图表滑动
-  const handleChartSwipe = (direction: "left" | "right") => {
-    handleDateChange(direction === "left" ? "next" : "prev");
   };
 
   // 当视图模式或日期变化时刷新数据
@@ -94,10 +88,6 @@ const PdAnalysis: React.FC = () => {
       
       {/* 图表区域 */}
       <View className="chart-section">
-        <View className="chart-controls">
-          <ChartIndicators />
-        </View>
-        
         <View className="chart-container">
           {isLoading && (
             <View className="loading-container">
@@ -109,7 +99,6 @@ const PdAnalysis: React.FC = () => {
             <PdChart 
               viewMode={viewMode} 
               pdData={pdData} 
-              onSwipe={handleChartSwipe}
               isLoading={false}
             />
           )}

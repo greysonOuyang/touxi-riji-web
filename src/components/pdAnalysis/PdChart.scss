@@ -39,22 +39,16 @@
       color: #333333;
     }
     
-    .chart-actions {
-      display: flex;
-      flex-wrap: wrap;
+    .view-toggle {
+      padding: 4px 10px;
+      font-size: 12px;
+      color: #666666;
+      background-color: #f5f5f5;
+      border-radius: 12px;
+      transition: all 0.3s ease;
       
-      .chart-type-toggle {
-        padding: 4px 10px;
-        font-size: 12px;
-        color: #666666;
-        background-color: #f5f5f5;
-        border-radius: 12px;
-        margin-left: 8px;
-        
-        &.active {
-          color: #ffffff;
-          background: linear-gradient(to right, #92A3FD, #9DCEFF);
-        }
+      &:active {
+        background-color: #e0e0e0;
       }
     }
   }
@@ -75,17 +69,6 @@
     }
   }
   
-  .chart-footer {
-    display: flex;
-    justify-content: center;
-    margin-top: 12px;
-    
-    .chart-note {
-      font-size: 12px;
-      color: #999999;
-    }
-  }
-  
   // 响应式调整
   @media screen and (max-width: 375px) {
     height: 200px;
@@ -97,7 +80,7 @@
         font-size: 14px;
       }
       
-      .chart-actions .chart-type-toggle {
+      .view-toggle {
         padding: 3px 8px;
         font-size: 11px;
       }

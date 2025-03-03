@@ -5,23 +5,16 @@ import "./ChartIndicators.scss";
 const ChartIndicators: React.FC = () => {
   return (
     <View className="chart-indicators">
-      <View className="indicators-group">
-        <View className="indicator-item">
-          <View className="indicator-dot" style={{ background: "#92A3FD" }} />
-          <Text className="indicator-text">超滤量</Text>
-        </View>
-        <View className="indicator-item">
-          <View className="indicator-dot" style={{ background: "#C58BF2" }} />
-          <Text className="indicator-text">引流量</Text>
-        </View>
-        <View className="indicator-item">
-          <View className="indicator-dot" style={{ background: "#EEA4CE" }} />
-          <Text className="indicator-text">注入量</Text>
-        </View>
+      <View className="indicator-item">
+        <View className="indicator-color" style={{ backgroundColor: "#92A3FD" }}></View>
+        <Text className="indicator-label">超滤量</Text>
       </View>
-      <Text className="chart-unit">单位：ml</Text>
+      <View className="indicator-item">
+        <View className="indicator-color" style={{ backgroundColor: "#C58BF2" }}></View>
+        <Text className="indicator-label">引流量</Text>
+      </View>
     </View>
   );
 };
 
-export default ChartIndicators; 
+export default ChartIndicators;
