@@ -1,0 +1,176 @@
+.weight-statistics {
+  margin-top: 16px;
+  
+  .empty-state, .loading-state {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #999;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .weight-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    
+    .card-header {
+      margin-bottom: 12px;
+      
+      .card-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 4px;
+        display: block;
+      }
+      
+      .card-subtitle {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+    
+    .weight-alert {
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      
+      &.good {
+        background-color: #e6f7e6;
+        color: #52c41a;
+      }
+      
+      &.warning {
+        background-color: #fff7e6;
+        color: #fa8c16;
+      }
+      
+      &.danger {
+        background-color: #fff1f0;
+        color: #f5222d;
+      }
+      
+      .alert-message {
+        font-size: 14px;
+      }
+    }
+    
+    .data-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #999;
+    }
+  }
+  
+  // BMI卡片样式
+  .bmi-card {
+    .bmi-container {
+      margin-top: 12px;
+      
+      .bmi-value-container {
+        display: flex;
+        align-items: baseline;
+        margin-bottom: 16px;
+        
+        .bmi-value {
+          font-size: 24px;
+          font-weight: bold;
+          color: #92A3FD;
+          margin-right: 8px;
+        }
+        
+        .bmi-label {
+          font-size: 14px;
+          padding: 2px 8px;
+          border-radius: 4px;
+        }
+      }
+      
+      .bmi-scale {
+        .bmi-scale-bar {
+          height: 8px;
+          background: linear-gradient(to right, #52c41a, #fadb14, #fa8c16, #f5222d);
+          border-radius: 4px;
+          position: relative;
+          margin-bottom: 8px;
+          
+          .bmi-scale-indicator {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #fff;
+            border: 2px solid #92A3FD;
+            border-radius: 50%;
+            top: -2px;
+            transform: translateX(-50%);
+          }
+        }
+        
+        .bmi-scale-labels {
+          display: flex;
+          justify-content: space-between;
+          
+          Text {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+      }
+      
+      .bmi-info {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px dashed #eee;
+        
+        .bmi-info-text {
+          font-size: 12px;
+          color: #999;
+          display: block;
+          margin-bottom: 4px;
+        }
+      }
+    }
+  }
+  
+  // 统计数据卡片样式
+  .stats-card {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 12px;
+      
+      .stats-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .stats-label {
+          font-size: 12px;
+          color: #999;
+          margin-bottom: 4px;
+        }
+        
+        .stats-value {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+        }
+        
+        .stats-unit {
+          font-size: 12px;
+          color: #999;
+          margin-left: 2px;
+        }
+      }
+    }
+  }
+} 

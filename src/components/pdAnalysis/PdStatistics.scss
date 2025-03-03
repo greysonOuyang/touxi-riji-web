@@ -1,8 +1,216 @@
 .pd-statistics {
-  margin: 16px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  width: 100%;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+  padding: 16px;
+  
+  &.loading, &.empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    
+    .loading-text {
+      font-size: 16px;
+      color: #999999;
+    }
+    
+    .empty-text {
+      font-size: 18px;
+      color: #666666;
+      margin-bottom: 8px;
+    }
+    
+    .empty-hint {
+      font-size: 14px;
+      color: #999999;
+    }
+  }
+  
+  .statistics-header {
+    margin-bottom: 16px;
+    
+    .statistics-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 4px;
+      display: block;
+    }
+    
+    .statistics-subtitle {
+      font-size: 14px;
+      color: #666666;
+      display: block;
+    }
+  }
+  
+  .status-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    
+    &.success {
+      background: linear-gradient(to right, #ADE792, #BFEAA6);
+    }
+    
+    &.info {
+      background: linear-gradient(to right, #9DCEFF, #92A3FD);
+    }
+    
+    &.warning {
+      background: linear-gradient(to right, #FFCF86, #FFAA85);
+    }
+    
+    .status-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 12px;
+      
+      .icon {
+        width: 24px;
+        height: 24px;
+      }
+    }
+    
+    .status-content {
+      flex: 1;
+      
+      .status-title {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.7);
+        margin-bottom: 4px;
+        display: block;
+      }
+      
+      .status-message {
+        font-size: 16px;
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.8);
+        display: block;
+      }
+    }
+  }
+  
+  .statistics-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #f0f0f0;
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 16px;
+      display: block;
+    }
+    
+    .statistics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      
+      .statistics-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .item-value {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333333;
+          margin-bottom: 4px;
+        }
+        
+        .item-label {
+          font-size: 12px;
+          color: #666666;
+          text-align: center;
+        }
+      }
+    }
+    
+    .concentration-distribution {
+      .concentration-item {
+        margin-bottom: 12px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .concentration-bar-container {
+          height: 12px;
+          background-color: #f5f5f5;
+          border-radius: 6px;
+          overflow: hidden;
+          margin-bottom: 4px;
+          
+          .concentration-bar {
+            height: 100%;
+            background: linear-gradient(to right, #92A3FD, #9DCEFF);
+            border-radius: 6px;
+          }
+        }
+        
+        .concentration-info {
+          display: flex;
+          justify-content: space-between;
+          
+          .concentration-type {
+            font-size: 12px;
+            color: #666666;
+          }
+          
+          .concentration-percentage {
+            font-size: 12px;
+            color: #333333;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+    
+    .health-tips {
+      .health-tip {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .tip-bullet {
+          width: 8px;
+          height: 8px;
+          border-radius: 4px;
+          background-color: #92A3FD;
+          margin-top: 6px;
+          margin-right: 8px;
+          flex-shrink: 0;
+        }
+        
+        .tip-text {
+          font-size: 14px;
+          color: #333333;
+          line-height: 1.5;
+          flex: 1;
+        }
+      }
+    }
+  }
 }
 
 .pd-card {

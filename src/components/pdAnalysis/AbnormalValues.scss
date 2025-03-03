@@ -1,81 +1,165 @@
 .abnormal-values {
-  margin: 16px 0;
-}
-
-.abnormal-card {
+  width: 100%;
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   
-  .card-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: #333;
-    margin-bottom: 12px;
-    display: block;
-  }
-  
-  .empty-abnormal, .normal-status {
+  &.loading, &.empty {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    padding: 20px 0;
+    align-items: center;
+    height: 200px;
     
-    .empty-text, .normal-text {
+    .loading-text {
+      font-size: 16px;
+      color: #999999;
+    }
+    
+    .empty-text {
+      font-size: 18px;
+      color: #666666;
+      margin-bottom: 8px;
+    }
+    
+    .empty-hint {
       font-size: 14px;
-      color: #999;
-      margin-left: 8px;
+      color: #999999;
     }
   }
   
-  .normal-status {
-    color: #4CAF50;
+  &.normal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    
+    .normal-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
+      background-color: rgba(173, 231, 146, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 16px;
+      
+      .icon {
+        width: 32px;
+        height: 32px;
+      }
+    }
     
     .normal-text {
-      color: #4CAF50;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333333;
+      margin-bottom: 8px;
+    }
+    
+    .normal-hint {
+      font-size: 14px;
+      color: #666666;
+    }
+  }
+  
+  .abnormal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .abnormal-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333333;
+    }
+    
+    .abnormal-count {
+      font-size: 14px;
+      color: #FF8A8A;
+      font-weight: 500;
     }
   }
   
   .abnormal-list {
     .abnormal-item {
       display: flex;
-      align-items: center;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      background-color: rgba(255, 138, 138, 0.1);
+      
+      &.high {
+        background-color: rgba(255, 138, 138, 0.2);
+        border-left: 4px solid #FF8A8A;
+      }
+      
+      &.medium {
+        background-color: rgba(255, 207, 134, 0.1);
+        border-left: 4px solid #FFCF86;
+      }
       
       &:last-child {
-        border-bottom: none;
+        margin-bottom: 0;
       }
       
       .abnormal-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 16px;
+        background-color: rgba(255, 255, 255, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
         margin-right: 12px;
+        
+        .icon {
+          width: 20px;
+          height: 20px;
+        }
       }
       
       .abnormal-content {
         flex: 1;
         
-        .abnormal-message {
-          font-size: 14px;
-          color: #333;
-          display: block;
+        .abnormal-description {
+          font-size: 16px;
+          font-weight: 500;
+          color: #333333;
+          margin-bottom: 8px;
         }
         
-        .abnormal-value {
-          font-size: 14px;
-          color: #FF8A8A;
-          font-weight: 500;
-          display: block;
-          margin-top: 4px;
+        .abnormal-details {
+          display: flex;
+          flex-direction: column;
+          
+          .abnormal-time {
+            font-size: 12px;
+            color: #666666;
+            margin-bottom: 4px;
+          }
+          
+          .abnormal-values-text {
+            font-size: 12px;
+            color: #999999;
+          }
         }
       }
-      
-      .abnormal-time {
-        .time-text {
-          font-size: 12px;
-          color: #999;
-        }
-      }
+    }
+  }
+  
+  .abnormal-footer {
+    margin-top: 16px;
+    text-align: center;
+    
+    .abnormal-tip {
+      font-size: 14px;
+      color: #666666;
+      font-style: italic;
     }
   }
 } 

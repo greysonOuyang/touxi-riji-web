@@ -1,6 +1,5 @@
 import React from "react";
-import { View, Text } from "@tarojs/components";
-import { AtIcon } from "taro-ui";
+import { View, Text, Image } from "@tarojs/components";
 import { format, parseISO } from "date-fns";
 import { PdDataPoint } from "./usePdData";
 import "./AbnormalValues.scss";
@@ -8,87 +7,179 @@ import "./AbnormalValues.scss";
 interface AbnormalValuesProps {
   pdData: PdDataPoint[];
   viewMode: "day" | "week" | "month";
+  isLoading?: boolean;
 }
 
-const AbnormalValues: React.FC<AbnormalValuesProps> = ({ pdData = [], viewMode }) => {
-  // 添加默认值并检查pdData是否存在
-  if (!pdData || !Array.isArray(pdData)) {
-    return (
-      <View className="abnormal-values">
-        <View className="abnormal-card">
-          <Text className="card-title">异常数值提醒</Text>
-          <View className="empty-abnormal">
-            <Text className="empty-text">暂无数据</Text>
-          </View>
-        </View>
-      </View>
-    );
-  }
-  
-  // 筛选异常值
-  const abnormalValues = pdData
-    .filter(item => {
-      if (!item || !item.hasMeasurement) return false;
-      
-      // 超滤量异常判断逻辑
-      return item.ultrafiltration < 0 || item.ultrafiltration > 1000;
-    })
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, 5); // 最多显示5条
-  
+const AbnormalValues: React.FC<AbnormalValuesProps> = ({
+  pdData,
+  viewMode,
+  isLoading = false
+}) => {
   // 格式化时间
   const formatTime = (timestamp: string) => {
     try {
       const date = parseISO(timestamp);
-      return `${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+      if (viewMode === "day") {
+        return format(date, "HH:mm");
+      } else {
+        return format(date, "MM-dd HH:mm");
+      }
     } catch (e) {
-      return "未知时间";
+      console.error("日期格式化错误:", e);
+      return timestamp;
     }
   };
-  
-  // 如果没有异常值，显示正常状态
-  if (abnormalValues.length === 0) {
+
+  // 获取异常值
+  const getAbnormalValues = () => {
+    if (!pdData || pdData.length === 0) return [];
+
+    return pdData.filter(item => {
+      // 超滤量异常
+      const isUltrafiltrationAbnormal = item.ultrafiltration < 0 || item.ultrafiltration > 1500;
+      
+      // 引流量异常
+      const isDrainageAbnormal = item.drainageVolume < item.infusionVolume * 0.8 || 
+                                item.drainageVolume > item.infusionVolume * 1.5;
+      
+      // 注入量异常
+      const isInfusionAbnormal = item.infusionVolume < 500 || item.infusionVolume > 3000;
+      
+      return isUltrafiltrationAbnormal || isDrainageAbnormal || isInfusionAbnormal;
+    });
+  };
+
+  // 获取异常描述
+  const getAbnormalDescription = (item: PdDataPoint) => {
+    const descriptions: string[] = [];
+    
+    // 超滤量异常
+    if (item.ultrafiltration < 0) {
+      descriptions.push("超滤量为负值");
+    } else if (item.ultrafiltration > 1500) {
+      descriptions.push("超滤量过高");
+    }
+    
+    // 引流量异常
+    if (item.drainageVolume < item.infusionVolume * 0.8) {
+      descriptions.push("引流量不足");
+    } else if (item.drainageVolume > item.infusionVolume * 1.5) {
+      descriptions.push("引流量过多");
+    }
+    
+    // 注入量异常
+    if (item.infusionVolume < 500) {
+      descriptions.push("注入量过少");
+    } else if (item.infusionVolume > 3000) {
+      descriptions.push("注入量过多");
+    }
+    
+    return descriptions.join("，");
+  };
+
+  // 获取异常严重程度
+  const getAbnormalSeverity = (item: PdDataPoint) => {
+    // 超滤量严重异常
+    if (item.ultrafiltration < -500 || item.ultrafiltration > 2000) {
+      return "high";
+    }
+    
+    // 引流量严重异常
+    if (item.drainageVolume < item.infusionVolume * 0.5 || 
+        item.drainageVolume > item.infusionVolume * 2) {
+      return "high";
+    }
+    
+    // 注入量严重异常
+    if (item.infusionVolume < 300 || item.infusionVolume > 3500) {
+      return "high";
+    }
+    
+    return "medium";
+  };
+
+  // 如果正在加载，显示加载状态
+  if (isLoading) {
     return (
-      <View className="abnormal-values">
-        <View className="abnormal-card">
-          <Text className="card-title">异常数值提醒</Text>
-          <View className="normal-status">
-            <AtIcon value="check-circle" size="16" color="#4CAF50" />
-            <Text className="normal-text">未检测到异常超滤量</Text>
-          </View>
-        </View>
+      <View className="abnormal-values loading">
+        <Text className="loading-text">加载中...</Text>
       </View>
     );
   }
-  
+
+  // 如果没有数据，显示空状态
+  if (!pdData || pdData.length === 0) {
+    return (
+      <View className="abnormal-values empty">
+        <Text className="empty-text">暂无腹透数据</Text>
+        <Text className="empty-hint">请先记录腹透数据</Text>
+      </View>
+    );
+  }
+
+  const abnormalValues = getAbnormalValues();
+
+  // 如果没有异常值，显示正常状态
+  if (abnormalValues.length === 0) {
+    return (
+      <View className="abnormal-values normal">
+        <View className="normal-icon">
+          <Image 
+            className="icon" 
+            src="/assets/icons/success.png" 
+            mode="aspectFit" 
+          />
+        </View>
+        <Text className="normal-text">未检测到异常值</Text>
+        <Text className="normal-hint">您的腹透数据正常，请继续保持</Text>
+      </View>
+    );
+  }
+
   return (
     <View className="abnormal-values">
-      <View className="abnormal-card">
-        <Text className="card-title">异常数值提醒</Text>
-        <View className="abnormal-list">
-          {abnormalValues.map((item, index) => (
-            <View key={index} className="abnormal-item">
+      <View className="abnormal-header">
+        <Text className="abnormal-title">异常值警报</Text>
+        <Text className="abnormal-count">共 {abnormalValues.length} 条</Text>
+      </View>
+      
+      <View className="abnormal-list">
+        {abnormalValues.map((item, index) => {
+          const severity = getAbnormalSeverity(item);
+          return (
+            <View 
+              key={index} 
+              className={`abnormal-item ${severity}`}
+            >
               <View className="abnormal-icon">
-                <AtIcon value="alert-circle" size="16" color="#FF8A8A" />
+                <Image 
+                  className="icon" 
+                  src="/assets/icons/warning.png" 
+                  mode="aspectFit" 
+                />
               </View>
               <View className="abnormal-content">
-                <Text className="abnormal-message">
-                  {item.ultrafiltration < 0 
-                    ? "超滤量为负值" 
-                    : item.ultrafiltration > 1000 
-                      ? "超滤量过高" 
-                      : "异常超滤量"}
+                <Text className="abnormal-description">
+                  {getAbnormalDescription(item)}
                 </Text>
-                <Text className="abnormal-value">{item.ultrafiltration} ml</Text>
-              </View>
-              <View className="abnormal-time">
-                <Text className="time-text">
-                  {format(parseISO(item.date), "MM-dd")} {formatTime(item.timestamp)}
-                </Text>
+                <View className="abnormal-details">
+                  <Text className="abnormal-time">{formatTime(item.timestamp)}</Text>
+                  <Text className="abnormal-values-text">
+                    超滤: {item.ultrafiltration}ml, 
+                    引流: {item.drainageVolume}ml, 
+                    注入: {item.infusionVolume}ml
+                  </Text>
+                </View>
               </View>
             </View>
-          ))}
-        </View>
+          );
+        })}
+      </View>
+      
+      <View className="abnormal-footer">
+        <Text className="abnormal-tip">
+          如有异常值，请咨询医生或调整透析方案
+        </Text>
       </View>
     </View>
   );

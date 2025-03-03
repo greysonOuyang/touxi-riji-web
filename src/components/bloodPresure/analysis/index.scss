@@ -22,6 +22,7 @@
     padding: 16px;
     margin-bottom: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
     
     .chart-controls {
       margin-bottom: 16px;
@@ -49,5 +50,12 @@
   .abnormal-values,
   .bp-statistics {
     margin: 16px 0;
+  }
+  
+  // 响应式调整
+  @media screen and (max-width: 375px) {
+    .chart-section .chart-container {
+      height: 180px;
+    }
   }
 } 

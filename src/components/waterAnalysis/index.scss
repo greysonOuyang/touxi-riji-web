@@ -1,0 +1,39 @@
+.water-analysis {
+  padding: 20px;
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  
+  // 标题
+  .header {
+    margin-bottom: 20px;
+    
+    .title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333333;
+    }
+  }
+  
+  // 视图模式选择器
+  .view-mode-selector {
+    margin-bottom: 16px;
+  }
+  
+  // 日期导航
+  .date-navigation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .date-display {
+      font-size: 16px;
+      font-weight: 500;
+      color: #666666;
+      padding: 8px 16px;
+      background-color: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+  }
+} 

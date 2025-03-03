@@ -4,6 +4,7 @@
   background: #FFFFFF;
   border-radius: 12px;
   transition: all 0.3s ease;
+  overflow: hidden;
   
   &.fullscreen {
     position: fixed;
@@ -41,6 +42,7 @@
   margin: 0;
   padding: 0;
   touch-action: pan-x; // 允许水平平移手势
+  overflow: hidden;
   
   // 确保图表在各种设备上有合适的高度
   @media screen and (max-height: 700px) {

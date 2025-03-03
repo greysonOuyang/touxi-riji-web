@@ -1,29 +1,28 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { Canvas, View, Text } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { format, parseISO } from "date-fns";
-import { PdDataPoint } from "./usePdData";
-import "./PdChart.scss";
+import "./WeightChart.scss";
+import { WeightDataPoint } from "./useWeightData";
 
 // 引入图表库
 import UCharts from "@qiun/ucharts";
 
-interface PdChartProps {
+interface WeightChartProps {
   viewMode: "day" | "week" | "month";
-  pdData: PdDataPoint[];
+  weightData?: WeightDataPoint[]; // 体重数据
   onSwipe?: (direction: "left" | "right") => void;
   isLoading?: boolean;
 }
 
-const PdChart: React.FC<PdChartProps> = ({
-  viewMode,
-  pdData,
+const WeightChart: React.FC<WeightChartProps> = ({ 
+  viewMode, 
+  weightData = [], 
   onSwipe,
   isLoading = false
 }) => {
   const chartRef = useRef<any>(null);
-  const canvasId = "pd-chart";
-  const [chartType, setChartType] = useState<"line" | "column">("line");
+  const canvasId = "weight-chart";
   let startX = 0;
 
   // 处理触摸开始事件
@@ -48,10 +47,9 @@ const PdChart: React.FC<PdChartProps> = ({
     }
   };
 
-  // 切换图表类型
-  const toggleChartType = () => {
-    const newType = chartType === "line" ? "column" : "line";
-    setChartType(newType);
+  // 触摸移动事件处理
+  const handleTouchMove = (e) => {
+    chartRef.current?.scrollMove(e);
   };
 
   // 初始化图表
@@ -76,52 +74,48 @@ const PdChart: React.FC<PdChartProps> = ({
     
     // 准备数据
     const categories: string[] = [];
-    const ultrafiltrationData: number[] = [];
-    const drainageData: number[] = [];
-    const infusionData: number[] = [];
-    const balanceData: number[] = []; // 平衡 = 引流 - 注入
+    const chartData: number[] = [];
     
     try {
       // 根据视图模式处理数据
       if (viewMode === "day") {
         // 日视图：按时间排序
-        const sortedData = [...pdData].sort((a, b) => 
+        const sortedData = [...weightData].sort((a, b) => 
           new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
         );
         
         sortedData.forEach(item => {
-          categories.push(item.recordTime.substring(0, 5));
-          ultrafiltrationData.push(item.ultrafiltration);
-          drainageData.push(item.drainageVolume);
-          infusionData.push(item.infusionVolume);
-          balanceData.push(item.drainageVolume - item.infusionVolume);
+          try {
+            const date = new Date(item.timestamp);
+            categories.push(`${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`);
+            if (typeof item.weight === 'number' && !isNaN(item.weight)) {
+              chartData.push(Number(item.weight.toFixed(1)));
+            }
+          } catch (e) {
+            console.error("日期格式化错误:", e);
+          }
         });
       } else if (viewMode === "week") {
         // 周视图：按日期分组
         const weekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-        const dayData = new Map<number, { 
-          ultrafiltration: number; 
-          drainage: number; 
-          infusion: number;
-          count: number 
-        }>();
+        const dayData = new Map<number, { weight: number; count: number }>();
         
         // 初始化每天的数据
         for (let i = 0; i < 7; i++) {
-          dayData.set(i, { ultrafiltration: 0, drainage: 0, infusion: 0, count: 0 });
+          dayData.set(i, { weight: 0, count: 0 });
         }
         
         // 累加每天的数据
-        pdData.forEach(item => {
+        weightData.forEach(item => {
           try {
             const date = parseISO(item.date);
             const dayIndex = (date.getDay() + 6) % 7; // 转换为周一为0
             
             const dayStats = dayData.get(dayIndex)!;
-            dayStats.ultrafiltration += item.ultrafiltration;
-            dayStats.drainage += item.drainageVolume;
-            dayStats.infusion += item.infusionVolume;
-            dayStats.count += 1;
+            if (typeof item.weight === 'number' && !isNaN(item.weight)) {
+              dayStats.weight += item.weight;
+              dayStats.count += 1;
+            }
           } catch (e) {
             console.error("日期解析错误:", e);
           }
@@ -133,43 +127,36 @@ const PdChart: React.FC<PdChartProps> = ({
           const stats = dayData.get(i)!;
           
           if (stats.count > 0) {
-            ultrafiltrationData.push(Math.round(stats.ultrafiltration / stats.count));
-            drainageData.push(Math.round(stats.drainage / stats.count));
-            infusionData.push(Math.round(stats.infusion / stats.count));
-            balanceData.push(Math.round((stats.drainage - stats.infusion) / stats.count));
+            const avgWeight = Number((stats.weight / stats.count).toFixed(1));
+            chartData.push(avgWeight);
           } else {
-            ultrafiltrationData.push(0);
-            drainageData.push(0);
-            infusionData.push(0);
-            balanceData.push(0);
+            // 对于没有数据的日期，使用0
+            chartData.push(0);
+            // 在categories中标记为无数据
+            categories[i] = `${weekDays[i]}(无)`;
           }
         }
       } else {
         // 月视图：按日期分组
         const daysInMonth = 31; // 假设最多31天
-        const dayData = new Map<number, { 
-          ultrafiltration: number; 
-          drainage: number; 
-          infusion: number;
-          count: number 
-        }>();
+        const dayData = new Map<number, { weight: number; count: number }>();
         
         // 初始化每天的数据
         for (let i = 1; i <= daysInMonth; i++) {
-          dayData.set(i, { ultrafiltration: 0, drainage: 0, infusion: 0, count: 0 });
+          dayData.set(i, { weight: 0, count: 0 });
         }
         
         // 累加每天的数据
-        pdData.forEach(item => {
+        weightData.forEach(item => {
           try {
             const date = parseISO(item.date);
             const day = date.getDate();
             
             const dayStats = dayData.get(day)!;
-            dayStats.ultrafiltration += item.ultrafiltration;
-            dayStats.drainage += item.drainageVolume;
-            dayStats.infusion += item.infusionVolume;
-            dayStats.count += 1;
+            if (typeof item.weight === 'number' && !isNaN(item.weight)) {
+              dayStats.weight += item.weight;
+              dayStats.count += 1;
+            }
           } catch (e) {
             console.error("日期解析错误:", e);
           }
@@ -177,74 +164,49 @@ const PdChart: React.FC<PdChartProps> = ({
         
         // 计算每天的平均值，只添加有数据的日期
         for (let i = 1; i <= daysInMonth; i++) {
-          const stats = dayData.get(i)!;
-          
-          if (stats.count > 0) {
+          if (dayData.get(i)!.count > 0) {
             categories.push(`${i}日`);
-            ultrafiltrationData.push(Math.round(stats.ultrafiltration / stats.count));
-            drainageData.push(Math.round(stats.drainage / stats.count));
-            infusionData.push(Math.round(stats.infusion / stats.count));
-            balanceData.push(Math.round((stats.drainage - stats.infusion) / stats.count));
+            const stats = dayData.get(i)!;
+            const avgWeight = Number((stats.weight / stats.count).toFixed(1));
+            chartData.push(avgWeight);
           }
         }
       }
       
-      // 如果没有数据，添加默认值
-      if (categories.length === 0) {
+      // 如果没有有效数据，添加一个默认数据点
+      if (categories.length === 0 || chartData.length === 0) {
         categories.push("无数据");
-        ultrafiltrationData.push(0);
-        drainageData.push(0);
-        infusionData.push(0);
-        balanceData.push(0);
+        chartData.push(0);
       }
       
       // 准备图表数据
       const series = [
         {
-          name: "超滤量",
-          data: ultrafiltrationData,
+          name: "体重",
+          data: chartData,
           color: "#92A3FD",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
+          type: "line",
+          style: "curve",
           pointShape: "circle",
           pointColor: "#92A3FD",
           pointSelectedColor: "#92A3FD",
           lineWidth: 3,
-          barWidth: 15,
-        },
-        {
-          name: "引流量",
-          data: drainageData,
-          color: "#C58BF2",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
-          pointShape: "circle",
-          pointColor: "#C58BF2",
-          pointSelectedColor: "#C58BF2",
-          lineWidth: 3,
-          barWidth: 15,
-        },
-        {
-          name: "注入量",
-          data: infusionData,
-          color: "#EEA4CE",
-          type: chartType,
-          style: chartType === "line" ? "curve" : "stroke",
-          pointShape: "circle",
-          pointColor: "#EEA4CE",
-          pointSelectedColor: "#EEA4CE",
-          lineWidth: 3,
-          barWidth: 15,
         }
       ];
       
       // 计算Y轴范围
-      const allValues = [...ultrafiltrationData, ...drainageData, ...infusionData];
-      const maxValue = Math.max(...allValues) * 1.2 || 2000;
+      let minWeight = 40;
+      let maxWeight = 100;
+      
+      if (chartData.length > 0 && chartData.some(w => w > 0)) {
+        const validData = chartData.filter(w => w > 0);
+        minWeight = Math.floor(Math.min(...validData) - 1);
+        maxWeight = Math.ceil(Math.max(...validData) + 1);
+      }
       
       // 图表配置
       chartRef.current = new UCharts({
-        type: chartType,
+        type: "line",
         context: ctx,
         width,
         height,
@@ -253,8 +215,8 @@ const PdChart: React.FC<PdChartProps> = ({
         animation: true,
         background: "#FFFFFF",
         padding: [15, 15, 15, 15],
-        enableScroll: true,
-        dataLabel: false,
+        enableScroll: false,
+        dataLabel: true,
         legend: {
           show: false
         },
@@ -267,7 +229,7 @@ const PdChart: React.FC<PdChartProps> = ({
           calibration: true,
           marginLeft: 5,
           itemCount: Math.min(7, categories.length), // 限制显示的项目数量
-          scrollShow: categories.length > 7,
+          scrollShow: false,
           labelCount: Math.min(7, categories.length), // 限制标签数量
           formatter: (item, index) => {
             return categories[index];
@@ -277,14 +239,14 @@ const PdChart: React.FC<PdChartProps> = ({
           data: [
             {
               position: "left",
-              title: "ml",
+              title: "kg",
               titleFontColor: "#999999",
               titleFontSize: 12,
               titleOffsetY: -5,
               titleOffsetX: -25,
-              min: 0,
-              max: maxValue,
-              format: (val) => { return val.toFixed(0) },
+              min: minWeight,
+              max: maxWeight,
+              format: (val) => { return val.toFixed(1) },
               fontColor: "#999999",
               fontSize: 12,
               lineColor: "#EEEEEE",
@@ -292,43 +254,30 @@ const PdChart: React.FC<PdChartProps> = ({
               gridType: "dash",
               splitNumber: 5,
               showTitle: true,
-              tofix: 0
+              tofix: 1
             }
           ]
         },
         extra: {
           line: {
             type: "curve",
-            width: 3
-          },
-          column: {
-            width: 15,
-            barBorderRadius: [5, 5, 0, 0],
-            linearType: "custom",
-            linearOpacity: 1,
-            customColor: [
-              {
-                series: 0,
-                color: [
-                  { stop: 0, color: "#92A3FD" },
-                  { stop: 1, color: "#9DCEFF" }
-                ]
-              },
-              {
-                series: 1,
-                color: [
-                  { stop: 0, color: "#C58BF2" },
-                  { stop: 1, color: "#EEA4CE" }
-                ]
-              },
-              {
-                series: 2,
-                color: [
-                  { stop: 0, color: "#EEA4CE" },
-                  { stop: 1, color: "#FFCF86" }
-                ]
-              }
-            ]
+            width: 2,
+            activeType: "hollow",
+            linearType: "none",
+            activeLine: true,
+            activeLineWidth: 1,
+            activeLineColor: "#999999",
+            activeAreaOpacity: 0.1,
+            point: {
+              size: 3,
+              activeSize: 5,
+              activeColor: "#FFFFFF",
+              activeBorderWidth: 2,
+              borderWidth: 1,
+              borderColor: "#FFFFFF",
+              fillColor: "#FFFFFF",
+              strokeWidth: 2,
+            }
           },
           tooltip: {
             showBox: true,
@@ -365,7 +314,7 @@ const PdChart: React.FC<PdChartProps> = ({
 
   // 组件挂载和更新时初始化图表
   useEffect(() => {
-    if (pdData && pdData.length > 0 && !isLoading) {
+    if (weightData && weightData.length > 0 && !isLoading) {
       Taro.nextTick(() => {
         try {
           Taro.createSelectorQuery()
@@ -389,12 +338,12 @@ const PdChart: React.FC<PdChartProps> = ({
         chartRef.current = null;
       }
     };
-  }, [pdData, viewMode, chartType, isLoading]);
+  }, [weightData, viewMode, isLoading]);
   
   // 监听窗口大小变化
   useEffect(() => {
     const handleResize = () => {
-      if (pdData && pdData.length > 0 && !isLoading) {
+      if (weightData && weightData.length > 0 && !isLoading) {
         try {
           Taro.createSelectorQuery()
             .select(`#${canvasId}`)
@@ -414,47 +363,29 @@ const PdChart: React.FC<PdChartProps> = ({
     return () => {
       Taro.offWindowResize(handleResize);
     };
-  }, [pdData, viewMode, chartType, isLoading]);
+  }, [weightData, viewMode, isLoading]);
 
   // 如果正在加载，显示加载状态
   if (isLoading) {
     return (
-      <View className="pd-chart loading">
+      <View className="weight-chart loading">
         <Text className="loading-text">加载中...</Text>
       </View>
     );
   }
 
   // 如果没有数据，显示空状态
-  if (!pdData || pdData.length === 0) {
+  if (!weightData || weightData.length === 0) {
     return (
-      <View className="pd-chart empty">
-        <Text className="empty-text">暂无腹透数据</Text>
-        <Text className="empty-hint">请先记录腹透数据</Text>
+      <View className="weight-chart empty">
+        <Text className="empty-text">暂无体重数据</Text>
+        <Text className="empty-hint">请先记录体重</Text>
       </View>
     );
   }
 
   return (
-    <View className="pd-chart">
-      <View className="chart-header">
-        <Text className="chart-title">腹透数据趋势</Text>
-        <View className="chart-actions">
-          <Text 
-            className={`chart-type-toggle ${chartType === "line" ? "active" : ""}`}
-            onClick={() => setChartType("line")}
-          >
-            折线图
-          </Text>
-          <Text 
-            className={`chart-type-toggle ${chartType === "column" ? "active" : ""}`}
-            onClick={() => setChartType("column")}
-          >
-            柱状图
-          </Text>
-        </View>
-      </View>
-      
+    <View className="weight-chart">
       <Canvas
         type="2d"
         id={canvasId}
@@ -462,13 +393,10 @@ const PdChart: React.FC<PdChartProps> = ({
         className="chart-canvas"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
       />
-      
-      <View className="chart-footer">
-        <Text className="chart-note">左右滑动可切换日期</Text>
-      </View>
     </View>
   );
 };
 
-export default PdChart; 
+export default WeightChart; 

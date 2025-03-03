@@ -13,7 +13,7 @@
 }
 
 .content-wrapper {
-    padding: 20px 15px 80px; // Added left and right padding
+    padding: 20px 0 80px; // 移除左右边距，让子组件自己控制
     background: #f5f7fa;
 }
 
@@ -71,7 +71,7 @@
 
 .tab-content {
     background: transparent;
-    padding: 0;
+    padding: 0 15px; // 为所有tab内容添加统一的左右边距
 }
 
 .section-title {

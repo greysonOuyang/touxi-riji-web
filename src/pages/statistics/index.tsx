@@ -5,11 +5,14 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 import BPAnalysis from "@/components/bloodPresure/analysis";
 import PdAnalysis from "@/components/pdAnalysis";
+import WeightAnalysis from "@/components/weightAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   // 血压视图模式默认为日模式
   const [bpViewMode, setBpViewMode] = useState<"day" | "week" | "month">("day");
+  // 体重视图模式默认为周模式
+  const [weightViewMode, setWeightViewMode] = useState<"day" | "week" | "month">("week");
 
   useDidShow(() => {
     // 检查本地存储中是否有当前tab的设置
@@ -97,7 +100,9 @@ const StatisticsReportPage: React.FC = () => {
           </AtTabsPane>
 
           <AtTabsPane current={current} index={3}>
-            {renderOtherTabContent("体重")}
+            <View className="tab-content">
+              <WeightAnalysis initialViewMode={weightViewMode} />
+            </View>
           </AtTabsPane>
 
           <AtTabsPane current={current} index={4}>
