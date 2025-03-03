@@ -2,7 +2,6 @@
   padding: 0;
   background-color: transparent;
   min-height: 100%;
-  padding: 0 16px;
   
   // 错误状态
   &.error {
@@ -39,30 +38,6 @@
     }
   }
   
-  // 头部区域 - 与血压分析保持一致的间距
-  .pd-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    
-    .pd-title-container {
-      .pd-title {
-        font-size: 18px;
-        font-weight: 600;
-        color: #333;
-        display: block;
-        margin-bottom: 4px;
-      }
-      
-      .pd-subtitle {
-        font-size: 14px;
-        color: #666;
-        display: block;
-      }
-    }
-  }
-  
   // 头部容器 - 与血压分析保持一致
   .header-container {
     display: flex;
@@ -71,19 +46,9 @@
     margin-bottom: 16px;
     
     .chart-title {
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       color: #333;
-    }
-  }
-  
-  // 控制区域 - 与血压分析保持一致的间距
-  .pd-controls {
-    margin-bottom: 16px;
-    
-    // 确保视图模式选择器和日期导航器之间有适当间距
-    .view-mode-selector {
-      margin-bottom: 12px;
     }
   }
   
@@ -97,7 +62,7 @@
     overflow: hidden;
     
     .chart-controls {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     
     .chart-container {
@@ -118,16 +83,6 @@
     }
   }
   
-  // 统计区域 - 移除多余的标题，直接使用组件内部标题
-  .statistics-section {
-    margin-bottom: 16px;
-  }
-  
-  // 异常值区域 - 移除多余的标题，直接使用组件内部标题
-  .abnormal-section {
-    margin-bottom: 16px;
-  }
-  
   // 确保所有卡片组件使用相同的外边距
   .abnormal-values,
   .pd-statistics {
@@ -136,8 +91,6 @@
   
   // 响应式调整
   @media screen and (max-width: 375px) {
-    padding: 0 12px;
-    
     .chart-section {
       padding: 12px;
       
