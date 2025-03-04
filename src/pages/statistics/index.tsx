@@ -6,6 +6,7 @@ import "./index.scss";
 import BPAnalysis from "@/components/bloodPresure/analysis";
 import PdAnalysis from "@/components/pdAnalysis";
 import WeightAnalysis from "@/components/weightAnalysis";
+import UrineAnalysis from "@/components/urineAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -92,7 +93,9 @@ const StatisticsReportPage: React.FC = () => {
           </AtTabsPane>
 
           <AtTabsPane current={current} index={1}>
-            {renderOtherTabContent("尿量")}
+            <View className="tab-content">
+              <UrineAnalysis />
+            </View>
           </AtTabsPane>
 
           <AtTabsPane current={current} index={2}>

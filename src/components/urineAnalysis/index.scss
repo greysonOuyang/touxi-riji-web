@@ -1,0 +1,391 @@
+.urine-analysis {
+  padding: 0;
+  
+  .content-wrapper {
+    // padding: 0 15px;
+  }
+  
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .chart-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+  
+  .navigator-wrapper {
+    margin-bottom: 16px;
+  }
+  
+  .chart-section {
+    margin-bottom: 20px;
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .chart-container {
+      height: 240px;
+      position: relative;
+      
+      .loading-container,
+      .empty-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        color: #999;
+        font-size: 14px;
+      }
+    }
+  }
+  
+  &.error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+    
+    .error-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #ff4d4f;
+      margin-bottom: 8px;
+    }
+    
+    .error-message {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .retry-button {
+      background: linear-gradient(274.42deg, #C58BF2 0%, #EEA4CE 124.45%);
+      padding: 8px 20px;
+      border-radius: 20px;
+      
+      .retry-text {
+        color: #fff;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+/* 异常值分析样式 */
+.abnormal-values {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+  
+  .abnormal-note {
+    background-color: #f9f9f9;
+    border-radius: 6px;
+    padding: 10px;
+    margin-bottom: 12px;
+    
+    .note-text {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+    }
+  }
+  
+  .abnormal-list {
+    .abnormal-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .time {
+        font-size: 14px;
+        color: #666;
+      }
+      
+      .value {
+        font-size: 14px;
+        color: #ff4d4f;
+        font-weight: 500;
+      }
+      
+      .reason {
+        font-size: 12px;
+        color: #999;
+        margin-top: 4px;
+      }
+    }
+  }
+  
+  .no-abnormal {
+    text-align: center;
+    color: #52c41a;
+    padding: 16px 0;
+    font-size: 14px;
+  }
+}
+
+/* 统计分析样式 */
+.urine-statistics {
+  .statistics-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 16px;
+      display: block;
+    }
+    
+    .card-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 12px;
+      display: block;
+    }
+    
+    .urine-alert {
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      
+      &.warning {
+        background-color: #fff2f0;
+        border: 1px solid #ffccc7;
+        
+        .alert-message {
+          color: #ff4d4f;
+        }
+      }
+      
+      &.notice {
+        background-color: #e6f7ff;
+        border: 1px solid #91d5ff;
+        
+        .alert-message {
+          color: #1890ff;
+        }
+      }
+      
+      &.good {
+        background-color: #f6ffed;
+        border: 1px solid #b7eb8f;
+        
+        .alert-message {
+          color: #52c41a;
+        }
+      }
+      
+      .alert-message {
+        font-size: 14px;
+      }
+    }
+    
+    .trend-info {
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      
+      &.increasing {
+        background-color: #e6f7ff;
+        border: 1px solid #91d5ff;
+        
+        .trend-text {
+          color: #1890ff;
+        }
+      }
+      
+      &.decreasing {
+        background-color: #fff2f0;
+        border: 1px solid #ffccc7;
+        
+        .trend-text {
+          color: #ff4d4f;
+        }
+      }
+      
+      &.fluctuating {
+        background-color: #fff7e6;
+        border: 1px solid #ffd591;
+        
+        .trend-text {
+          color: #fa8c16;
+        }
+      }
+      
+      &.stable {
+        background-color: #f6ffed;
+        border: 1px solid #b7eb8f;
+        
+        .trend-text {
+          color: #52c41a;
+        }
+      }
+      
+      .trend-text {
+        font-size: 14px;
+      }
+    }
+    
+    .data-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      .count-text {
+        font-size: 12px;
+        color: #999;
+      }
+      
+      .reliability-text {
+        font-size: 12px;
+        color: #ff7a45;
+      }
+    }
+  }
+  
+  .statistics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    
+    .statistics-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      
+      .item-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1890ff;
+        margin-bottom: 4px;
+      }
+      
+      .item-label {
+        font-size: 12px;
+        color: #666;
+      }
+    }
+  }
+  
+  .time-distribution {
+    .time-period-item {
+      margin-bottom: 16px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .period-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .period-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          margin-right: 8px;
+        }
+        
+        .period-name {
+          font-size: 14px;
+          font-weight: 500;
+          color: #333;
+        }
+        
+        .period-percentage {
+          font-size: 12px;
+          color: #999;
+          margin-left: 4px;
+        }
+      }
+      
+      .period-stats {
+        display: flex;
+        margin-bottom: 8px;
+        
+        .period-stat {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          
+          .stat-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1890ff;
+          }
+          
+          .stat-label {
+            font-size: 12px;
+            color: #999;
+          }
+        }
+      }
+      
+      .period-bar {
+        height: 6px;
+        border-radius: 3px;
+        background-color: #1890ff;
+        transition: width 0.3s ease;
+      }
+    }
+    
+    .no-data {
+      text-align: center;
+      color: #999;
+      padding: 16px 0;
+      font-size: 14px;
+    }
+  }
+  
+  .health-tips {
+    .tip-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+      
+      .tip-icon {
+        margin-right: 8px;
+        color: #1890ff;
+      }
+      
+      .tip-text {
+        font-size: 14px;
+        color: #666;
+        flex: 1;
+      }
+    }
+  }
+} 
