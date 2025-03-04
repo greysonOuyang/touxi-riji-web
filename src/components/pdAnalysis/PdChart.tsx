@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, Canvas } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, getDay } from "date-fns";
+import { zhCN } from "date-fns/locale";
 import { PdDataPoint } from "./usePdData";
 import "./PdChart.scss";
 
@@ -13,6 +14,9 @@ interface PdChartProps {
   pdData: PdDataPoint[];
   isLoading?: boolean;
 }
+
+// 星期几的中文表示
+const weekDayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 
 const PdChart: React.FC<PdChartProps> = ({
   viewMode,
@@ -78,53 +82,57 @@ const PdChart: React.FC<PdChartProps> = ({
                 drainageData.push(item.drainageVolume);
               });
             } else if (viewMode === "week") {
-              // 周视图：按日期分组
-              const dateMap = new Map<string, {
+              // 周视图：按周几分组
+              const weekDayMap = new Map<number, {
                 ultrafiltration: number[],
                 drainage: number[],
-                count: number
+                count: number,
+                dayOfWeek: number
               }>();
               
               pdData.forEach(item => {
-                // 提取日期部分 MM-DD
-                const dateStr = item.date.substring(5); // 获取MM-DD部分
-                if (!dateMap.has(dateStr)) {
-                  dateMap.set(dateStr, {
+                // 获取日期对应的星期几（0-6，0表示周日）
+                const date = new Date(item.date);
+                const dayOfWeek = getDay(date); // 0-6
+                
+                if (!weekDayMap.has(dayOfWeek)) {
+                  weekDayMap.set(dayOfWeek, {
                     ultrafiltration: [],
                     drainage: [],
-                    count: 0
+                    count: 0,
+                    dayOfWeek
                   });
                 }
                 
-                const dateData = dateMap.get(dateStr)!;
-                dateData.ultrafiltration.push(item.ultrafiltration);
-                dateData.drainage.push(item.drainageVolume);
-                dateData.count++;
+                const dayData = weekDayMap.get(dayOfWeek)!;
+                dayData.ultrafiltration.push(item.ultrafiltration);
+                dayData.drainage.push(item.drainageVolume);
+                dayData.count++;
               });
               
-              // 按日期排序
-              const sortedDates = Array.from(dateMap.keys()).sort((a, b) => {
-                // 正确排序MM-DD格式的日期
-                const [monthA, dayA] = a.split('-').map(Number);
-                const [monthB, dayB] = b.split('-').map(Number);
-                if (monthA !== monthB) return monthA - monthB;
-                return dayA - dayB;
+              // 按周几排序（周一到周日）
+              const sortedDays = Array.from(weekDayMap.keys()).sort((a, b) => {
+                // 自定义排序：周一(1)到周日(0)
+                const orderA = a === 0 ? 7 : a; // 把周日(0)变成7，这样它就排在最后
+                const orderB = b === 0 ? 7 : b;
+                return orderA - orderB;
               });
               
-              sortedDates.forEach(dateStr => {
-                const dateData = dateMap.get(dateStr)!;
-                categories.push(dateStr.replace("-", "/"));
+              sortedDays.forEach(dayOfWeek => {
+                const dayData = weekDayMap.get(dayOfWeek)!;
+                // 使用中文星期几
+                categories.push(weekDayNames[dayOfWeek]);
                 
                 // 计算平均值
-                const avgUltrafiltration = dateData.ultrafiltration.reduce((sum, val) => sum + val, 0) / dateData.count;
-                const avgDrainage = dateData.drainage.reduce((sum, val) => sum + val, 0) / dateData.count;
+                const avgUltrafiltration = dayData.ultrafiltration.reduce((sum, val) => sum + val, 0) / dayData.count;
+                const avgDrainage = dayData.drainage.reduce((sum, val) => sum + val, 0) / dayData.count;
                 
                 ultrafiltrationData.push(Math.round(avgUltrafiltration));
                 drainageData.push(Math.round(avgDrainage));
               });
             } else if (viewMode === "month") {
               // 月视图：按周分组
-              const weekMap = new Map<string, {
+              const weekMap = new Map<number, {
                 ultrafiltration: number[],
                 drainage: number[],
                 count: number,
@@ -136,10 +144,9 @@ const PdChart: React.FC<PdChartProps> = ({
                 const date = new Date(item.date);
                 // 获取日期所在的周
                 const weekNumber = Math.ceil(date.getDate() / 7);
-                const weekKey = `第${weekNumber}周`;
                 
-                if (!weekMap.has(weekKey)) {
-                  weekMap.set(weekKey, {
+                if (!weekMap.has(weekNumber)) {
+                  weekMap.set(weekNumber, {
                     ultrafiltration: [],
                     drainage: [],
                     count: 0,
@@ -147,20 +154,18 @@ const PdChart: React.FC<PdChartProps> = ({
                   });
                 }
                 
-                const weekData = weekMap.get(weekKey)!;
+                const weekData = weekMap.get(weekNumber)!;
                 weekData.ultrafiltration.push(item.ultrafiltration);
                 weekData.drainage.push(item.drainageVolume);
                 weekData.count++;
               });
               
               // 按周排序
-              const sortedWeeks = Array.from(weekMap.entries())
-                .sort((a, b) => a[1].weekNumber - b[1].weekNumber)
-                .map(entry => entry[0]);
+              const sortedWeeks = Array.from(weekMap.keys()).sort((a, b) => a - b);
               
-              sortedWeeks.forEach(weekKey => {
-                const weekData = weekMap.get(weekKey)!;
-                categories.push(weekKey);
+              sortedWeeks.forEach(weekNumber => {
+                const weekData = weekMap.get(weekNumber)!;
+                categories.push(`第${weekNumber}周`);
                 
                 // 计算平均值
                 const avgUltrafiltration = weekData.ultrafiltration.reduce((sum, val) => sum + val, 0) / weekData.count;
