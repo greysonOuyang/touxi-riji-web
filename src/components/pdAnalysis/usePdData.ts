@@ -180,11 +180,31 @@ const usePdData = () => {
   const [metadata, setMetadata] = useState<PdMetadata | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastRequest, setLastRequest] = useState<{
+    viewMode: "day" | "week" | "month";
+    date: string;
+  } | null>(null);
 
   // 获取数据
   const refreshData = useCallback(async (viewMode: "day" | "week" | "month", currentDate: Date) => {
+    // 检查是否与上次请求相同，避免重复请求
+    const currentDateStr = format(currentDate, "yyyy-MM-dd");
+    if (
+      lastRequest && 
+      lastRequest.viewMode === viewMode && 
+      lastRequest.date === currentDateStr
+    ) {
+      return; // 避免重复请求相同的数据
+    }
+    
     setIsLoading(true);
     setError(null);
+    
+    // 更新最后请求信息
+    setLastRequest({
+      viewMode,
+      date: currentDateStr
+    });
 
     try {
       const userId = Taro.getStorageSync("userId");
@@ -247,6 +267,7 @@ const usePdData = () => {
         }
       }
       
+      // 直接设置新数据，不需要先清空再设置
       setPdData(dataPoints);
       setMetadata(statsMetadata);
     } catch (err) {
@@ -257,7 +278,7 @@ const usePdData = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [lastRequest]); // 移除pdData.length依赖，只依赖lastRequest
 
   return {
     pdData,

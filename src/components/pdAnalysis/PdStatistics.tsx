@@ -150,7 +150,6 @@ const PdStatistics: React.FC<PdStatisticsProps> = ({
   return (
     <View className="pd-statistics">
       <View className="statistics-header">
-        <Text className="statistics-title">腹透统计分析</Text>
         <Text className="statistics-subtitle">
           {viewMode === "day" && "今日统计"}
           {viewMode === "week" && "本周统计"}

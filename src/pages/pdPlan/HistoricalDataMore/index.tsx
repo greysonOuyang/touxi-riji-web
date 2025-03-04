@@ -17,7 +17,6 @@ import {
 } from "date-fns";
 import {
   getPaginatedPdRecords,
-  getPaginatedPdRecordsData,
   PdRecordDateVO,
   PdRecordData,
   getLatestPdRecord,

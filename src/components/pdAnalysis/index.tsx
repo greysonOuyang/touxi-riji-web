@@ -20,7 +20,8 @@ const PdAnalysis: React.FC = () => {
     handleDateChange,
     resetToCurrentDate
   } = useDateNavigation(viewMode, (date) => {
-    refreshData(viewMode, date);
+    // 日期变化时的回调，这里不需要主动调用refreshData
+    // 因为useEffect会监听currentEndDate的变化
   });
   
   // 使用自定义钩子获取腹透数据
@@ -37,6 +38,7 @@ const PdAnalysis: React.FC = () => {
     setViewMode(mode);
     // 切换视图模式时重置为当天
     resetToCurrentDate();
+    // 不需要在这里调用refreshData，因为视图模式和日期变化会触发useEffect
   };
 
   // 当视图模式或日期变化时刷新数据
@@ -97,6 +99,7 @@ const PdAnalysis: React.FC = () => {
           
           {!isLoading && pdData && pdData.length > 0 && (
             <PdChart 
+              key={`chart-${viewMode}`} // 添加key确保组件在视图模式变化时重新渲染
               viewMode={viewMode} 
               pdData={pdData} 
               isLoading={false}
@@ -123,6 +126,7 @@ const PdAnalysis: React.FC = () => {
       {/* 腹透统计分析 */}
       {!isLoading && pdData && Array.isArray(pdData) && pdData.length > 0 && (
         <PdStatistics 
+          key={`stats-${viewMode}`} // 添加key确保组件在视图模式变化时重新渲染
           pdData={pdData} 
           metadata={metadata} 
           viewMode={viewMode}

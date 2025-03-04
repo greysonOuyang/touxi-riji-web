@@ -32,7 +32,7 @@ export default function useDateNavigation(
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (direction === 'next' && newDate > today) {
-        return;
+        newDate = today; // 设置为今天，而不是直接返回
       }
     } else if (viewMode === "week") {
       // 周视图，前后移动一周

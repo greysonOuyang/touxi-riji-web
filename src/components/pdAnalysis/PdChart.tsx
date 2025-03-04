@@ -63,13 +63,16 @@ const PdChart: React.FC<PdChartProps> = ({
             // 根据视图模式处理数据
             if (viewMode === "day") {
               // 日视图：按时间排序
-              const sortedData = [...pdData].sort((a, b) => 
-                new Date(a.recordTime).getTime() - new Date(b.recordTime).getTime()
-              );
+              const sortedData = [...pdData].sort((a, b) => {
+                // 确保使用完整的时间戳进行排序
+                const timeA = a.timestamp ? new Date(a.timestamp).getTime() : new Date(`${a.date}T${a.recordTime}`).getTime();
+                const timeB = b.timestamp ? new Date(b.timestamp).getTime() : new Date(`${b.date}T${b.recordTime}`).getTime();
+                return timeA - timeB;
+              });
               
               sortedData.forEach(item => {
                 // 只提取时间部分 HH:mm
-                const timeStr = item.recordTime.substring(11, 16);
+                const timeStr = item.recordTime;
                 categories.push(timeStr);
                 ultrafiltrationData.push(item.ultrafiltration);
                 drainageData.push(item.drainageVolume);
@@ -84,7 +87,7 @@ const PdChart: React.FC<PdChartProps> = ({
               
               pdData.forEach(item => {
                 // 提取日期部分 MM-DD
-                const dateStr = item.recordTime.substring(5, 10);
+                const dateStr = item.date.substring(5); // 获取MM-DD部分
                 if (!dateMap.has(dateStr)) {
                   dateMap.set(dateStr, {
                     ultrafiltration: [],
@@ -100,7 +103,13 @@ const PdChart: React.FC<PdChartProps> = ({
               });
               
               // 按日期排序
-              const sortedDates = Array.from(dateMap.keys()).sort();
+              const sortedDates = Array.from(dateMap.keys()).sort((a, b) => {
+                // 正确排序MM-DD格式的日期
+                const [monthA, dayA] = a.split('-').map(Number);
+                const [monthB, dayB] = b.split('-').map(Number);
+                if (monthA !== monthB) return monthA - monthB;
+                return dayA - dayB;
+              });
               
               sortedDates.forEach(dateStr => {
                 const dateData = dateMap.get(dateStr)!;
@@ -119,14 +128,14 @@ const PdChart: React.FC<PdChartProps> = ({
                 ultrafiltration: number[],
                 drainage: number[],
                 count: number,
-                startDate: Date
+                weekNumber: number
               }>();
               
               pdData.forEach(item => {
-                // 从记录时间中提取日期
-                const date = new Date(item.recordTime);
+                // 从日期中提取日期
+                const date = new Date(item.date);
                 // 获取日期所在的周
-                const weekNumber = Math.floor(date.getDate() / 7) + 1;
+                const weekNumber = Math.ceil(date.getDate() / 7);
                 const weekKey = `第${weekNumber}周`;
                 
                 if (!weekMap.has(weekKey)) {
@@ -134,26 +143,20 @@ const PdChart: React.FC<PdChartProps> = ({
                     ultrafiltration: [],
                     drainage: [],
                     count: 0,
-                    startDate: date
+                    weekNumber
                   });
                 }
                 
                 const weekData = weekMap.get(weekKey)!;
-                if (date < weekData.startDate) {
-                  weekData.startDate = date;
-                }
-                
                 weekData.ultrafiltration.push(item.ultrafiltration);
                 weekData.drainage.push(item.drainageVolume);
                 weekData.count++;
               });
               
               // 按周排序
-              const sortedWeeks = Array.from(weekMap.keys()).sort((a, b) => {
-                const weekA = parseInt(a.replace(/[^0-9]/g, ""));
-                const weekB = parseInt(b.replace(/[^0-9]/g, ""));
-                return weekA - weekB;
-              });
+              const sortedWeeks = Array.from(weekMap.entries())
+                .sort((a, b) => a[1].weekNumber - b[1].weekNumber)
+                .map(entry => entry[0]);
               
               sortedWeeks.forEach(weekKey => {
                 const weekData = weekMap.get(weekKey)!;
@@ -304,7 +307,15 @@ const PdChart: React.FC<PdChartProps> = ({
   // 初始化图表
   useEffect(() => {
     if (!isLoading && pdData && pdData.length > 0) {
-      initChart();
+      // 清除旧图表实例
+      if (chartRef.current) {
+        chartRef.current = null;
+      }
+      
+      // 初始化新图表
+      setTimeout(() => {
+        initChart();
+      }, 100);
     }
     
     // 监听窗口大小变化

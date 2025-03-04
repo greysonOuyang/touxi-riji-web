@@ -2,7 +2,7 @@
   margin: 16px 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   
   &.loading, &.empty {
     display: flex;
@@ -35,7 +35,7 @@
 .pd-card {
   background-color: #ffffff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 14px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
   
@@ -66,9 +66,9 @@
 .status-card {
   display: flex;
   align-items: center;
-  padding: 12px;
+  padding: 10px;
   border-radius: 10px;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   
   &:last-child {
     margin-bottom: 0;
@@ -132,8 +132,8 @@
 .statistics-card {
   background-color: #ffffff;
   border-radius: 10px;
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 10px;
+  margin-bottom: 8px;
   border: 1px solid #f0f0f0;
   
   &:last-child {
@@ -144,20 +144,20 @@
     font-size: 15px;
     font-weight: 600;
     color: #333333;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     display: block;
   }
   
   .statistics-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
+    gap: 8px;
     
     .statistics-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 8px;
+      padding: 8px 6px;
       background-color: #f8f9fa;
       border-radius: 8px;
       
@@ -179,7 +179,7 @@
   
   .concentration-distribution {
     .concentration-item {
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       
       &:last-child {
         margin-bottom: 0;
@@ -221,7 +221,7 @@
     .health-tip {
       display: flex;
       align-items: flex-start;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       
       &:last-child {
         margin-bottom: 0;
