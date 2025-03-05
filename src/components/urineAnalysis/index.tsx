@@ -46,6 +46,17 @@ const UrineAnalysis: React.FC = () => {
     refreshData(viewMode, currentEndDate);
   }, [viewMode, currentEndDate, refreshData]);
 
+  // 在UrineAnalysis组件中添加onSwipe处理函数
+  const handleSwipe = (direction: "left" | "right") => {
+    if (direction === "left") {
+      // 向左滑动，显示下一天/周/月
+      handleDateChange("next");
+    } else {
+      // 向右滑动，显示上一天/周/月
+      handleDateChange("prev");
+    }
+  };
+
   // 如果发生错误，显示错误信息
   if (error) {
     return (
@@ -99,6 +110,7 @@ const UrineAnalysis: React.FC = () => {
                 viewMode={viewMode} 
                 urineData={urineData} 
                 isLoading={false}
+                onSwipe={handleSwipe}
               />
             )}
             

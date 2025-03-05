@@ -79,7 +79,7 @@ instance.interceptors.response.use(
   (response) => {
     console.log("Response:", response);
 
-    if (response.data && response.data.code !== 200) {
+    if (response.data && response.data.code !== 0 && response.data.code !== 200) {
       const error = new Error(response.data.msg || "请求错误");
       (error as any).response = response;
       return Promise.reject(error);
