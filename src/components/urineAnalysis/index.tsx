@@ -30,7 +30,8 @@ const UrineAnalysis: React.FC = () => {
     metadata, 
     refreshData, 
     isLoading, 
-    error 
+    error,
+    timeDistribution
   } = useUrineData();
 
   // 处理视图模式变化
@@ -137,6 +138,7 @@ const UrineAnalysis: React.FC = () => {
             key={`stats-${viewMode}`}
             urineData={urineData} 
             metadata={metadata} 
+            timeDistribution={timeDistribution}
             viewMode={viewMode}
             isLoading={false}
           />

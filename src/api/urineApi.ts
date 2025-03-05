@@ -207,7 +207,7 @@ export const getUrineTimeDistribution = (
     url += `&endDate=${encodeURIComponent(endDate)}`;
   }
   
-  return get(url);
+  return get<UrineTimeDistributionListVO>(url);
 };
 
 

@@ -3,11 +3,13 @@ import { View, Text, Canvas } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import UCharts from "@qiun/ucharts";
 import { UrineDataPoint, UrineMetadata, NORMAL_VOLUME_RANGE, TIME_PERIODS } from "./useUrineData";
+import { UrineTimeDistributionItemVO } from "@/api/urineApi";
 import "./index.scss";
 
 interface UrineStatisticsProps {
   urineData: UrineDataPoint[];
   metadata: UrineMetadata | null;
+  timeDistribution?: UrineTimeDistributionItemVO[];
   viewMode: "day" | "week" | "month";
   isLoading?: boolean;
 }
@@ -15,6 +17,7 @@ interface UrineStatisticsProps {
 const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   urineData,
   metadata,
+  timeDistribution,
   viewMode,
   isLoading = false
 }) => {
@@ -31,7 +34,27 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
           'not an array'
       });
     }
-  }, [metadata]);
+    
+    if (timeDistribution) {
+      console.log('UrineStatistics接收到独立的timeDistribution:', {
+        isArray: Array.isArray(timeDistribution),
+        length: timeDistribution.length
+      });
+    }
+  }, [metadata, timeDistribution]);
+
+  // 获取时间分布数据 - 优先使用传入的timeDistribution
+  const getTimeDistributionData = () => {
+    if (timeDistribution && Array.isArray(timeDistribution) && timeDistribution.length > 0) {
+      return timeDistribution;
+    }
+    
+    if (metadata && metadata.timeDistribution && Array.isArray(metadata.timeDistribution) && metadata.timeDistribution.length > 0) {
+      return metadata.timeDistribution;
+    }
+    
+    return [];
+  };
 
   // 饼图引用
   const frequencyPieChartRef = useRef<any>(null);
@@ -70,28 +93,11 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   
   // 初始化尿频饼图
   const initFrequencyPieChart = (canvas, width, height) => {
-    if (!canvas || !metadata || !metadata.timeDistribution) return null;
+    if (!canvas) return null;
     
-    const ctx = canvas.getContext("2d");
-    
-    // 确保宽高相等，使用较小的一边作为尺寸
-    const size = Math.min(width, height);
-    
-    // 准备饼图数据 - 只包含次数大于0的时间段
-    const series = [];
-    const pieData = metadata.timeDistribution
-      .filter(item => item.count > 0) // 过滤掉次数为0的数据
-      .map(item => {
-        const periodInfo = Object.values(TIME_PERIODS).find(p => p.name === item.period);
-        return {
-          name: item.period,
-          value: item.count,
-          color: periodInfo ? periodInfo.color : "#9E9E9E"
-        };
-      });
-    
-    if (pieData.length === 0) {
-      // 如果没有数据，绘制空状态
+    const timeDistData = getTimeDistributionData();
+    if (timeDistData.length === 0) {
+      const ctx = canvas.getContext("2d");
       ctx.fillStyle = "#999";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -100,9 +106,36 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
       return null;
     }
     
-    series.push({
-      data: pieData
+    const ctx = canvas.getContext("2d");
+    
+    // 设置Canvas尺寸和像素比例
+    const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+    ctx.scale(pixelRatio, pixelRatio);
+    
+    // 确保宽高相等，使用较小的一边作为尺寸
+    const size = Math.min(width, height);
+    
+    // 准备饼图数据 - 包含所有时间段，即使次数为0
+    const allPeriods = Object.values(TIME_PERIODS);
+    const pieData = allPeriods.map(periodInfo => {
+      // 查找对应的数据项
+      const dataItem = timeDistData.find(item => item.period === periodInfo.name);
+      const count = dataItem ? dataItem.count : 0;
+      
+      return {
+        name: periodInfo.name,
+        value: count,
+        color: periodInfo.color
+      };
     });
+    
+    // 直接使用series数组
+    const series = [{
+      name: "排尿频次",
+      data: pieData
+    }];
     
     frequencyPieChartRef.current = new UCharts({
       type: "pie",
@@ -158,28 +191,11 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   
   // 初始化尿量饼图
   const initVolumePieChart = (canvas, width, height) => {
-    if (!canvas || !metadata || !metadata.timeDistribution) return null;
+    if (!canvas) return null;
     
-    const ctx = canvas.getContext("2d");
-    
-    // 确保宽高相等，使用较小的一边作为尺寸
-    const size = Math.min(width, height);
-    
-    // 准备饼图数据 - 只包含次数大于0的时间段
-    const series = [];
-    const pieData = metadata.timeDistribution
-      .filter(item => item.count > 0) // 过滤掉次数为0的数据
-      .map(item => {
-        const periodInfo = Object.values(TIME_PERIODS).find(p => p.name === item.period);
-        return {
-          name: item.period,
-          value: item.totalVolume,
-          color: periodInfo ? periodInfo.color : "#9E9E9E"
-        };
-      });
-    
-    if (pieData.length === 0) {
-      // 如果没有数据，绘制空状态
+    const timeDistData = getTimeDistributionData();
+    if (timeDistData.length === 0) {
+      const ctx = canvas.getContext("2d");
       ctx.fillStyle = "#999";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -188,9 +204,36 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
       return null;
     }
     
-    series.push({
-      data: pieData
+    const ctx = canvas.getContext("2d");
+    
+    // 设置Canvas尺寸和像素比例
+    const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+    ctx.scale(pixelRatio, pixelRatio);
+    
+    // 确保宽高相等，使用较小的一边作为尺寸
+    const size = Math.min(width, height);
+    
+    // 准备饼图数据 - 包含所有时间段，即使尿量为0
+    const allPeriods = Object.values(TIME_PERIODS);
+    const pieData = allPeriods.map(periodInfo => {
+      // 查找对应的数据项
+      const dataItem = timeDistData.find(item => item.period === periodInfo.name);
+      const volume = dataItem ? dataItem.totalVolume : 0;
+      
+      return {
+        name: periodInfo.name,
+        value: volume,
+        color: periodInfo.color
+      };
     });
+    
+    // 直接使用series数组
+    const series = [{
+      name: "尿量分布",
+      data: pieData
+    }];
     
     volumePieChartRef.current = new UCharts({
       type: "pie",
@@ -246,42 +289,37 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   
   // 渲染时间分布图例
   const renderTimeDistributionLegend = () => {
-    if (!metadata || !metadata.timeDistribution) {
+    const timeDistData = getTimeDistributionData();
+    
+    if (timeDistData.length === 0) {
       return <Text className="no-data">暂无时间分布数据</Text>;
     }
     
-    // 确保timeDistribution是数组
-    if (!Array.isArray(metadata.timeDistribution)) {
-      console.error('timeDistribution不是数组:', metadata.timeDistribution);
-      return <Text className="no-data">时间分布数据格式错误</Text>;
-    }
-    
-    // 过滤掉次数为0的数据
-    const validDistribution = metadata.timeDistribution.filter(item => item.count > 0);
-    
-    if (validDistribution.length === 0) {
-      return <Text className="no-data">暂无时间分布数据</Text>;
-    }
+    // 确保所有时间段都显示在图例中，即使是0
+    const allPeriods = Object.values(TIME_PERIODS);
+    const legendItems = allPeriods.map(periodInfo => {
+      // 查找对应的数据项
+      const dataItem = timeDistData.find(item => item.period === periodInfo.name);
+      const count = dataItem ? dataItem.count : 0;
+      const totalVolume = dataItem ? dataItem.totalVolume : 0;
+      
+      return (
+        <View className="legend-item" key={periodInfo.name}>
+          <View 
+            className="legend-color" 
+            style={{ backgroundColor: periodInfo.color }}
+          />
+          <View className="legend-info">
+            <Text className="legend-name">{periodInfo.name}</Text>
+            <Text className="legend-value">{count}次 / {totalVolume}ml</Text>
+          </View>
+        </View>
+      );
+    });
     
     return (
       <View className="time-distribution-legend">
-        {validDistribution.map((item, index) => {
-          const periodInfo = Object.values(TIME_PERIODS).find(p => p.name === item.period);
-          const bgColor = periodInfo ? periodInfo.color : "#9E9E9E";
-          
-          return (
-            <View className="legend-item" key={index}>
-              <View 
-                className="legend-color" 
-                style={{ backgroundColor: bgColor }}
-              />
-              <View className="legend-info">
-                <Text className="legend-name">{item.period}</Text>
-                <Text className="legend-value">{item.count}次 / {item.totalVolume}ml</Text>
-              </View>
-            </View>
-          );
-        })}
+        {legendItems}
       </View>
     );
   };
@@ -300,6 +338,47 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   const alert = getUrineVolumeAlert(metadata.dailyAverage);
   const trendDescription = getTrendDescription(metadata.trend, metadata.trendPercentage);
   
+  // 修复Canvas onReady类型错误
+  const handleFrequencyChartReady = (e) => {
+    const { canvas, width, height } = e.detail;
+    return initFrequencyPieChart(canvas, width, height);
+  };
+  
+  const handleVolumeChartReady = (e) => {
+    const { canvas, width, height } = e.detail;
+    return initVolumePieChart(canvas, width, height);
+  };
+  
+  // 使用useEffect来初始化饼图
+  useEffect(() => {
+    if (!metadata) return;
+    
+    // 使用Taro的API获取Canvas节点
+    setTimeout(() => {
+      Taro.createSelectorQuery()
+        .select(`#${frequencyCanvasId}`)
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (res[0]) {
+            initFrequencyPieChart(res[0].node, res[0].width, res[0].height);
+          } else {
+            console.error("获取频次饼图Canvas节点失败");
+          }
+        });
+        
+      Taro.createSelectorQuery()
+        .select(`#${volumeCanvasId}`)
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (res[0]) {
+            initVolumePieChart(res[0].node, res[0].width, res[0].height);
+          } else {
+            console.error("获取尿量饼图Canvas节点失败");
+          }
+        });
+    }, 100); // 延迟100ms确保DOM已渲染
+  }, [metadata, timeDistribution]);
+
   return (
     <View className="urine-statistics">
       {/* 卡片1: 尿量状态概览 */}
@@ -392,7 +471,6 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
                 canvasId={frequencyCanvasId}
                 className="distribution-chart"
                 style={{ width: '100%', height: '200px' }}
-                onReady={initFrequencyPieChart}
               />
             </View>
           </View>
@@ -405,7 +483,6 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
                 canvasId={volumeCanvasId}
                 className="distribution-chart"
                 style={{ width: '100%', height: '200px' }}
-                onReady={initVolumePieChart}
               />
             </View>
           </View>

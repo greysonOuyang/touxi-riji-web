@@ -6,7 +6,9 @@ import {
   getUrineStatistics, 
   getUrineTimeDistribution,
   UrineHistoryItem, 
-  UrineStatistics as ApiUrineStatistics
+  UrineStatistics as ApiUrineStatistics,
+  UrineTimeDistributionListVO,
+  UrineTimeDistributionItemVO
 } from "@/api/urineApi";
 
 // 定义尿量数据类型
@@ -33,13 +35,7 @@ export interface UrineMetadata {
   dailyAverage: number;
   dayWithMaxVolume: string;
   dayWithMinVolume: string;
-  timeDistribution: {
-    period: string;
-    count: number;
-    percentage: number;
-    totalVolume: number;
-    avgVolume: number;
-  }[];
+  timeDistribution: UrineTimeDistributionItemVO[];
   trend: "increasing" | "decreasing" | "stable" | "fluctuating";
   trendPercentage: number;
   // API返回的额外字段
@@ -168,13 +164,7 @@ const generateMetadataFromApiData = (
   const dataCoverage = uniqueDays / expectedDays;
   
   // 初始化空的时间分布数组，将在refreshData中填充
-  const timeDistribution: {
-    period: string;
-    count: number;
-    percentage: number;
-    totalVolume: number;
-    avgVolume: number;
-  }[] = [];
+  const timeDistribution: UrineTimeDistributionItemVO[] = [];
   
   // 计算趋势百分比（如果API没有提供）
   const trendPercentage = apiStats.trendAnalysis?.percentage || (apiStats.trend === 'up' ? 5 : (apiStats.trend === 'down' ? -5 : 0));
@@ -202,6 +192,7 @@ const generateMetadataFromApiData = (
 const useUrineData = () => {
   const [urineData, setUrineData] = useState<UrineDataPoint[]>([]);
   const [metadata, setMetadata] = useState<UrineMetadata | null>(null);
+  const [timeDistribution, setTimeDistribution] = useState<UrineTimeDistributionItemVO[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   
@@ -340,11 +331,6 @@ const useUrineData = () => {
   };
   
   // 刷新数据
-  // 优化说明：
-  // 1. 将数据获取逻辑拆分为独立的函数，提高代码可读性和可维护性
-  // 2. 使用统一的/history接口获取数据
-  // 3. 移除了复杂的前端计算逻辑和API失效时的备选方案
-  // 4. 保留了必要的API调用（统计数据和时间分布数据）
   const refreshData = useCallback(async (
     viewMode: "day" | "week" | "month" = "day",
     endDate: Date = new Date()
@@ -376,7 +362,7 @@ const useUrineData = () => {
       
       // 3. 获取统计数据
       const apiPeriod = viewMode === 'day' ? 'day' : (viewMode === 'week' ? 'week' : 'month');
-      const statsData = await fetchStatisticsData(userId, apiPeriod, startDate, endDateStr, viewMode);
+      const statsData = await fetchStatisticsData(userId, apiPeriod as "day" | "week" | "month", startDate, endDateStr, viewMode);
       
       // 4. 获取时间分布数据
       const timeDistData = await fetchTimeDistributionData(userId, apiPeriod as "day" | "week" | "month", startDate, endDateStr);
@@ -387,9 +373,11 @@ const useUrineData = () => {
       // 6. 使用时间分布数据
       if (timeDistData && timeDistData.items && timeDistData.items.length > 0) {
         metadataObj.timeDistribution = timeDistData.items;
+        setTimeDistribution(timeDistData.items);
       } else {
         // 如果没有时间分布数据，设置为空数组
         metadataObj.timeDistribution = [];
+        setTimeDistribution([]);
         debugLog('警告: 时间分布数据为空');
       }
       
@@ -397,7 +385,7 @@ const useUrineData = () => {
       setUrineData(dataPoints);
       setMetadata(metadataObj);
       
-      debugLog('数据刷新完成', { dataPoints, metadata: metadataObj });
+      debugLog('数据刷新完成', { dataPoints, metadata: metadataObj, timeDistribution: metadataObj.timeDistribution });
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '未知错误';
@@ -412,6 +400,7 @@ const useUrineData = () => {
   return {
     urineData,
     metadata,
+    timeDistribution,
     refreshData,
     isLoading,
     error
