@@ -24,6 +24,10 @@ export interface UrineHistoryItem {
   recordedTime: string; // 记录时间
   notes?: string;       // 备注
   tag?: string;         // 时间段标签
+  date?: string;        // 日期（格式：yyyy-MM-dd）
+  timestamp?: string;   // 时间戳（ISO格式）
+  recordTime?: string;  // 记录时间（格式化后的字符串）
+  hasMeasurement?: boolean; // 是否有测量数据
 }
 
 // 获取历史记录请求参数
@@ -63,6 +67,10 @@ export interface UrineStatistics {
   abnormalPercentage?: number;  // 异常比例
   totalVolume?: number;         // 总尿量
   trendAnalysis?: any;          // 趋势分析
+  // 数据完整度相关字段
+  dataCompleteness?: number;    // 数据完整度百分比
+  daysWithData?: number;        // 有数据的天数
+  totalDays?: number;           // 总天数
 }
 
 // 更新尿量记录请求参数
@@ -88,6 +96,14 @@ export interface UrineTimeDistributionListVO {
   items: UrineTimeDistributionItemVO[]; // 时间分布数据项列表
   totalCount: number;                   // 总记录数
   totalVolume: number;                  // 总尿量
+}
+
+export interface Page<T> {
+  records: T[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
 }
 
 /**
@@ -117,44 +133,35 @@ export const addUrineRecord = (
  * @param params UrineHistoryParams
  * @returns Promise<ApiResponse<Page<UrineHistoryItem>>>
  */
-export const getUrineHistory = (
-  params: UrineHistoryParams
-): Promise<ApiResponse<{
-  records: UrineHistoryItem[];
-  total: number;
-  size: number;
-  current: number;
-  pages: number;
-}>> => {
-  return get<{
-    records: UrineHistoryItem[];
-    total: number;
-    size: number;
-    current: number;
-    pages: number;
-  }>('/api/urine-records/history', params);
+export const getUrineHistory = (params: {
+  userId: number;
+  startDate?: string;
+  endDate?: string;
+  pageNum?: number;
+  pageSize?: number;
+  viewMode?: 'day' | 'week' | 'month';
+}): Promise<ApiResponse<Page<UrineHistoryItem>>> => {
+  const { userId, startDate, endDate, pageNum = 1, pageSize = 10, viewMode = 'day' } = params;
+  return get<Page<UrineHistoryItem>>(`/api/urine-records/history?userId=${userId}&startDate=${startDate}&endDate=${endDate}&pageNum=${pageNum}&pageSize=${pageSize}&viewMode=${viewMode}`);
 };
 
 /**
  * 获取用户尿量统计数据
  * @param userId 用户ID
- * @param period 统计周期，可选 'day', 'week', 'month'
+ * @param viewMode 视图模式，可选 'day', 'week', 'month'
  * @param startDate 开始日期（可选，ISO格式）
  * @param endDate 结束日期（可选，ISO格式）
- * @param viewMode 视图模式，可选 'day', 'week', 'month'
  * @returns Promise<ApiResponse<UrineStatistics>>
  */
 export const getUrineStatistics = (
   userId: number,
-  period: 'day' | 'week' | 'month' = 'week',
+  viewMode: 'day' | 'week' | 'month' = 'week',
   startDate?: string,
-  endDate?: string,
-  viewMode?: 'day' | 'week' | 'month'
+  endDate?: string
 ): Promise<ApiResponse<UrineStatistics>> => {
-  let url = `/api/urine-records/statistics?userId=${userId}&period=${period}`;
+  let url = `/api/urine-records/statistics?userId=${userId}&viewMode=${viewMode}`;
   if (startDate) url += `&startDate=${startDate}`;
   if (endDate) url += `&endDate=${endDate}`;
-  if (viewMode) url += `&viewMode=${viewMode}`;
   return get<UrineStatistics>(url);
 };
 

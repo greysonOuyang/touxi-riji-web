@@ -41,6 +41,10 @@ export interface UrineMetadata {
   // API返回的额外字段
   weeklyAverage?: number;
   monthlyAverage?: number;
+  // 数据完整度相关字段
+  dataCompleteness?: number;
+  daysWithData?: number;
+  totalDays?: number;
 }
 
 // 尿量正常范围
@@ -88,20 +92,34 @@ const mapApiTrendToComponentTrend = (apiTrend: 'up' | 'down' | 'stable'): "incre
 
 // 将API返回的历史记录转换为组件使用的数据点
 const mapHistoryItemToDataPoint = (item: UrineHistoryItem): UrineDataPoint => {
-  const date = parseISO(item.recordedTime);
-  const formattedDate = format(date, 'yyyy-MM-dd');
-  const formattedTime = format(date, 'HH:mm');
+  // 如果后端已经提供了格式化的字段，直接使用
+  if (item.date && item.timestamp && item.recordTime) {
+    return {
+      id: item.id,
+      date: item.date,
+      timestamp: item.timestamp,
+      volume: item.volume,
+      recordTime: item.recordTime,
+      hasMeasurement: true,
+      notes: item.notes || '',
+      tag: item.tag || ''
+    };
+  }
+  
+  // 否则，从recordedTime字段解析
+  const recordedTime = new Date(item.recordedTime);
+  const date = recordedTime.toISOString().split('T')[0]; // YYYY-MM-DD
+  const recordTime = recordedTime.toTimeString().substring(0, 5); // HH:MM
   
   return {
     id: item.id,
-    date: formattedDate,
+    date: date,
     timestamp: item.recordedTime,
     volume: item.volume,
-    recordTime: formattedTime,
-    // 根据volume判断是否有测量值，如果volume大于0则认为有测量值
-    hasMeasurement: item.volume > 0,
-    notes: item.notes,
-    tag: item.tag
+    recordTime: recordTime,
+    hasMeasurement: true,
+    notes: item.notes || '',
+    tag: item.tag || ''
   };
 };
 
@@ -111,53 +129,84 @@ const generateMetadataFromApiData = (
   historyData: UrineDataPoint[],
   viewMode: "day" | "week" | "month"
 ): UrineMetadata => {
-  // 优先使用API返回的统计数据
-  const dailyAverage = apiStats.dailyAverage || 0;
-  const weeklyAverage = apiStats.weeklyAverage || 0;
-  const monthlyAverage = apiStats.monthlyAverage || 0;
-  const totalRecords = apiStats.totalRecords || 0;
-  const highestVolume = apiStats.highestVolume || 0;
-  const lowestVolume = apiStats.lowestVolume || 0;
-  const totalVolume = apiStats.totalVolume || historyData.reduce((sum, item) => sum + item.volume, 0);
-  const abnormalCount = apiStats.abnormalCount || 0;
-  const averageSingleVolume = apiStats.averageSingleVolume || 0;
+  // 从API获取的基本统计数据
+  const {
+    dailyAverage = 0,
+    weeklyAverage = 0,
+    monthlyAverage = 0,
+    totalRecords = 0,
+    lowestVolume = 0,
+    highestVolume = 0,
+    averageSingleVolume = 0,
+    abnormalCount = 0,
+    totalVolume = historyData.reduce((sum, item) => sum + item.volume, 0),
+    dataCompleteness = 0,
+    daysWithData = 0,
+    totalDays = 0
+  } = apiStats;
   
   // 计算每日最大和最小尿量的日期（如果API没有提供）
   let dayWithMaxVolume = "";
   let dayWithMinVolume = "";
   
-  // 只有在API没有提供时才进行前端计算
   if (historyData.length > 0) {
-    const dailyData = new Map<string, number>();
+    // 按日期分组计算每日总尿量
+    const dailyVolumes: Record<string, number> = {};
     historyData.forEach(item => {
-      const currentDate = item.date;
-      dailyData.set(
-        currentDate,
-        (dailyData.get(currentDate) || 0) + item.volume
-      );
+      const day = item.date;
+      if (!dailyVolumes[day]) {
+        dailyVolumes[day] = 0;
+      }
+      dailyVolumes[day] += item.volume;
     });
     
-    let maxDailyVolume = 0;
-    let minDailyVolume = Number.MAX_SAFE_INTEGER;
+    // 找出最大和最小尿量的日期
+    let maxDay = "";
+    let minDay = "";
+    let maxVol = -1;
+    let minVol = Number.MAX_VALUE;
     
-    dailyData.forEach((volume, date) => {
-      if (volume > maxDailyVolume) {
-        maxDailyVolume = volume;
-        dayWithMaxVolume = date;
+    Object.entries(dailyVolumes).forEach(([day, vol]) => {
+      if (vol > maxVol) {
+        maxVol = vol;
+        maxDay = day;
       }
-      if (volume < minDailyVolume) {
-        minDailyVolume = volume;
-        dayWithMinVolume = date;
+      if (vol < minVol) {
+        minVol = vol;
+        minDay = day;
       }
     });
+    
+    dayWithMaxVolume = maxDay;
+    dayWithMinVolume = minDay;
   }
   
-  // 计算数据覆盖率
+  // 根据视图模式选择正确的平均值
+  let effectiveAverage = dailyAverage;
+  switch (viewMode) {
+    case "week":
+      effectiveAverage = weeklyAverage || dailyAverage;
+      break;
+    case "month":
+      effectiveAverage = monthlyAverage || weeklyAverage || dailyAverage;
+      break;
+    default:
+      effectiveAverage = dailyAverage;
+  }
+  
+  // 计算预期天数
   let expectedDays = 1;
-  if (viewMode === "week") {
-    expectedDays = 7;
-  } else if (viewMode === "month") {
-    expectedDays = 30;
+  switch (viewMode) {
+    case "week":
+      expectedDays = 7;
+      break;
+    case "month":
+      // 获取当月天数
+      const today = new Date();
+      expectedDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      break;
+    default:
+      expectedDays = 1;
   }
   
   const uniqueDays = new Set(historyData.map(item => item.date)).size;
@@ -177,15 +226,50 @@ const generateMetadataFromApiData = (
     dataCoverage,
     abnormalCount,
     recordCount: totalRecords,
-    dailyAverage,
+    dailyAverage: effectiveAverage,
     weeklyAverage,
     monthlyAverage,
     dayWithMaxVolume,
     dayWithMinVolume,
     timeDistribution,
-    trend: mapApiTrendToComponentTrend(apiStats.trend),
-    trendPercentage
+    trend: mapApiTrendToComponentTrend(apiStats.trend || 'stable'),
+    trendPercentage,
+    // 添加数据完整度相关字段
+    dataCompleteness,
+    daysWithData,
+    totalDays: expectedDays
   };
+};
+
+// 按周分组数据
+const groupDataByWeek = (dataPoints: UrineDataPoint[]): UrineDataPoint[] => {
+  const weeklyData: Record<string, UrineDataPoint> = {};
+  
+  dataPoints.forEach(point => {
+    const date = new Date(point.date);
+    const weekStart = new Date(date);
+    weekStart.setDate(date.getDate() - date.getDay()); // 设置为本周第一天
+    const weekKey = format(weekStart, 'yyyy-MM-dd');
+    
+    if (!weeklyData[weekKey]) {
+      weeklyData[weekKey] = {
+        date: weekKey,
+        timestamp: point.timestamp,
+        volume: 0,
+        recordTime: '00:00',
+        hasMeasurement: false,
+        notes: '',
+        tag: 'week'
+      };
+    }
+    
+    weeklyData[weekKey].volume += point.volume;
+    weeklyData[weekKey].hasMeasurement = true;
+  });
+  
+  return Object.values(weeklyData).sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
 };
 
 // 主钩子函数
@@ -242,10 +326,15 @@ const useUrineData = () => {
         startDate = endDate; // 当天
         break;
       case "week":
-        startDate = subDays(endDate, 6); // 过去7天
+        // 获取自然周的第一天（周一）
+        const dayOfWeek = endDate.getDay(); // 0是周日，1-6是周一到周六
+        const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 计算到周一的天数差
+        startDate = new Date(endDate);
+        startDate.setDate(endDate.getDate() - diff);
         break;
       case "month":
-        startDate = subDays(endDate, 29); // 过去30天
+        // 获取当月第一天
+        startDate = new Date(endDate.getFullYear(), endDate.getMonth(), 1);
         break;
       default:
         startDate = endDate;
@@ -258,53 +347,47 @@ const useUrineData = () => {
   };
 
   // 获取历史记录数据
-  const fetchHistoryData = async (userId: number, startDate: string, endDate: string) => {
-    const historyResponse = await getUrineHistory({
-      userId,
-      startDate,
-      endDate,
-      pageSize: 100, // 足够大的页面大小以获取所有数据
-      pageNum: 1
-    });
-    
-    if (historyResponse.code !== 0 && historyResponse.code !== 200) {
-      throw new Error(historyResponse.msg || '获取历史记录失败');
-    }
-    
-    if (!historyResponse.data || !historyResponse.data.records || !Array.isArray(historyResponse.data.records)) {
-      debugLog('警告: 历史记录API返回数据结构异常', historyResponse.data);
-      return [];
-    }
-    
-    // 转换历史记录为数据点
-    return historyResponse.data.records.map(item => {
-      try {
-        return mapHistoryItemToDataPoint(item);
-      } catch (error) {
-        debugLog('转换历史记录项时出错', { error, item });
-        // 返回一个默认的数据点，避免整个映射失败
-        return {
-          id: item.id || 0,
-          date: item.recordedTime ? format(parseISO(item.recordedTime), 'yyyy-MM-dd') : '未知日期',
-          timestamp: item.recordedTime || new Date().toISOString(),
-          volume: item.volume || 0,
-          recordTime: item.recordedTime ? format(parseISO(item.recordedTime), 'HH:mm') : '00:00',
-          hasMeasurement: item.volume > 0,
-          notes: item.notes || '',
-          tag: item.tag || ''
-        };
+  const fetchHistoryData = async (userId: number, startDate: string, endDate: string, viewMode: "day" | "week" | "month" = "day") => {
+    try {
+      const response = await getUrineHistory({
+        userId,
+        startDate,
+        endDate,
+        pageSize: 100, // 获取足够多的数据以便前端处理
+        viewMode
+      });
+      
+      if (response.code !== 0 && response.code !== 200) {
+        throw new Error(`获取历史数据失败: ${response.msg}`);
       }
-    });
+      
+      // 将API返回的数据转换为前端需要的格式
+      const dataPoints: UrineDataPoint[] = [];
+      
+      if (response.data && response.data.records) {
+        for (const record of response.data.records) {
+          try {
+            dataPoints.push(mapHistoryItemToDataPoint(record));
+          } catch (error) {
+            console.error("转换历史记录失败:", error);
+          }
+        }
+      }
+      
+      return dataPoints;
+    } catch (error) {
+      console.error("获取历史数据失败:", error);
+      throw error;
+    }
   };
   
   // 获取统计数据
-  const fetchStatisticsData = async (userId: number, period: "day" | "week" | "month", startDate: string, endDate: string, viewMode: "day" | "week" | "month") => {
+  const fetchStatisticsData = async (userId: number, viewMode: "day" | "week" | "month", startDate: string, endDate: string) => {
     const statsResponse = await getUrineStatistics(
       userId, 
-      period, 
+      viewMode,
       startDate, 
-      endDate, 
-      viewMode
+      endDate
     );
     
     if (statsResponse.code !== 0 && statsResponse.code !== 200) {
@@ -315,10 +398,10 @@ const useUrineData = () => {
   };
   
   // 获取时间分布数据
-  const fetchTimeDistributionData = async (userId: number, period: "day" | "week" | "month", startDate: string, endDate: string) => {
+  const fetchTimeDistributionData = async (userId: number, viewMode: "day" | "week" | "month", startDate: string, endDate: string) => {
     const timeDistResponse = await getUrineTimeDistribution(
       userId,
-      period,
+      viewMode,
       startDate,
       endDate
     );
@@ -345,30 +428,33 @@ const useUrineData = () => {
       debugLog(`刷新数据: 模式=${viewMode}, 开始=${startDate}, 结束=${endDateStr}`, endDate);
       
       // 1. 获取历史记录数据
-      const dataPoints = await fetchHistoryData(userId, startDate, endDateStr);
+      const dataPoints = await fetchHistoryData(userId, startDate, endDateStr, viewMode);
       
-      // 2. 根据视图模式排序数据
+      // 2. 根据视图模式处理数据
+      let processedDataPoints: UrineDataPoint[];
       if (viewMode === 'day') {
         // 日模式下，按记录时间排序
-        dataPoints.sort((a, b) => {
+        processedDataPoints = dataPoints.sort((a, b) => {
           return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
         });
-      } else {
-        // 周/月模式下，按日期排序
-        dataPoints.sort((a, b) => {
+      } else if (viewMode === 'week') {
+        // 周模式下，按日期排序
+        processedDataPoints = dataPoints.sort((a, b) => {
           return new Date(a.date).getTime() - new Date(b.date).getTime();
         });
+      } else {
+        // 月模式下，数据已经按周分组，直接使用
+        processedDataPoints = dataPoints;
       }
       
       // 3. 获取统计数据
-      const apiPeriod = viewMode === 'day' ? 'day' : (viewMode === 'week' ? 'week' : 'month');
-      const statsData = await fetchStatisticsData(userId, apiPeriod as "day" | "week" | "month", startDate, endDateStr, viewMode);
+      const statsData = await fetchStatisticsData(userId, viewMode, startDate, endDateStr);
       
       // 4. 获取时间分布数据
-      const timeDistData = await fetchTimeDistributionData(userId, apiPeriod as "day" | "week" | "month", startDate, endDateStr);
+      const timeDistData = await fetchTimeDistributionData(userId, viewMode, startDate, endDateStr);
       
       // 5. 生成元数据
-      const metadataObj = generateMetadataFromApiData(statsData, dataPoints, viewMode);
+      const metadataObj = generateMetadataFromApiData(statsData, processedDataPoints, viewMode);
       
       // 6. 使用时间分布数据
       if (timeDistData && timeDistData.items && timeDistData.items.length > 0) {
@@ -382,10 +468,14 @@ const useUrineData = () => {
       }
       
       // 7. 更新状态
-      setUrineData(dataPoints);
+      setUrineData(processedDataPoints);
       setMetadata(metadataObj);
       
-      debugLog('数据刷新完成', { dataPoints, metadata: metadataObj, timeDistribution: metadataObj.timeDistribution });
+      debugLog('数据刷新完成', { 
+        dataPoints: processedDataPoints, 
+        metadata: metadataObj, 
+        timeDistribution: metadataObj.timeDistribution 
+      });
       
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : '未知错误';

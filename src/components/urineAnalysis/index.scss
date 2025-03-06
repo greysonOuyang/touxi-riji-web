@@ -381,6 +381,52 @@
         color: #ff7a45;
       }
     }
+    
+    .data-completeness {
+      margin: 16px 0;
+      padding: 12px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      
+      .completeness-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .completeness-title {
+          font-size: 14px;
+          color: #333;
+          font-weight: 500;
+        }
+        
+        .completeness-value {
+          font-size: 14px;
+          font-weight: 600;
+          color: #1890ff;
+        }
+      }
+      
+      .completeness-bar-container {
+        height: 8px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 8px;
+        
+        .completeness-bar {
+          height: 100%;
+          border-radius: 4px;
+          transition: width 0.3s ease;
+        }
+      }
+      
+      .completeness-desc {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+      }
+    }
   }
   
   .statistics-grid {

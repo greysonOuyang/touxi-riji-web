@@ -153,6 +153,30 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
           )}
         </View>
         
+        {/* 数据完整度 */}
+        {metadata && (
+          <View className="data-completeness">
+            <View className="completeness-header">
+              <Text className="completeness-title">数据完整度</Text>
+              <Text className="completeness-value">{metadata.dataCompleteness || 0}%</Text>
+            </View>
+            <View className="completeness-bar-container">
+              <View 
+                className="completeness-bar" 
+                style={{ 
+                  width: `${metadata.dataCompleteness || 0}%`,
+                  backgroundColor: (metadata.dataCompleteness || 0) < 30 ? '#ff4d4f' : 
+                                  (metadata.dataCompleteness || 0) < 70 ? '#faad14' : '#52c41a'
+                }}
+              />
+            </View>
+            <Text className="completeness-desc">
+              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
+              共{metadata.totalDays || 0}天，有{metadata.daysWithData || 0}天记录了数据
+            </Text>
+          </View>
+        )}
+        
         {/* 尿量统计数据 */}
         <View className="statistics-grid">
           <View className="statistics-item">
@@ -163,9 +187,14 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
           </View>
           <View className="statistics-item">
             <Text className="item-value">
-              {metadata?.recordCount ? Math.round(metadata.recordCount / (viewMode === "day" ? 1 : viewMode === "week" ? 7 : 30)) : "-"}
+              {metadata?.recordCount && metadata?.daysWithData && metadata.daysWithData > 0
+                ? Math.round((metadata.recordCount / metadata.daysWithData) * 10) / 10 
+                : "-"}
             </Text>
             <Text className="item-label">日均次数</Text>
+            <Text className="item-source">
+              {metadata?.daysWithData ? `(${metadata.daysWithData}天)` : ""}
+            </Text>
           </View>
           <View className="statistics-item">
             <Text className="item-value">
