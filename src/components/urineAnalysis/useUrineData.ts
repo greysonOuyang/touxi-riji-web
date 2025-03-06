@@ -32,15 +32,12 @@ export interface UrineMetadata {
   dataCoverage: number;
   abnormalCount: number;
   recordCount: number;
-  dailyAverage: number;
+  dailyAverage: number;  // 日平均值（基于有数据的天数）
   dayWithMaxVolume: string;
   dayWithMinVolume: string;
   timeDistribution: UrineTimeDistributionItemVO[];
   trend: "increasing" | "decreasing" | "stable" | "fluctuating";
   trendPercentage: number;
-  // API返回的额外字段
-  weeklyAverage?: number;
-  monthlyAverage?: number;
   // 数据完整度相关字段
   dataCompleteness?: number;
   daysWithData?: number;
@@ -132,8 +129,6 @@ const generateMetadataFromApiData = (
   // 从API获取的基本统计数据
   const {
     dailyAverage = 0,
-    weeklyAverage = 0,
-    monthlyAverage = 0,
     totalRecords = 0,
     lowestVolume = 0,
     highestVolume = 0,
@@ -181,29 +176,20 @@ const generateMetadataFromApiData = (
     dayWithMinVolume = minDay;
   }
   
-  // 根据视图模式选择正确的平均值
-  let effectiveAverage = dailyAverage;
-  switch (viewMode) {
-    case "week":
-      effectiveAverage = weeklyAverage || dailyAverage;
-      break;
-    case "month":
-      effectiveAverage = monthlyAverage || weeklyAverage || dailyAverage;
-      break;
-    default:
-      effectiveAverage = dailyAverage;
-  }
-  
-  // 计算预期天数
+  // 计算预期天数（已经过去的天数）
   let expectedDays = 1;
   switch (viewMode) {
     case "week":
-      expectedDays = 7;
+      // 计算从本周一到今天的天数
+      const today = new Date();
+      const dayOfWeek = today.getDay(); // 0是周日，1-6是周一到周六
+      const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+      expectedDays = daysSinceMonday + 1; // +1 是因为要包括今天
       break;
     case "month":
-      // 获取当月天数
-      const today = new Date();
-      expectedDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+      // 计算从本月1日到今天的天数
+      const currentDate = new Date();
+      expectedDays = currentDate.getDate(); // 当前日期就是本月过去的天数
       break;
     default:
       expectedDays = 1;
@@ -226,9 +212,7 @@ const generateMetadataFromApiData = (
     dataCoverage,
     abnormalCount,
     recordCount: totalRecords,
-    dailyAverage: effectiveAverage,
-    weeklyAverage,
-    monthlyAverage,
+    dailyAverage: dailyAverage,
     dayWithMaxVolume,
     dayWithMinVolume,
     timeDistribution,

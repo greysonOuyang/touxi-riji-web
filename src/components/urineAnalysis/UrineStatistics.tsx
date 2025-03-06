@@ -130,7 +130,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         {viewMode !== "day" && (
           <View className="chart-tip-container">
             <Text className="tip-text">
-              提示：{viewMode === "week" ? "周视图显示的是每日平均值" : "月视图显示的是每周平均值"}
+              提示：日均尿量是基于有记录的天数计算的平均值
             </Text>
           </View>
         )}
@@ -171,8 +171,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
               />
             </View>
             <Text className="completeness-desc">
-              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
-              共{metadata.totalDays || 0}天，有{metadata.daysWithData || 0}天记录了数据
+              在过去的{metadata.totalDays || 0}天中，有{metadata.daysWithData || 0}天记录了数据
             </Text>
           </View>
         )}
