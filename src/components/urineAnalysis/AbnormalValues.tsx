@@ -1,137 +1,287 @@
 import React, { useMemo } from "react";
 import { View, Text } from "@tarojs/components";
 import { format, parseISO } from "date-fns";
-import { UrineDataPoint, getUrineVolumeStatus, NORMAL_VOLUME_RANGE } from "./useUrineData";
+import { UrineDataPoint, NORMAL_VOLUME_RANGE } from "./useUrineData";
 import "./index.scss";
 
 interface AbnormalValuesProps {
   urineData: UrineDataPoint[];
   viewMode: "day" | "week" | "month";
+  baselineVolume?: number;
   isLoading?: boolean;
 }
 
-interface AbnormalRecord {
-  timestamp: string;
-  formattedTime: string;
-  volume: number;
-  reason: string;
-  status: "low" | "high";
+// 尿量类型定义
+interface UrineVolumeCategory {
+  type: "anuria" | "oliguria" | "normal" | "polyuria" | "baseline_low" | "baseline_high";
+  label: string;
+  count: number;
+  percentage: number;
+  color: string;
+  description: string;
 }
 
-const AbnormalValues: React.FC<AbnormalValuesProps> = ({ urineData, viewMode, isLoading = false }) => {
-  // 筛选异常值
-  const abnormalRecords = useMemo(() => {
-    if (!urineData || urineData.length === 0) return [];
+// 尿量异常记录
+interface UrineAbnormalRecord {
+  date: string;
+  formattedDate: string;
+  volume: number;
+  category: UrineVolumeCategory["type"];
+  description: string;
+}
+
+const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({ 
+  urineData, 
+  viewMode, 
+  baselineVolume,
+  isLoading = false 
+}) => {
+  // 分析尿量分布
+  const { volumeCategories, abnormalRecords } = useMemo(() => {
+    if (!urineData || urineData.length === 0) {
+      return { volumeCategories: [], abnormalRecords: [] };
+    }
     
-    const records: AbnormalRecord[] = [];
-    
+    // 按日期分组计算每日总尿量
+    const dailyVolumes: Record<string, number> = {};
     urineData.forEach(item => {
-      // 检查尿量是否异常
-      const volumeStatus = getUrineVolumeStatus(item.volume);
-      if (volumeStatus === "low" || volumeStatus === "high") {
-        try {
-          const date = parseISO(item.timestamp);
-          records.push({
-            timestamp: item.timestamp,
-            formattedTime: format(date, "MM-dd HH:mm"),
-            volume: item.volume,
-            reason: volumeStatus === "low" 
-              ? `尿量偏低 (${item.volume}ml < ${NORMAL_VOLUME_RANGE.MIN_SINGLE}ml)` 
-              : `尿量偏高 (${item.volume}ml > ${NORMAL_VOLUME_RANGE.MAX_SINGLE}ml)`,
-            status: volumeStatus
-          });
-        } catch (error) {
-          console.error("解析异常值时间出错:", error, item);
+      const day = item.date;
+      if (!dailyVolumes[day]) {
+        dailyVolumes[day] = 0;
+      }
+      dailyVolumes[day] += item.volume;
+    });
+    
+    // 初始化各类别计数
+    const categories: Record<string, UrineVolumeCategory> = {
+      anuria: {
+        type: "anuria",
+        label: "无尿",
+        count: 0,
+        percentage: 0,
+        color: "#ff4d4f",
+        description: "日尿量<100ml，属于无尿，需立即就医"
+      },
+      oliguria: {
+        type: "oliguria",
+        label: "少尿",
+        count: 0,
+        percentage: 0,
+        color: "#faad14",
+        description: "日尿量<400ml，属于少尿，需咨询医生"
+      },
+      normal: {
+        type: "normal",
+        label: "正常",
+        count: 0,
+        percentage: 0,
+        color: "#52c41a",
+        description: "日尿量在400-1000ml之间，属于尿毒症患者的正常范围"
+      },
+      polyuria: {
+        type: "polyuria",
+        label: "多尿",
+        count: 0,
+        percentage: 0,
+        color: "#1890ff",
+        description: "日尿量>1000ml，对尿毒症患者来说可能偏高"
+      }
+    };
+    
+    // 如果有基线尿量，添加基线相关类别
+    if (baselineVolume && baselineVolume > 0) {
+      categories.baseline_low = {
+        type: "baseline_low",
+        label: "低于基线",
+        count: 0,
+        percentage: 0,
+        color: "#ffa39e",
+        description: `日尿量显著低于您的参考基线(${Math.round(baselineVolume)}ml)的50%`
+      };
+      
+      categories.baseline_high = {
+        type: "baseline_high",
+        label: "高于基线",
+        count: 0,
+        percentage: 0,
+        color: "#91caff",
+        description: `日尿量显著高于您的参考基线(${Math.round(baselineVolume)}ml)的150%`
+      };
+    }
+    
+    // 收集异常记录
+    const records: UrineAbnormalRecord[] = [];
+    
+    // 分析每日尿量
+    Object.entries(dailyVolumes).forEach(([date, volume]) => {
+      let category: UrineVolumeCategory["type"] = "normal";
+      let description = "";
+      
+      // 判断尿量类别
+      if (volume < NORMAL_VOLUME_RANGE.MIN) {
+        category = "anuria";
+        description = `日尿量${volume}ml，低于${NORMAL_VOLUME_RANGE.MIN}ml，属于无尿`;
+      } else if (volume < 400) {
+        category = "oliguria";
+        description = `日尿量${volume}ml，低于400ml，属于少尿`;
+      } else if (volume > NORMAL_VOLUME_RANGE.MAX) {
+        category = "polyuria";
+        description = `日尿量${volume}ml，超过${NORMAL_VOLUME_RANGE.MAX}ml，对尿毒症患者来说可能偏高`;
+      } else {
+        category = "normal";
+        description = `日尿量${volume}ml，在尿毒症患者的正常范围内(400-1000ml)`;
+      }
+      
+      // 如果有基线尿量，优先考虑与基线的比较
+      if (baselineVolume && baselineVolume > 0) {
+        if (volume < baselineVolume * 0.5) {
+          category = "baseline_low";
+          description = `日尿量${volume}ml，显著低于您的参考基线(${Math.round(baselineVolume)}ml)的50%`;
+        } else if (volume > baselineVolume * 1.5) {
+          category = "baseline_high";
+          description = `日尿量${volume}ml，显著高于您的参考基线(${Math.round(baselineVolume)}ml)的150%`;
         }
+      }
+      
+      // 增加类别计数
+      categories[category].count++;
+      
+      // 添加到异常记录（只添加非正常记录）
+      if (category !== "normal") {
+        records.push({
+          date,
+          formattedDate: date,
+          volume,
+          category,
+          description
+        });
       }
     });
     
-    // 按时间排序，最近的记录在前面
-    return records.sort((a, b) => 
-      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-    );
-  }, [urineData]);
-  
-  // 计算异常值统计
-  const abnormalStats = useMemo(() => {
-    const total = abnormalRecords.length;
-    const lowCount = abnormalRecords.filter(r => r.status === "low").length;
-    const highCount = abnormalRecords.filter(r => r.status === "high").length;
+    // 计算百分比
+    const totalDays = Object.keys(dailyVolumes).length;
+    if (totalDays > 0) {
+      Object.values(categories).forEach(category => {
+        category.percentage = Math.round((category.count / totalDays) * 100);
+      });
+    }
     
-    return {
-      total,
-      lowCount,
-      highCount,
-      lowPercentage: Math.round((lowCount / total) * 100),
-      highPercentage: Math.round((highCount / total) * 100)
+    // 按计数排序并过滤掉计数为0的类别
+    const sortedCategories = Object.values(categories)
+      .filter(category => category.count > 0)
+      .sort((a, b) => b.count - a.count);
+    
+    // 按日期排序，最近的记录在前面
+    const sortedRecords = records.sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    return { 
+      volumeCategories: sortedCategories, 
+      abnormalRecords: sortedRecords 
     };
-  }, [abnormalRecords]);
+  }, [urineData, viewMode, baselineVolume]);
   
-  // 如果没有异常值，显示正常提示
-  if (abnormalRecords.length === 0) {
+  // 如果没有数据，显示空状态
+  if (!urineData || urineData.length === 0) {
     return (
-      <View className="abnormal-values">
-        <Text className="section-title">异常值分析</Text>
-        <View className="no-abnormal">
-          <Text>未检测到异常值，尿量状况良好</Text>
+      <View className="urine-volume-distribution">
+        <Text className="section-title">尿量分布分析</Text>
+        <View className="no-data">
+          <Text>暂无尿量数据</Text>
+        </View>
+      </View>
+    );
+  }
+  
+  // 如果所有尿量都正常，显示正常状态
+  if (volumeCategories.length === 1 && volumeCategories[0].type === "normal") {
+    return (
+      <View className="urine-volume-distribution">
+        <Text className="section-title">尿量分布分析</Text>
+        <View className="normal-status">
+          <View className="status-icon normal"></View>
+          <Text className="status-text">所有记录的尿量均在正常范围内</Text>
         </View>
       </View>
     );
   }
   
   return (
-    <View className="abnormal-values">
-      <Text className="section-title">异常值分析</Text>
+    <View className="urine-volume-distribution">
+      <Text className="section-title">尿量分布分析</Text>
       
-      {/* 异常值统计 */}
-      <View className="abnormal-stats">
-        <View className="stats-item">
-          <Text className="stats-value">{abnormalStats.total}</Text>
-          <Text className="stats-label">异常记录</Text>
-        </View>
-        {abnormalStats.lowCount > 0 && (
-          <View className="stats-item low">
-            <Text className="stats-value">{abnormalStats.lowCount}</Text>
-            <Text className="stats-label">尿量偏低</Text>
-            <Text className="stats-percentage">({abnormalStats.lowPercentage}%)</Text>
-          </View>
-        )}
-        {abnormalStats.highCount > 0 && (
-          <View className="stats-item high">
-            <Text className="stats-value">{abnormalStats.highCount}</Text>
-            <Text className="stats-label">尿量偏高</Text>
-            <Text className="stats-percentage">({abnormalStats.highPercentage}%)</Text>
-          </View>
-        )}
-      </View>
-      
-      {/* 异常提示说明 */}
-      <View className="abnormal-note">
-        <Text className="note-text">尿量异常可能与多种因素有关，如饮水量、药物、疾病等。请遵医嘱调整，必要时咨询医生。</Text>
-      </View>
-      
-      {/* 异常记录列表标题 */}
-      <View className="list-header">
-        <Text className="list-title">异常记录详情</Text>
-        <Text className="list-count">共 {abnormalRecords.length} 条</Text>
-      </View>
-      
-      {/* 异常记录列表 */}
-      <View className="abnormal-list">
-        {abnormalRecords.map((record, index) => (
-          <View className={`abnormal-item ${record.status}`} key={index}>
-            <View className="left-content">
-              <Text className="time">{record.formattedTime}</Text>
-              <Text className="reason">{record.reason}</Text>
+      {/* 分布图表 */}
+      <View className="distribution-chart">
+        {volumeCategories.map((category, index) => (
+          <View className="chart-item" key={index}>
+            <View className="chart-bar-container">
+              <View 
+                className="chart-bar" 
+                style={{ 
+                  width: `${category.percentage}%`,
+                  backgroundColor: category.color
+                }}
+              />
             </View>
-            <View className="right-content">
-              <Text className="value">{record.volume} ml</Text>
+            <View className="chart-label">
+              <View className="label-dot" style={{ backgroundColor: category.color }}></View>
+              <Text className="label-text">{category.label}</Text>
+              <Text className="label-count">{category.count}天</Text>
+              <Text className="label-percentage">({category.percentage}%)</Text>
             </View>
           </View>
         ))}
+      </View>
+      
+      {/* 分布说明 */}
+      <View className="distribution-legend">
+        {volumeCategories.map((category, index) => (
+          <View className="legend-item" key={index}>
+            <View className="legend-dot" style={{ backgroundColor: category.color }}></View>
+            <Text className="legend-text">{category.description}</Text>
+          </View>
+        ))}
+      </View>
+      
+      {/* 异常记录列表 */}
+      {abnormalRecords.length > 0 && (
+        <View className="abnormal-records">
+          <View className="records-header">
+            <Text className="header-title">异常记录</Text>
+            <Text className="header-count">共 {abnormalRecords.length} 条</Text>
+          </View>
+          
+          <View className="records-list">
+            {abnormalRecords.map((record, index) => (
+              <View className={`record-item ${record.category}`} key={index}>
+                <View className="record-date">
+                  <Text className="date-text">{record.formattedDate}</Text>
+                </View>
+                <View className="record-content">
+                  <Text className="volume-text">{record.volume} ml</Text>
+                  <Text className="description-text">{record.description}</Text>
+                </View>
+                <View className="record-tag">
+                  <Text className="tag-text">
+                    {volumeCategories.find(c => c.type === record.category)?.label || "异常"}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+      
+      {/* 提示说明 */}
+      <View className="distribution-note">
+        <Text className="note-text">
+          尿毒症患者应特别关注尿量变化。无尿(&lt;100ml/天)需立即就医；少尿(&lt;400ml/天)需咨询医生评估肾功能；
+          正常范围(400-1000ml/天)；多尿(&gt;1000ml/天)可能需要调整治疗。具体情况请遵医嘱。
+        </Text>
       </View>
     </View>
   );
 };
 
-export default AbnormalValues; 
+export default UrineVolumeDistribution; 

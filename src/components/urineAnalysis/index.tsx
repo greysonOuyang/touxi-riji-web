@@ -7,7 +7,7 @@ import DateNavigator from "@/components/common/DateNavigator";
 import useDateNavigation from "@/components/common/useDateNavigation";
 import UrineChart from "./UrineChart";
 import UrineStatistics from "./UrineStatistics";
-import AbnormalValues from "./AbnormalValues";
+import UrineVolumeDistribution from "./AbnormalValues";
 import UrineRecentRecords from "./UrineRecentRecords";
 import "./index.scss";
 
@@ -35,12 +35,14 @@ const UrineAnalysis: React.FC = () => {
     timeDistribution
   } = useUrineData();
 
-  // 处理视图模式变化
+  // 视图模式变化处理
   const handleViewModeChange = (mode: "day" | "week" | "month") => {
-    setViewMode(mode);
-    // 切换视图模式时重置为当天
-    resetToCurrentDate();
-    // 不需要在这里调用refreshData，因为视图模式和日期变化会触发useEffect
+    if (mode !== viewMode) {
+      setViewMode(mode);
+      
+      // 重置为当前日期
+      resetToCurrentDate();
+    }
   };
 
   // 当视图模式或日期变化时刷新数据
@@ -124,22 +126,7 @@ const UrineAnalysis: React.FC = () => {
           </View>
         </View>
         
-        {/* 最近尿量记录 */}
-        <UrineRecentRecords 
-          limit={5}
-          onViewMore={() => Taro.navigateTo({ url: '/pages/urineHistory/index' })}
-        />
-        
-        {/* 异常值分析 - 仅在日视图模式下显示 */}
-        {!isLoading && urineData && Array.isArray(urineData) && urineData.length > 0 && viewMode === "day" && (
-          <AbnormalValues 
-            urineData={urineData} 
-            viewMode={viewMode}
-            isLoading={false}
-          />
-        )}
-        
-        {/* 尿量统计分析 */}
+        {/* 尿量统计分析 - 优先显示 */}
         {!isLoading && urineData && Array.isArray(urineData) && urineData.length > 0 && (
           <UrineStatistics 
             key={`stats-${viewMode}`}
@@ -150,6 +137,22 @@ const UrineAnalysis: React.FC = () => {
             isLoading={false}
           />
         )}
+        
+        {/* 异常值分析 */}
+        {!isLoading && urineData && Array.isArray(urineData) && urineData.length > 0 && (
+          <UrineVolumeDistribution 
+            urineData={urineData} 
+            viewMode={viewMode}
+            baselineVolume={metadata?.baselineVolume}
+            isLoading={false}
+          />
+        )}
+        
+        {/* 最近尿量记录 */}
+        <UrineRecentRecords 
+          limit={5}
+          onViewMore={() => Taro.navigateTo({ url: '/pages/urineHistory/index' })}
+        />
       </View>
     </View>
   );

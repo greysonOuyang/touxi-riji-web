@@ -39,7 +39,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
     if (metadata) {
       // 设置尿量提醒
       if (metadata.dailyAverage) {
-        setAlert(getUrineVolumeAlert(metadata.dailyAverage));
+        setAlert(getUrineVolumeAlert(metadata));
       }
       
       // 设置趋势信息
@@ -68,22 +68,51 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   };
 
   // 获取尿量提醒
-  const getUrineVolumeAlert = (dailyVolume: number) => {
-    if (dailyVolume < 1000) {
-      return {
-        type: "warning",
-        message: `平均每日排尿量${dailyVolume}ml，低于一般正常水平，请咨询医生是否需要调整液体摄入`
-      };
-    } else if (dailyVolume > 2500) {
-      return {
-        type: "notice",
-        message: `平均每日排尿量${dailyVolume}ml，高于一般正常水平，请咨询医生进行评估`
-      };
-    } else {
-      return {
-        type: "good",
-        message: `平均每日排尿量${dailyVolume}ml，处于一般正常范围`
-      };
+  const getUrineVolumeAlert = (metadata: UrineMetadata | null) => {
+    if (!metadata) return null;
+    
+    const { dailyAverage, urineStatus, baselineVolume, baselineChangePercentage } = metadata;
+    
+    // 根据尿量状态生成提醒
+    switch (urineStatus) {
+      case "anuria":
+        return {
+          type: "warning",
+          message: `平均每日排尿量${Math.round(dailyAverage)}ml，已达到无尿标准(<100ml/天)，请立即就医`
+        };
+      case "oliguria":
+        return {
+          type: "warning",
+          message: `平均每日排尿量${Math.round(dailyAverage)}ml，属于少尿(<400ml/天)，请咨询医生评估肾功能`
+        };
+      case "polyuria":
+        return {
+          type: "notice",
+          message: `平均每日排尿量${Math.round(dailyAverage)}ml，对尿毒症患者来说可能偏高，请咨询医生是否需要调整治疗`
+        };
+      case "baseline_low":
+        return {
+          type: "warning",
+          message: `平均每日排尿量${Math.round(dailyAverage)}ml，显著低于您的参考基线(${Math.round(baselineVolume || 0)}ml)，请咨询医生评估肾功能`
+        };
+      case "baseline_high":
+        return {
+          type: "notice",
+          message: `平均每日排尿量${Math.round(dailyAverage)}ml，显著高于您的参考基线(${Math.round(baselineVolume || 0)}ml)，请咨询医生是否需要调整治疗`
+        };
+      case "normal":
+      default:
+        if (baselineVolume) {
+          return {
+            type: "good",
+            message: `平均每日排尿量${Math.round(dailyAverage)}ml，与您的参考基线(${Math.round(baselineVolume)}ml)相符，请继续监测`
+          };
+        } else {
+          return {
+            type: "good",
+            message: `平均每日排尿量${Math.round(dailyAverage)}ml，对尿毒症患者来说在可接受范围内(400-1000ml/天)，请继续监测`
+          };
+        }
     }
   };
 
@@ -177,7 +206,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
               </Text>
               <View className="help-icon" onClick={() => Taro.showModal({
                 title: '日均尿量说明',
-                content: '日均尿量是基于有记录的天数计算的平均值，而非所有天数。',
+                content: '日均尿量是基于有记录的天数计算的平均值。对尿毒症患者来说，日均尿量通常低于健康人群，无尿：<100ml/天；少尿：<400ml/天；正常范围：400-1000ml/天。如果您有基线尿量，系统会根据您的个人情况进行评估。',
                 showCancel: false,
                 confirmText: '我知道了'
               })}>?</View>
@@ -211,7 +240,8 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         
         <View className="data-note">
           <Text className="note-text">
-            *一般成人每日排尿量约1000-2000ml，次数4-8次，单次尿量约200-400ml。具体情况因个人健康状况而异，请遵医嘱。
+            *尿毒症患者每日排尿量通常低于健康人群。无尿：&lt;100ml/天；少尿：&lt;400ml/天；
+            正常范围：400-1000ml/天。具体情况因个人病情而异，请遵医嘱。如有基线尿量，系统会根据您的个人情况进行评估。
           </Text>
         </View>
       </View>

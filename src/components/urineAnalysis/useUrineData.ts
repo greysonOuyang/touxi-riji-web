@@ -42,14 +42,22 @@ export interface UrineMetadata {
   dataCompleteness?: number;
   daysWithData?: number;
   totalDays?: number;
+  // 尿毒症患者相关字段
+  anuriaCount?: number;  // 无尿天数
+  oliguriaCount?: number;  // 少尿天数
+  polyuriaCount?: number;  // 多尿天数
+  dailyAbnormalPercentage?: number;  // 日尿量异常百分比
+  baselineVolume?: number;  // 参考基线尿量
+  baselineChangePercentage?: number;  // 相对于基线的变化百分比
+  urineStatus?: string;  // 尿量状态评估
 }
 
-// 尿量正常范围
+// 尿量正常范围 - 针对尿毒症患者
 export const NORMAL_VOLUME_RANGE = {
-  MIN: 800,  // 每日最小正常尿量(ml)
-  MAX: 2000, // 每日最大正常尿量(ml)
-  MIN_SINGLE: 200, // 单次最小正常尿量(ml)
-  MAX_SINGLE: 500  // 单次最大正常尿量(ml)
+  MIN: 100,  // 尿毒症患者每日最小警戒尿量(ml)，低于此值可能为无尿
+  MAX: 1000, // 尿毒症患者每日最大正常尿量(ml)，超过此值需关注
+  MIN_SINGLE: 50, // 单次最小正常尿量(ml)
+  MAX_SINGLE: 300  // 单次最大正常尿量(ml)
 };
 
 // 时间段定义
@@ -60,16 +68,45 @@ export const TIME_PERIODS = {
   NIGHT: { name: "夜间", range: [0, 5], color: "#9575CD" }
 };
 
-// 获取尿量状态
-export const getUrineVolumeStatus = (volume: number, isDaily = false) => {
+// 获取尿量状态 - 针对尿毒症患者
+export const getUrineVolumeStatus = (volume: number, isDaily = false, baselineVolume?: number) => {
+  // 如果提供了基线尿量，则与基线比较
+  if (baselineVolume && isDaily) {
+    // 尿量显著低于基线（低于基线的50%）
+    if (volume < baselineVolume * 0.5) {
+      return "severe_low";
+    }
+    // 尿量低于基线（低于基线的80%）
+    else if (volume < baselineVolume * 0.8) {
+      return "low";
+    }
+    // 尿量显著高于基线（高于基线的150%）
+    else if (volume > baselineVolume * 1.5) {
+      return "high";
+    }
+    // 正常范围内的波动
+    else {
+      return "normal";
+    }
+  }
+  
+  // 如果没有基线尿量，则使用固定标准
   const min = isDaily ? NORMAL_VOLUME_RANGE.MIN : NORMAL_VOLUME_RANGE.MIN_SINGLE;
   const max = isDaily ? NORMAL_VOLUME_RANGE.MAX : NORMAL_VOLUME_RANGE.MAX_SINGLE;
   
-  if (volume < min) {
-    return "low";
-  } else if (volume > max) {
-    return "high";
-  } else {
+  // 无尿（每天<100ml）
+  if (isDaily && volume < 100) {
+    return "anuria";
+  }
+  // 少尿（每天<400ml）
+  else if (volume < min) {
+    return "oliguria";
+  }
+  // 多尿（每天>1000ml，对尿毒症患者来说可能是异常的）
+  else if (volume > max) {
+    return "polyuria";
+  }
+  else {
     return "normal";
   }
 };
@@ -221,7 +258,15 @@ const generateMetadataFromApiData = (
     // 添加数据完整度相关字段
     dataCompleteness,
     daysWithData,
-    totalDays: expectedDays
+    totalDays: expectedDays,
+    // 尿毒症患者相关字段
+    anuriaCount: 0,
+    oliguriaCount: 0,
+    polyuriaCount: 0,
+    dailyAbnormalPercentage: 0,
+    baselineVolume: 0,
+    baselineChangePercentage: 0,
+    urineStatus: "normal"
   };
 };
 
