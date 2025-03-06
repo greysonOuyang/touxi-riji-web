@@ -52,16 +52,6 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ urineData, viewMode, is
     );
   }, [urineData]);
   
-  // 如果没有异常值，显示正常提示
-  if (abnormalRecords.length === 0) {
-    return (
-      <View className="abnormal-values">
-        <Text className="section-title">异常值分析</Text>
-        <Text className="no-abnormal">未检测到异常值，尿量状况良好</Text>
-      </View>
-    );
-  }
-  
   // 计算异常值统计
   const abnormalStats = useMemo(() => {
     const total = abnormalRecords.length;
@@ -76,6 +66,18 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ urineData, viewMode, is
       highPercentage: Math.round((highCount / total) * 100)
     };
   }, [abnormalRecords]);
+  
+  // 如果没有异常值，显示正常提示
+  if (abnormalRecords.length === 0) {
+    return (
+      <View className="abnormal-values">
+        <Text className="section-title">异常值分析</Text>
+        <View className="no-abnormal">
+          <Text>未检测到异常值，尿量状况良好</Text>
+        </View>
+      </View>
+    );
+  }
   
   return (
     <View className="abnormal-values">
@@ -103,8 +105,15 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({ urineData, viewMode, is
         )}
       </View>
       
+      {/* 异常提示说明 */}
       <View className="abnormal-note">
-        <Text className="note-text">尿量异常可能与多种因素有关，请遵医嘱调整，必要时咨询医生</Text>
+        <Text className="note-text">尿量异常可能与多种因素有关，如饮水量、药物、疾病等。请遵医嘱调整，必要时咨询医生。</Text>
+      </View>
+      
+      {/* 异常记录列表标题 */}
+      <View className="list-header">
+        <Text className="list-title">异常记录详情</Text>
+        <Text className="list-count">共 {abnormalRecords.length} 条</Text>
       </View>
       
       {/* 异常记录列表 */}
