@@ -60,6 +60,11 @@ export function getCurrentUser(): User | null {
   return Taro.getStorageSync('user') || null;
 }
 
+// 获取当前用户ID
+export function getUserId(): number | null {
+  return Taro.getStorageSync('userId') || null;
+}
+
 // 退出登录
 export function logout() {
   Taro.removeStorageSync('token');

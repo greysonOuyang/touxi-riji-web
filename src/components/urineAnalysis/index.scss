@@ -583,4 +583,123 @@
     color: #666;
     line-height: 1.4;
   }
+}
+
+// 最近尿量记录样式
+.urine-recent-records {
+  margin: 20px 0;
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  .records-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    
+    .records-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 16px;
+      
+      .refresh-btn, .view-more-btn {
+        font-size: 14px;
+        color: #1890ff;
+        cursor: pointer;
+      }
+    }
+  }
+  
+  .loading-state, .error-state, .empty-state {
+    text-align: center;
+    padding: 20px 0;
+    color: #999;
+    font-size: 14px;
+  }
+  
+  .error-state {
+    color: #ff4d4f;
+  }
+  
+  .records-list {
+    max-height: 400px;
+    
+    .record-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      .record-time {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        
+        .time-text {
+          font-size: 14px;
+          color: #666;
+        }
+        
+        .tag-text {
+          font-size: 12px;
+          color: #1890ff;
+          background-color: #e6f7ff;
+          padding: 2px 8px;
+          border-radius: 10px;
+        }
+      }
+      
+      .record-volume {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        
+        .volume-text {
+          font-size: 18px;
+          font-weight: 600;
+        }
+        
+        .volume-status {
+          font-size: 14px;
+          padding: 2px 8px;
+          border-radius: 10px;
+          background-color: rgba(0, 0, 0, 0.05);
+        }
+      }
+      
+      .record-notes {
+        font-size: 14px;
+        color: #999;
+        margin-top: 8px;
+        word-break: break-all;
+      }
+    }
+    
+    .loading-more, .no-more-data {
+      text-align: center;
+      padding: 12px 0;
+      font-size: 12px;
+      color: #999;
+    }
+  }
+  
+  .records-footer {
+    margin-top: 12px;
+    text-align: right;
+    
+    .total-text {
+      font-size: 12px;
+      color: #999;
+    }
+  }
 } 

@@ -8,6 +8,7 @@ import useDateNavigation from "@/components/common/useDateNavigation";
 import UrineChart from "./UrineChart";
 import UrineStatistics from "./UrineStatistics";
 import AbnormalValues from "./AbnormalValues";
+import UrineRecentRecords from "./UrineRecentRecords";
 import "./index.scss";
 
 const UrineAnalysis: React.FC = () => {
@@ -122,6 +123,12 @@ const UrineAnalysis: React.FC = () => {
             )}
           </View>
         </View>
+        
+        {/* 最近尿量记录 */}
+        <UrineRecentRecords 
+          limit={5}
+          onViewMore={() => Taro.navigateTo({ url: '/pages/urineHistory/index' })}
+        />
         
         {/* 异常值分析 - 仅在日视图模式下显示 */}
         {!isLoading && urineData && Array.isArray(urineData) && urineData.length > 0 && viewMode === "day" && (

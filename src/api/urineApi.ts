@@ -35,14 +35,18 @@ export interface UrineHistoryParams {
   pageNum?: number;     // 页码
 }
 
+// 获取最近记录请求参数
+export interface RecentUrineRecordsParams {
+  userId: number;       // 用户ID
+  limit?: number;       // 限制返回的记录数量
+}
+
 // 尿量趋势数据点
 export interface UrineTrendPoint {
   date: string;         // 日期（ISO格式或YYYY-MM-DD）
   volume: number;       // 尿量总和 (后端返回Double)
   count: number;        // 记录次数 (后端返回Integer)
 }
-
-
 
 // 尿量统计数据
 export interface UrineStatistics {
@@ -69,9 +73,6 @@ export interface UpdateUrineRecord {
   notes?: string;       // 备注
   tag?: string;         // 时间段标签
 }
-
-
-
 
 // 尿量时间分布数据项
 export interface UrineTimeDistributionItemVO {
@@ -133,8 +134,6 @@ export const getUrineHistory = (
     pages: number;
   }>('/api/urine-records/history', params);
 };
-
-
 
 /**
  * 获取用户尿量统计数据
@@ -208,6 +207,33 @@ export const getUrineTimeDistribution = (
   }
   
   return get<UrineTimeDistributionListVO>(url);
+};
+
+/**
+ * 获取用户最近的尿量记录
+ * @param userId 用户ID
+ * @param pageNum 页码，默认为1
+ * @param pageSize 每页记录数，默认为5
+ * @returns Promise<ApiResponse<Page<UrineHistoryItem>>>
+ */
+export const getRecentUrineRecords = (
+  userId: number,
+  pageNum: number = 1,
+  pageSize: number = 5
+): Promise<ApiResponse<{
+  records: UrineHistoryItem[];
+  total: number;
+  size: number;
+  current: number;
+  pages: number;
+}>> => {
+  return get<{
+    records: UrineHistoryItem[];
+    total: number;
+    size: number;
+    current: number;
+    pages: number;
+  }>(`/api/urine-records/recent?userId=${userId}&pageNum=${pageNum}&pageSize=${pageSize}`);
 };
 
 
