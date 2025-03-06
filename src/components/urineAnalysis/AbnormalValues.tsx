@@ -120,26 +120,26 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
       // 判断尿量类别
       if (volume < NORMAL_VOLUME_RANGE.MIN) {
         category = "anuria";
-        description = `日尿量${volume}ml，低于${NORMAL_VOLUME_RANGE.MIN}ml，属于无尿`;
+        description = `日尿量${volume}ml，无尿`;
       } else if (volume < 400) {
         category = "oliguria";
-        description = `日尿量${volume}ml，低于400ml，属于少尿`;
+        description = `日尿量${volume}ml，少尿`;
       } else if (volume > NORMAL_VOLUME_RANGE.MAX) {
         category = "polyuria";
-        description = `日尿量${volume}ml，超过${NORMAL_VOLUME_RANGE.MAX}ml，对尿毒症患者来说可能偏高`;
+        description = `日尿量${volume}ml，多尿`;
       } else {
         category = "normal";
-        description = `日尿量${volume}ml，在尿毒症患者的正常范围内(400-1000ml)`;
+        description = `日尿量${volume}ml，正常`;
       }
       
       // 如果有基线尿量，优先考虑与基线的比较
       if (baselineVolume && baselineVolume > 0) {
         if (volume < baselineVolume * 0.5) {
           category = "baseline_low";
-          description = `日尿量${volume}ml，显著低于您的参考基线(${Math.round(baselineVolume)}ml)的50%`;
+          description = `日尿量${volume}ml，低于基线(${Math.round(baselineVolume)}ml)的50%`;
         } else if (volume > baselineVolume * 1.5) {
           category = "baseline_high";
-          description = `日尿量${volume}ml，显著高于您的参考基线(${Math.round(baselineVolume)}ml)的150%`;
+          description = `日尿量${volume}ml，高于基线(${Math.round(baselineVolume)}ml)的150%`;
         }
       }
       
@@ -260,7 +260,6 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
                 </View>
                 <View className="record-content">
                   <Text className="volume-text">{record.volume} ml</Text>
-                  <Text className="description-text">{record.description}</Text>
                 </View>
                 <View className="record-tag">
                   <Text className="tag-text">
