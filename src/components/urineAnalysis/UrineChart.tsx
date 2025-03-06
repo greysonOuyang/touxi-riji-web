@@ -471,6 +471,13 @@ const UrineChart: React.FC<UrineChartProps> = ({
           <Text className="empty-text">暂无数据</Text>
         </View>
       )}
+      {!isLoading && chartData.labels.length > 0 && viewMode !== "day" && (
+        <View className="chart-tip">
+          <Text className="chart-tip-text">
+            {viewMode === "week" ? "* 图表显示的是每日尿液总量" : "* 图表显示的是每日平均尿量"}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

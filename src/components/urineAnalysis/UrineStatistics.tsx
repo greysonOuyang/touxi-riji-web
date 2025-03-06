@@ -127,14 +127,6 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
           </Text>
         </View>
         
-        {viewMode !== "day" && (
-          <View className="chart-tip-container">
-            <Text className="tip-text">
-              提示：日均尿量是基于有记录的天数计算的平均值
-            </Text>
-          </View>
-        )}
-        
         {alert && (
           <View className={`urine-alert ${alert.type}`}>
             <Text className="alert-message">{alert.message}</Text>
@@ -154,7 +146,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         </View>
         
         {/* 数据完整度 */}
-        {metadata && (
+        {metadata && viewMode !== "day" && (
           <View className="data-completeness">
             <View className="completeness-header">
               <Text className="completeness-title">数据完整度</Text>
@@ -179,9 +171,17 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         {/* 尿量统计数据 */}
         <View className="statistics-grid">
           <View className="statistics-item">
-            <Text className="item-value">
-              {metadata?.dailyAverage ? `${Math.round(metadata.dailyAverage)}ml` : "-"}
-            </Text>
+            <View className="item-header">
+              <Text className="item-value">
+                {metadata?.dailyAverage ? `${Math.round(metadata.dailyAverage)}ml` : "-"}
+              </Text>
+              <View className="help-icon" onClick={() => Taro.showModal({
+                title: '日均尿量说明',
+                content: '日均尿量是基于有记录的天数计算的平均值，而非所有天数。',
+                showCancel: false,
+                confirmText: '我知道了'
+              })}>?</View>
+            </View>
             <Text className="item-label">日均尿量</Text>
           </View>
           <View className="statistics-item">
