@@ -20,6 +20,7 @@ const UrineRecentRecords: React.FC<UrineRecentRecordsProps> = ({
   const [pageNum, setPageNum] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [total, setTotal] = useState<number>(0);
+  const isHidden = true; // 设置为true来隐藏组件
 
   // 格式化时间
   const formatTime = (timeStr: string) => {
@@ -162,6 +163,11 @@ const UrineRecentRecords: React.FC<UrineRecentRecordsProps> = ({
     pageNum,
     total
   });
+
+  // 如果组件被设置为隐藏，则直接返回null
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <View className="urine-recent-records" style={{ border: '1px solid #eee', borderRadius: '8px', padding: '16px', margin: '16px 0' }}>
