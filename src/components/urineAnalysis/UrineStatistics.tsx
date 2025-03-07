@@ -31,17 +31,11 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
   isLoading = false
 }) => {
   // 状态
-  const [alert, setAlert] = useState<{ type: string; message: string } | null>(null);
   const [trendInfo, setTrendInfo] = useState<{ type: string; message: string } | null>(null);
 
-  // 初始化时设置提醒和趋势信息
+  // 初始化时设置趋势信息
   useEffect(() => {
     if (metadata) {
-      // 设置尿量提醒
-      if (metadata.dailyAverage) {
-        setAlert(getUrineVolumeAlert(metadata));
-      }
-      
       // 设置趋势信息
       if (metadata.trend) {
         setTrendInfo(getTrendDescription(metadata.trend, metadata.trendPercentage));
@@ -67,80 +61,29 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
     return [];
   };
 
-  // 获取尿量提醒
-  const getUrineVolumeAlert = (metadata: UrineMetadata | null) => {
-    if (!metadata) return null;
-    
-    const { dailyAverage, urineStatus, baselineVolume, baselineChangePercentage } = metadata;
-    
-    // 根据尿量状态生成提醒
-    switch (urineStatus) {
-      case "anuria":
-        return {
-          type: "warning",
-          message: `平均每日排尿量${Math.round(dailyAverage)}ml，已达到无尿标准(<100ml/天)，请立即就医`
-        };
-      case "oliguria":
-        return {
-          type: "warning",
-          message: `平均每日排尿量${Math.round(dailyAverage)}ml，属于少尿(<400ml/天)，请咨询医生评估肾功能`
-        };
-      case "polyuria":
-        return {
-          type: "notice",
-          message: `平均每日排尿量${Math.round(dailyAverage)}ml，对尿毒症患者来说可能偏高，请咨询医生是否需要调整治疗`
-        };
-      case "baseline_low":
-        return {
-          type: "warning",
-          message: `平均每日排尿量${Math.round(dailyAverage)}ml，显著低于您的参考基线(${Math.round(baselineVolume || 0)}ml)，请咨询医生评估肾功能`
-        };
-      case "baseline_high":
-        return {
-          type: "notice",
-          message: `平均每日排尿量${Math.round(dailyAverage)}ml，显著高于您的参考基线(${Math.round(baselineVolume || 0)}ml)，请咨询医生是否需要调整治疗`
-        };
-      case "normal":
-      default:
-        if (baselineVolume) {
-          return {
-            type: "good",
-            message: `平均每日排尿量${Math.round(dailyAverage)}ml，与您的参考基线(${Math.round(baselineVolume)}ml)相符，请继续监测`
-          };
-        } else {
-          return {
-            type: "good",
-            message: `平均每日排尿量${Math.round(dailyAverage)}ml，对尿毒症患者来说在可接受范围内(400-1000ml/天)，请继续监测`
-          };
-        }
-    }
-  };
-
   // 获取趋势描述
   const getTrendDescription = (trend: string, percentage?: number) => {
-    const percentText = percentage ? `${percentage}%` : "";
-    
     switch (trend) {
       case "increasing":
         return {
           type: "increasing",
-          message: `排尿量呈上升趋势 ${percentText}，请遵医嘱调整`
+          message: `排尿量呈上升趋势，请遵医嘱调整`
         };
       case "decreasing":
         return {
           type: "decreasing",
-          message: `排尿量呈下降趋势 ${percentText}，请遵医嘱调整`
+          message: `排尿量呈下降趋势，请遵医嘱调整`
         };
       case "fluctuating":
         return {
           type: "fluctuating",
-          message: `排尿量波动较大 ${percentText}，建议咨询医生`
+          message: `排尿量波动较大，建议咨询医生`
         };
       case "stable":
       default:
         return {
           type: "stable",
-          message: `排尿量保持稳定 ${percentText}`
+          message: `排尿量保持稳定`
         };
     }
   };
@@ -155,12 +98,6 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
             {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}尿量概览
           </Text>
         </View>
-        
-        {alert && (
-          <View className={`urine-alert ${alert.type}`}>
-            <Text className="alert-message">{alert.message}</Text>
-          </View>
-        )}
         
         {/* 测量次数和数据可靠性 */}
         <View className="data-meta">
@@ -240,8 +177,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         
         <View className="data-note">
           <Text className="note-text">
-            *尿毒症患者每日排尿量通常低于健康人群。无尿：&lt;100ml/天；少尿：&lt;400ml/天；
-            正常范围：400-1000ml/天。具体情况因个人病情而异，请遵医嘱。如有基线尿量，系统会根据您的个人情况进行评估。
+            *尿量数据仅供参考，具体情况因个人病情而异，请遵医嘱。
           </Text>
         </View>
       </View>
