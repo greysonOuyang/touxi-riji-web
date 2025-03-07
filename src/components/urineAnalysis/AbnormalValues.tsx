@@ -208,13 +208,7 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
         ))}
       </View>
       
-      {/* 提示说明 */}
-      <View className="distribution-note">
-        <Text className="note-text">
-          尿毒症患者应特别关注尿量变化。无尿(&lt;100ml/天) 需咨询医生评估肾功能；少尿(&lt;400ml/天)需咨询医生评估肾功能；
-          正常范围(400-1000ml/天)；多尿(&gt;1000ml/天)可能需要调整治疗。具体情况请遵医嘱。
-        </Text>
-      </View>
+     
     </View>
   );
 };
