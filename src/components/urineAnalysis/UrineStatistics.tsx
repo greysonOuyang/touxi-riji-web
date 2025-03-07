@@ -90,7 +90,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
 
   return (
     <View className="urine-statistics">
-      {/* 卡片1: 尿量状态概览 */}
+      {/* 卡片1: 尿量统计分析 */}
       <View className="statistics-card">
         <View className="card-header">
           <Text className="card-title">尿量统计分析</Text>
@@ -134,38 +134,66 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
           </View>
         )}
         
-        {/* 尿量统计数据 */}
+        {/* 合并尿量统计数据和尿量汇总 */}
         <View className="statistics-grid">
+          {/* 第一行 */}
           <View className="statistics-item">
-            <View className="item-header">
-              <Text className="item-value">
-                {metadata?.dailyAverage ? `${Math.round(metadata.dailyAverage)}ml` : "-"}
-              </Text>
+            <Text className="item-value">
+              {metadata?.dailyAverage ? `${Math.round(metadata.dailyAverage)}ml` : "-"}
+            </Text>
+            <Text className="item-label">
+              日均尿量
               <View className="help-icon" onClick={() => Taro.showModal({
                 title: '日均尿量说明',
-                content: '日均尿量是基于有记录的天数计算的平均值。对尿毒症患者来说，日均尿量通常低于健康人群，无尿：<100ml/天；少尿：<400ml/天；正常范围：400-1000ml/天。如果您有基线尿量，系统会根据您的个人情况进行评估。',
+                content: '日均尿量是基于有记录的天数计算的平均值。具体情况因个人病情而异，请遵医嘱。',
                 showCancel: false,
                 confirmText: '我知道了'
               })}>?</View>
-            </View>
-            <Text className="item-label">日均尿量</Text>
-          </View>
-          <View className="statistics-item">
-            <Text className="item-value">
-              {metadata?.recordCount && metadata?.daysWithData && metadata.daysWithData > 0
-                ? Math.round((metadata.recordCount / metadata.daysWithData) * 10) / 10 
-                : "-"}
             </Text>
-            <Text className="item-label">日均次数</Text>
-            <Text className="item-source">
-              {metadata?.daysWithData ? `(${metadata.daysWithData}天)` : ""}
-            </Text>
+            {viewMode !== "day" && metadata?.daysWithData && (
+              <Text className="item-source">
+                ({metadata.daysWithData}天)
+              </Text>
+            )}
           </View>
           <View className="statistics-item">
             <Text className="item-value">
               {metadata?.averageVolume ? `${Math.round(metadata.averageVolume)}ml` : "-"}
             </Text>
             <Text className="item-label">平均单次</Text>
+          </View>
+          <View className="statistics-item">
+            <Text className="item-value">
+              {metadata?.totalVolume ? `${metadata.totalVolume}ml` : "-"}
+            </Text>
+            <Text className="item-label">总尿量</Text>
+            <Text className="item-source">
+              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
+            </Text>
+          </View>
+          
+          {/* 第二行 */}
+          {viewMode !== "day" && (
+            <View className="statistics-item">
+              <Text className="item-value">
+                {metadata?.recordCount && metadata?.daysWithData && metadata.daysWithData > 0
+                  ? Math.round((metadata.recordCount / metadata.daysWithData) * 10) / 10 
+                  : "-"}
+              </Text>
+              <Text className="item-label">日均次数</Text>
+            </View>
+          )}
+          <View className="statistics-item">
+            <Text className="item-value">
+              {metadata?.recordCount || 0}
+            </Text>
+            <Text className="item-label">总次数</Text>
+          </View>
+          <View className="statistics-item">
+            <Text className="item-value">
+              {metadata?.abnormalCount || 0}
+            </Text>
+            <Text className="item-label">异常次数</Text>
           </View>
         </View>
         
@@ -182,41 +210,7 @@ const UrineStatistics: React.FC<UrineStatisticsProps> = ({
         </View>
       </View>
       
-      {/* 卡片2: 尿量汇总 */}
-      <View className="statistics-card">
-        <Text className="card-title">尿量汇总</Text>
-        <View className="statistics-grid">
-          <View className="statistics-item">
-            <Text className="item-value">
-              {metadata?.totalVolume ? `${metadata.totalVolume}ml` : "-"}
-            </Text>
-            <Text className="item-label">总尿量</Text>
-            <Text className="item-source">
-              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
-            </Text>
-          </View>
-          <View className="statistics-item">
-            <Text className="item-value">
-              {metadata?.recordCount || 0}
-            </Text>
-            <Text className="item-label">总次数</Text>
-            <Text className="item-source">
-              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
-            </Text>
-          </View>
-          <View className="statistics-item">
-            <Text className="item-value">
-              {metadata?.abnormalCount || 0}
-            </Text>
-            <Text className="item-label">异常次数</Text>
-            <Text className="item-source">
-              {viewMode === "day" ? "当日" : viewMode === "week" ? "本周" : "本月"}
-            </Text>
-          </View>
-        </View>
-      </View>
-      
-      {/* 卡片3: 时间分布 */}
+      {/* 卡片2: 时间分布 */}
       <View className="statistics-card">
         <Text className="card-title">排尿时间分布</Text>
         <View className="time-distribution">

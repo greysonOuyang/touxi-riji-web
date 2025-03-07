@@ -60,7 +60,7 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
         count: 0,
         percentage: 0,
         color: "#ff4d4f",
-        description: "日尿量<100ml，属于无尿，需立即就医"
+        description: "日尿量<100ml，属于无尿，如有需要，请咨询医生"
       },
       oliguria: {
         type: "oliguria",
@@ -68,7 +68,7 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
         count: 0,
         percentage: 0,
         color: "#faad14",
-        description: "日尿量<400ml，属于少尿，需咨询医生"
+        description: "日尿量<400ml，属于少尿，如有需要，请咨询医生"
       },
       normal: {
         type: "normal",
@@ -275,7 +275,7 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
       {/* 提示说明 */}
       <View className="distribution-note">
         <Text className="note-text">
-          尿毒症患者应特别关注尿量变化。无尿(&lt;100ml/天)需立即就医；少尿(&lt;400ml/天)需咨询医生评估肾功能；
+          尿毒症患者应特别关注尿量变化。无尿(&lt;100ml/天) 需咨询医生评估肾功能；少尿(&lt;400ml/天)需咨询医生评估肾功能；
           正常范围(400-1000ml/天)；多尿(&gt;1000ml/天)可能需要调整治疗。具体情况请遵医嘱。
         </Text>
       </View>
