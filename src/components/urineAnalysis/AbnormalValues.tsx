@@ -21,15 +21,6 @@ interface UrineVolumeCategory {
   description: string;
 }
 
-// 尿量异常记录
-interface UrineAbnormalRecord {
-  date: string;
-  formattedDate: string;
-  volume: number;
-  category: UrineVolumeCategory["type"];
-  description: string;
-}
-
 const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({ 
   urineData, 
   viewMode, 
@@ -37,9 +28,9 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
   isLoading = false 
 }) => {
   // 分析尿量分布
-  const { volumeCategories, abnormalRecords } = useMemo(() => {
+  const { volumeCategories } = useMemo(() => {
     if (!urineData || urineData.length === 0) {
-      return { volumeCategories: [], abnormalRecords: [] };
+      return { volumeCategories: [] };
     }
     
     // 按日期分组计算每日总尿量
@@ -109,53 +100,32 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
       };
     }
     
-    // 收集异常记录
-    const records: UrineAbnormalRecord[] = [];
-    
     // 分析每日尿量
     Object.entries(dailyVolumes).forEach(([date, volume]) => {
       let category: UrineVolumeCategory["type"] = "normal";
-      let description = "";
       
       // 判断尿量类别
       if (volume < NORMAL_VOLUME_RANGE.MIN) {
         category = "anuria";
-        description = `日尿量${volume}ml，无尿`;
       } else if (volume < 400) {
         category = "oliguria";
-        description = `日尿量${volume}ml，少尿`;
       } else if (volume > NORMAL_VOLUME_RANGE.MAX) {
         category = "polyuria";
-        description = `日尿量${volume}ml，多尿`;
       } else {
         category = "normal";
-        description = `日尿量${volume}ml，正常`;
       }
       
       // 如果有基线尿量，优先考虑与基线的比较
       if (baselineVolume && baselineVolume > 0) {
         if (volume < baselineVolume * 0.5) {
           category = "baseline_low";
-          description = `日尿量${volume}ml，低于基线(${Math.round(baselineVolume)}ml)的50%`;
         } else if (volume > baselineVolume * 1.5) {
           category = "baseline_high";
-          description = `日尿量${volume}ml，高于基线(${Math.round(baselineVolume)}ml)的150%`;
         }
       }
       
       // 增加类别计数
       categories[category].count++;
-      
-      // 添加到异常记录（只添加非正常记录）
-      if (category !== "normal") {
-        records.push({
-          date,
-          formattedDate: date,
-          volume,
-          category,
-          description
-        });
-      }
     });
     
     // 计算百分比
@@ -171,14 +141,8 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
       .filter(category => category.count > 0)
       .sort((a, b) => b.count - a.count);
     
-    // 按日期排序，最近的记录在前面
-    const sortedRecords = records.sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    
     return { 
-      volumeCategories: sortedCategories, 
-      abnormalRecords: sortedRecords 
+      volumeCategories: sortedCategories
     };
   }, [urineData, viewMode, baselineVolume]);
   
@@ -243,34 +207,6 @@ const UrineVolumeDistribution: React.FC<AbnormalValuesProps> = ({
           </View>
         ))}
       </View>
-      
-      {/* 异常记录列表 */}
-      {abnormalRecords.length > 0 && (
-        <View className="abnormal-records">
-          <View className="records-header">
-            <Text className="header-title">异常记录</Text>
-            <Text className="header-count">共 {abnormalRecords.length} 条</Text>
-          </View>
-          
-          <View className="records-list">
-            {abnormalRecords.map((record, index) => (
-              <View className={`record-item ${record.category}`} key={index}>
-                <View className="record-date">
-                  <Text className="date-text">{record.formattedDate}</Text>
-                </View>
-                <View className="record-content">
-                  <Text className="volume-text">{record.volume} ml</Text>
-                </View>
-                <View className="record-tag">
-                  <Text className="tag-text">
-                    {volumeCategories.find(c => c.type === record.category)?.label || "异常"}
-                  </Text>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
       
       {/* 提示说明 */}
       <View className="distribution-note">
