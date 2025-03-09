@@ -61,21 +61,7 @@ const UrineAnalysis: React.FC = () => {
     }
   };
 
-  // 如果发生错误，显示错误信息
-  if (error) {
-    return (
-      <View className="urine-analysis error">
-        <Text className="error-text">加载数据时出错</Text>
-        <Text className="error-message">{error}</Text>
-        <View 
-          className="retry-button"
-          onClick={() => refreshData(viewMode, currentEndDate)}
-        >
-          <Text className="retry-text">重试</Text>
-        </View>
-      </View>
-    );
-  }
+ 
 
   return (
     <View className="urine-analysis">
@@ -102,11 +88,7 @@ const UrineAnalysis: React.FC = () => {
         {/* 图表区域 */}
         <View className="chart-section">
           <View className="chart-container">
-            {isLoading && (
-              <View className="loading-container">
-                <Text>加载中...</Text>
-              </View>
-            )}
+            
             
             {!isLoading && urineData && urineData.length > 0 && (
               <UrineChart 

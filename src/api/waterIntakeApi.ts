@@ -1,4 +1,4 @@
-import { get, post } from "../utils/request";
+import { get, post, put, deleted } from "../utils/request";
 import { ApiResponse } from "../utils/request";
 
 /**
@@ -37,12 +37,60 @@ export interface WaterIntakeResponse {
  */
 export interface WaterStatisticsVO {
   totalAmount: number; // 总饮水量
-  targetAmount: number; // 目标饮水量
+  recommendedLimit: number; // 建议饮水上限 (原 targetAmount)
   averageAmount: number; // 平均饮水量
   maxAmount: number; // 最大饮水量
-  minAmount: number; // 最小饮水量
-  completionDays: number; // 达标天数
   recordDays: number; // 记录天数
+  completionRate: number; // 达标率 (不超过限制的天数比例)
+}
+
+/**
+ * 喝水时间分布数据类型
+ */
+export interface WaterIntakeTimeDistributionVO {
+  // 按时间段分布
+  periodDistribution: {
+    period: string; // 时间段名称
+    amount: number; // 该时间段饮水量
+    percentage: number; // 该时间段饮水量占比
+    recordCount: number; // 记录次数
+  }[];
+  // 按小时分布
+  hourlyDistribution: {
+    hour: number; // 小时(0-23)
+    amount: number; // 该小时饮水量
+    percentage: number; // 该小时饮水量占比
+    recordCount: number; // 记录次数
+  }[];
+  // 最佳饮水时间段
+  bestPeriod: string;
+  // 饮水间隔
+  averageInterval: number; // 平均间隔(分钟)
+}
+
+/**
+ * 喝水习惯分析数据类型
+ */
+export interface WaterIntakeHabitVO {
+  // 饮水规律性
+  regularity: {
+    score: number; // 规律性得分(0-100)
+    level: string; // 规律性等级
+    analysis: string; // 分析结果描述
+  };
+  // 日间分布特征
+  dailyPattern: {
+    pattern: string; // 分布模式
+    description: string; // 模式描述
+  };
+  // 工作日vs周末对比
+  weekdayVsWeekend: {
+    weekdayAverage: number; // 工作日平均值
+    weekendAverage: number; // 周末平均值
+    difference: number; // 差异百分比
+  };
+  // 改进建议
+  suggestions: string[];
 }
 
 /**
@@ -82,7 +130,7 @@ export const getWaterIntakeRecords = (
   viewMode: "day" | "week" | "month"
 ): Promise<ApiResponse<WaterIntakeVO[]>> => {
   return get<WaterIntakeVO[]>(
-    `/api/water-intake/records/${userId}?startDate=${startDate}&endDate=${endDate}&viewMode=${viewMode}`
+    `/api/water-intake/records?userId=${userId}&startDate=${startDate}&endDate=${endDate}&viewMode=${viewMode}`
   );
 };
 
@@ -101,66 +149,130 @@ export const getWaterStatistics = (
   viewMode: "day" | "week" | "month"
 ): Promise<ApiResponse<WaterStatisticsVO>> => {
   return get<WaterStatisticsVO>(
-    `/api/water-intake/statistics/${userId}?startDate=${startDate}&endDate=${endDate}&viewMode=${viewMode}`
+    `/api/water-intake/statistics?userId=${userId}&startDate=${startDate}&endDate=${endDate}&viewMode=${viewMode}`
   );
 };
 
 /**
- * 添加水分摄入记录
+ * 添加水分摄入记录（简化版）
+ * @param userId 用户ID
  * @param data 水分摄入记录数据
  * @returns Promise<ApiResponse<WaterIntakeVO>>
  */
-export const addWaterIntake = (data: {
-  amount: number;
-  timestamp?: string;
-  remark?: string;
-}): Promise<ApiResponse<WaterIntakeVO>> => {
-  return post<WaterIntakeVO>("/api/water/intake", data);
+export const addWaterIntake = (
+  userId: number,
+  data: {
+    amount: number;
+    timestamp?: string;
+    remark?: string;
+  }
+): Promise<ApiResponse<WaterIntakeVO>> => {
+  return post<WaterIntakeVO>(`/api/water-intake/intake?userId=${userId}`, data);
 };
 
 /**
- * 获取水分摄入记录
+ * 根据参数获取水分摄入记录
+ * @param userId 用户ID
  * @param params 查询参数
  * @returns Promise<ApiResponse<WaterIntakeVO[]>>
  */
-export const getWaterIntakeRecordsByParams = (params: {
-  startDate: string;
-  endDate: string;
-}): Promise<ApiResponse<WaterIntakeVO[]>> => {
-  return get<WaterIntakeVO[]>("/api/water/records", { params });
+export const getWaterIntakeRecordsByParams = (
+  userId: number,
+  params: {
+    startDate?: string;
+    endDate?: string;
+  }
+): Promise<ApiResponse<WaterIntakeVO[]>> => {
+  return get<WaterIntakeVO[]>(
+    `/api/water-intake/records-by-params?userId=${userId}${
+      params.startDate ? `&startDate=${params.startDate}` : ""
+    }${params.endDate ? `&endDate=${params.endDate}` : ""}`
+  );
 };
 
 /**
- * 获取水分摄入统计数据
+ * 根据参数获取水分摄入统计数据
+ * @param userId 用户ID
  * @param params 查询参数
  * @returns Promise<ApiResponse<WaterStatisticsVO>>
  */
-export const getWaterStatisticsByParams = (params: {
-  startDate: string;
-  endDate: string;
-}): Promise<ApiResponse<WaterStatisticsVO>> => {
-  return get<WaterStatisticsVO>("/api/water/statistics", { params });
+export const getWaterStatisticsByParams = (
+  userId: number,
+  params: {
+    startDate?: string;
+    endDate?: string;
+    viewMode?: "day" | "week" | "month";
+  }
+): Promise<ApiResponse<WaterStatisticsVO>> => {
+  return get<WaterStatisticsVO>(
+    `/api/water-intake/statistics-by-params?userId=${userId}${
+      params.startDate ? `&startDate=${params.startDate}` : ""
+    }${params.endDate ? `&endDate=${params.endDate}` : ""}${
+      params.viewMode ? `&viewMode=${params.viewMode}` : ""
+    }`
+  );
 };
 
 /**
  * 删除水分摄入记录
  * @param id 水分摄入记录ID
+ * @param userId 用户ID
  * @returns Promise<ApiResponse<null>>
  */
-export const deleteWaterIntake = (id: string): Promise<ApiResponse<null>> => {
-  return get<null>(`/api/water/intake/${id}`);
+export const deleteWaterIntake = (
+  id: string,
+  userId: number
+): Promise<ApiResponse<null>> => {
+  return deleted<null>(`/api/water-intake/${id}?userId=${userId}`);
 };
 
 /**
  * 更新水分摄入记录
  * @param id 水分摄入记录ID
+ * @param userId 用户ID
  * @param data 更新后的水分摄入记录数据
  * @returns Promise<ApiResponse<WaterIntakeVO>>
  */
-export const updateWaterIntake = (id: string, data: {
-  amount?: number;
-  timestamp?: string;
-  remark?: string;
-}): Promise<ApiResponse<WaterIntakeVO>> => {
-  return post<WaterIntakeVO>(`/api/water/intake/${id}`, data);
+export const updateWaterIntake = (
+  id: string,
+  userId: number,
+  data: {
+    amount?: number;
+    timestamp?: string;
+    remark?: string;
+  }
+): Promise<ApiResponse<WaterIntakeVO>> => {
+  return put<WaterIntakeVO>(`/api/water-intake/${id}?userId=${userId}`, data);
+};
+
+/**
+ * 获取用户喝水时间分布
+ * @param userId 用户ID
+ * @param startDate 开始日期 (YYYY-MM-DD)
+ * @param endDate 结束日期 (YYYY-MM-DD)
+ * @returns Promise<ApiResponse<WaterIntakeTimeDistributionVO>>
+ */
+export const getWaterIntakeTimeDistribution = (
+  userId: number,
+  startDate: string,
+  endDate: string
+): Promise<ApiResponse<WaterIntakeTimeDistributionVO>> => {
+  return get<WaterIntakeTimeDistributionVO>(
+    `/api/water-intake/time-distribution?userId=${userId}&startDate=${startDate}&endDate=${endDate}`
+  );
+};
+
+/**
+ * 获取用户喝水习惯分析
+ * @param userId 用户ID
+ * @param days 分析天数，默认30天
+ * @returns Promise<ApiResponse<WaterIntakeHabitVO>>
+ */
+export const getWaterIntakeHabitAnalysis = (
+  userId: number,
+  days: number = 30
+): Promise<ApiResponse<WaterIntakeHabitVO>> => {
+  return get<WaterIntakeHabitVO>(
+    `/api/water-intake/habit-analysis?userId=${userId}&days=${days}`
+  );
 };

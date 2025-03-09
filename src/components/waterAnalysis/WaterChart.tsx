@@ -4,6 +4,8 @@ import Taro from "@tarojs/taro";
 import { format, parseISO } from "date-fns";
 import "./WaterChart.scss";
 import { WaterIntakeVO } from "@/api/waterIntakeApi";
+import ViewModeSelector from "@/components/common/ViewModeSelector";
+import DateNavigator from "@/components/common/DateNavigator";
 
 // 引入图表库
 import UCharts from "@qiun/ucharts";
@@ -11,15 +13,19 @@ import UCharts from "@qiun/ucharts";
 interface WaterChartProps {
   viewMode: "day" | "week" | "month";
   waterData?: WaterIntakeVO[]; // 喝水数据
+  endDate: Date; // 当前显示的结束日期
+  onViewModeChange: (mode: "day" | "week" | "month") => void; // 视图模式变更回调
+  onDateChange: (newDate: Date) => void; // 日期变更回调
   onSwipe?: (direction: "left" | "right") => void;
-  isLoading?: boolean;
 }
 
 const WaterChart: React.FC<WaterChartProps> = ({ 
   viewMode, 
   waterData = [], 
-  onSwipe,
-  isLoading = false
+  endDate,
+  onViewModeChange,
+  onDateChange,
+  onSwipe
 }) => {
   const chartRef = useRef<any>(null);
   const canvasId = "water-chart";
@@ -52,6 +58,44 @@ const WaterChart: React.FC<WaterChartProps> = ({
     chartRef.current?.scrollMove(e);
   };
 
+  // 处理日期导航
+  const handleNavigate = (direction: "prev" | "next" | "today") => {
+    let newDate = new Date(endDate);
+    
+    if (direction === "prev") {
+      // 向前导航
+      switch (viewMode) {
+        case "day":
+          newDate.setDate(newDate.getDate() - 1);
+          break;
+        case "week":
+          newDate.setDate(newDate.getDate() - 7);
+          break;
+        case "month":
+          newDate.setMonth(newDate.getMonth() - 1);
+          break;
+      }
+    } else if (direction === "next") {
+      // 向后导航
+      switch (viewMode) {
+        case "day":
+          newDate.setDate(newDate.getDate() + 1);
+          break;
+        case "week":
+          newDate.setDate(newDate.getDate() + 7);
+          break;
+        case "month":
+          newDate.setMonth(newDate.getMonth() + 1);
+          break;
+      }
+    } else if (direction === "today") {
+      // 重置为今天
+      newDate = new Date();
+    }
+    
+    onDateChange(newDate);
+  };
+
   // 初始化图表
   const initChart = (canvas, width, height) => {
     if (!canvas) {
@@ -79,96 +123,81 @@ const WaterChart: React.FC<WaterChartProps> = ({
     try {
       // 根据视图模式处理数据
       if (viewMode === "day") {
-        // 日视图：按时间排序
-        const sortedData = [...waterData].sort((a, b) => 
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
+        // 日视图：按小时分组
+        const hourlyData = new Map<number, number>();
         
-        sortedData.forEach(item => {
+        for (let i = 0; i < 24; i++) {
+          hourlyData.set(i, 0);
+        }
+        
+        waterData.forEach(item => {
           try {
             const date = new Date(item.timestamp);
-            categories.push(`${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`);
-            if (typeof item.amount === 'number' && !isNaN(item.amount)) {
-              chartData.push(Number(item.amount));
-            }
+            const hour = date.getHours();
+            hourlyData.set(hour, (hourlyData.get(hour) || 0) + item.amount);
           } catch (e) {
             console.error("日期格式化错误:", e);
           }
         });
-      } else if (viewMode === "week") {
-        // 周视图：按日期分组
-        const weekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
-        const dayData = new Map<number, { amount: number; count: number }>();
         
-        // 初始化每天的数据
-        for (let i = 0; i < 7; i++) {
-          dayData.set(i, { amount: 0, count: 0 });
+        // 生成小时标签和数据
+        for (let i = 0; i < 24; i++) {
+          categories.push(`${i}:00`);
+          chartData.push(hourlyData.get(i) || 0);
         }
+      } else if (viewMode === "week") {
+        // 周视图：按天分组
+        const weekDays = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+        const dailyData = new Map<string, number>();
         
-        // 累加每天的数据
+        weekDays.forEach(day => {
+          dailyData.set(day, 0);
+        });
+        
         waterData.forEach(item => {
           try {
-            const date = parseISO(item.date);
-            const dayIndex = (date.getDay() + 6) % 7; // 转换为周一为0
-            
-            const dayStats = dayData.get(dayIndex)!;
-            if (typeof item.amount === 'number' && !isNaN(item.amount)) {
-              dayStats.amount += item.amount;
-              dayStats.count += 1;
-            }
+            const date = new Date(item.timestamp);
+            // 获取星期几（0是周日，1-6是周一到周六）
+            let dayOfWeek = date.getDay();
+            // 调整为周一为一周的第一天
+            if (dayOfWeek === 0) dayOfWeek = 7;
+            const dayName = weekDays[dayOfWeek - 1];
+            dailyData.set(dayName, (dailyData.get(dayName) || 0) + item.amount);
           } catch (e) {
             console.error("日期解析错误:", e);
           }
         });
         
-        // 计算每天的总量
-        for (let i = 0; i < 7; i++) {
-          categories.push(weekDays[i]);
-          const stats = dayData.get(i)!;
-          
-          if (stats.count > 0) {
-            chartData.push(stats.amount);
-          } else {
-            // 对于没有数据的日期，使用0
-            chartData.push(0);
-            // 在categories中标记为无数据
-            categories[i] = `${weekDays[i]}(无)`;
-          }
-        }
+        // 生成周标签和数据
+        weekDays.forEach(day => {
+          categories.push(day);
+          chartData.push(dailyData.get(day) || 0);
+        });
       } else {
         // 月视图：按日期分组
-        const daysInMonth = 31; // 假设最多31天
-        const dayData = new Map<number, { amount: number; count: number }>();
+        const dailyData = new Map<string, number>();
+        const daySet = new Set<string>();
         
-        // 初始化每天的数据
-        for (let i = 1; i <= daysInMonth; i++) {
-          dayData.set(i, { amount: 0, count: 0 });
-        }
-        
-        // 累加每天的数据
         waterData.forEach(item => {
           try {
-            const date = parseISO(item.date);
-            const day = date.getDate();
-            
-            const dayStats = dayData.get(day)!;
-            if (typeof item.amount === 'number' && !isNaN(item.amount)) {
-              dayStats.amount += item.amount;
-              dayStats.count += 1;
-            }
+            const date = item.date || format(new Date(item.timestamp), "yyyy-MM-dd");
+            // 提取日期中的日部分
+            const day = date.split("-")[2];
+            daySet.add(day);
+            dailyData.set(day, (dailyData.get(day) || 0) + item.amount);
           } catch (e) {
             console.error("日期解析错误:", e);
           }
         });
         
-        // 计算每天的总量，只添加有数据的日期
-        for (let i = 1; i <= daysInMonth; i++) {
-          if (dayData.get(i)!.count > 0) {
-            categories.push(`${i}日`);
-            const stats = dayData.get(i)!;
-            chartData.push(stats.amount);
-          }
-        }
+        // 按日期排序
+        const days = Array.from(daySet).sort((a, b) => parseInt(a) - parseInt(b));
+        
+        // 生成日期标签和数据
+        days.forEach(day => {
+          categories.push(`${day}日`);
+          chartData.push(dailyData.get(day) || 0);
+        });
       }
       
       // 如果没有有效数据，添加一个默认数据点
@@ -306,86 +335,74 @@ const WaterChart: React.FC<WaterChartProps> = ({
 
   // 组件挂载和更新时初始化图表
   useEffect(() => {
-    if (waterData && waterData.length > 0 && !isLoading) {
-      Taro.nextTick(() => {
-        try {
-          Taro.createSelectorQuery()
-            .select(`#${canvasId}`)
-            .fields({ node: true, size: true })
-            .exec((res) => {
-              if (res && res[0]) {
-                initChart(res[0].node, res[0].width, res[0].height);
-              } else {
-                console.error("获取Canvas节点失败");
-              }
-            });
-        } catch (error) {
-          console.error("初始化图表错误:", error);
-        }
-      });
-    }
-    
-    return () => {
-      if (chartRef.current) {
-        chartRef.current = null;
+    if (waterData && waterData.length > 0) {
+      const query = Taro.createSelectorQuery();
+      
+      if (Taro.canIUse("SelectorQuery.selectViewport")) {
+        query.selectViewport().scrollOffset();
       }
-    };
-  }, [waterData, viewMode, isLoading]);
-  
-  // 监听窗口大小变化
+      
+      query
+        .select(`#${canvasId}`)
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (res && res[0]) {
+            initChart(res[0].node, res[0].width, res[0].height);
+          } else {
+            console.error("获取Canvas节点失败");
+          }
+        });
+    }
+  }, [waterData, viewMode]);
+
+  // 处理屏幕旋转等导致的尺寸变化
   useEffect(() => {
     const handleResize = () => {
-      if (waterData && waterData.length > 0 && !isLoading) {
-        try {
-          Taro.createSelectorQuery()
-            .select(`#${canvasId}`)
-            .fields({ node: true, size: true })
-            .exec((res) => {
-              if (res && res[0]) {
-                initChart(res[0].node, res[0].width, res[0].height);
-              }
-            });
-        } catch (error) {
-          console.error("窗口大小变化时初始化图表错误:", error);
-        }
+      if (chartRef.current) {
+        const query = Taro.createSelectorQuery();
+        query
+          .select(`#${canvasId}`)
+          .fields({ node: true, size: true })
+          .exec((res) => {
+            if (res && res[0]) {
+              initChart(res[0].node, res[0].width, res[0].height);
+            }
+          });
       }
     };
     
     Taro.onWindowResize(handleResize);
+    
     return () => {
       Taro.offWindowResize(handleResize);
     };
-  }, [waterData, viewMode, isLoading]);
-
-  // 如果正在加载，显示加载状态
-  if (isLoading) {
-    return (
-      <View className="water-chart loading">
-        <Text className="loading-text">加载中...</Text>
-      </View>
-    );
-  }
-
-  // 如果没有数据，显示空状态
-  if (!waterData || waterData.length === 0) {
-    return (
-      <View className="water-chart empty">
-        <Text className="empty-text">暂无喝水数据</Text>
-        <Text className="empty-hint">请先记录喝水</Text>
-      </View>
-    );
-  }
+  }, []);
 
   return (
-    <View className="water-chart">
+    <View className="water-chart-container">
+      <View className="header-container">
+        <Text className="chart-title">喝水趋势</Text>
+        <ViewModeSelector
+          viewMode={viewMode}
+          onViewModeChange={onViewModeChange}
+        />
+      </View>
+      
+      <DateNavigator
+        mode={viewMode}
+        currentDate={endDate}
+        onNavigate={handleNavigate}
+        onReset={() => handleNavigate("today")}
+      />
+      
       <Canvas
         type="2d"
         id={canvasId}
-        canvasId={canvasId}
-        className="chart-canvas"
+        className="water-chart"
         onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onInit={initChart}
       />
     </View>
   );

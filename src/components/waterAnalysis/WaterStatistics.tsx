@@ -4,7 +4,7 @@ import { WaterStatisticsVO } from "@/api/waterIntakeApi";
 import "./WaterStatistics.scss";
 
 interface WaterStatisticsProps {
-  statistics?: WaterStatisticsVO;
+  statistics?: WaterStatisticsVO | null;
   isLoading?: boolean;
 }
 
@@ -16,12 +16,12 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
   const getWaterStatus = () => {
     if (!statistics) return "warning";
     
-    const { totalAmount, targetAmount } = statistics;
-    const percentage = totalAmount / targetAmount;
+    const { totalAmount, recommendedLimit } = statistics;
+    const percentage = totalAmount / recommendedLimit;
     
-    if (percentage >= 1) return "good"; // 达到目标
-    if (percentage >= 0.7) return "warning"; // 接近目标
-    return "danger"; // 远低于目标
+    if (percentage > 1) return "danger"; // 超过限制
+    if (percentage >= 0.8) return "warning"; // 接近限制
+    return "good"; // 低于限制
   };
   
   // 获取水分摄入状态文本
@@ -32,11 +32,11 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
     
     switch (status) {
       case "good":
-        return "水分摄入达标，继续保持！";
+        return "今日水分摄入控制良好，继续保持！";
       case "warning":
-        return "水分摄入接近目标，再喝一点吧！";
+        return "今日水分摄入接近上限，请注意控制！";
       case "danger":
-        return "水分摄入不足，请多喝水！";
+        return "今日水分摄入已超过建议上限，请严格控制！";
       default:
         return "暂无数据";
     }
@@ -44,10 +44,10 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
   
   // 计算完成百分比
   const getCompletionPercentage = () => {
-    if (!statistics || !statistics.targetAmount) return 0;
+    if (!statistics || !statistics.recommendedLimit) return 0;
     
-    const { totalAmount, targetAmount } = statistics;
-    return Math.min(Math.round((totalAmount / targetAmount) * 100), 100);
+    const { totalAmount, recommendedLimit } = statistics;
+    return Math.min(Math.round((totalAmount / recommendedLimit) * 100), 100);
   };
   
   // 如果正在加载，显示加载状态
@@ -72,7 +72,7 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
     );
   }
   
-  const { totalAmount, targetAmount, averageAmount, maxAmount, minAmount, completionDays, recordDays } = statistics;
+  const { totalAmount, recommendedLimit, averageAmount, maxAmount, recordDays, completionRate } = statistics;
   
   return (
     <View className="water-statistics">
@@ -80,7 +80,7 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
       <View className="water-card">
         <View className="card-header">
           <Text className="card-title">今日水分摄入</Text>
-          <Text className="card-subtitle">目标: {targetAmount}ml</Text>
+          <Text className="card-subtitle">建议上限: {recommendedLimit}ml</Text>
         </View>
         
         <View className={`water-alert ${getWaterStatus()}`}>
@@ -116,13 +116,8 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
         </View>
         
         <View className="stats-item">
-          <Text className="stats-label">最低摄入量</Text>
-          <Text className="stats-value">{minAmount}ml</Text>
-        </View>
-        
-        <View className="stats-item">
-          <Text className="stats-label">达标天数</Text>
-          <Text className="stats-value">{completionDays}天</Text>
+          <Text className="stats-label">建议上限</Text>
+          <Text className="stats-value">{recommendedLimit}ml</Text>
         </View>
         
         <View className="stats-item">
@@ -131,9 +126,16 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
         </View>
         
         <View className="stats-item">
-          <Text className="stats-label">达标率</Text>
+          <Text className="stats-label">控制达标率</Text>
           <Text className="stats-value">
-            {recordDays > 0 ? Math.round((completionDays / recordDays) * 100) : 0}%
+            {completionRate ? Math.round(completionRate) : 0}%
+          </Text>
+        </View>
+        
+        <View className="stats-item">
+          <Text className="stats-label">今日状态</Text>
+          <Text className="stats-value">
+            {totalAmount <= recommendedLimit ? "达标" : "超量"}
           </Text>
         </View>
       </View>
@@ -142,7 +144,7 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
       <View className="health-tips">
         <Text className="tips-title">健康提示</Text>
         <Text className="tips-content">
-          每天保持充足的水分摄入有助于维持身体健康，提高新陈代谢，改善皮肤状况。建议成年人每天饮水量在1500-2000ml之间。
+          腹膜透析患者需要严格控制水分摄入量，良好的水分平衡有助于减轻心脏负担和提高透析效果。建议每天饮水量不超过医生建议的上限，通常根据体重、尿量和超滤量计算得出。过量饮水可能导致水肿、高血压和心脏负担加重。
         </Text>
       </View>
     </View>

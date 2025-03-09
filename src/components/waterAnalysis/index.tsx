@@ -1,116 +1,160 @@
-import React, { useState } from "react";
-import { View, Text } from "@tarojs/components";
-import { AtSegmentedControl } from "taro-ui";
-import { format, subDays, subWeeks, subMonths } from "date-fns";
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView } from "@tarojs/components";
+import Taro from "@tarojs/taro";
+import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
 import WaterChart from "./WaterChart";
 import WaterStatistics from "./WaterStatistics";
-import ChartIndicators from "./ChartIndicators";
+import WaterTimeDistribution from "./WaterTimeDistribution";
+import WaterHabitAnalysis from "./WaterHabitAnalysis";
 import { useWaterData } from "./useWaterData";
+import { getWaterIntakeTimeDistribution, getWaterIntakeHabitAnalysis, WaterIntakeTimeDistributionVO, WaterIntakeHabitVO } from "@/api/waterIntakeApi";
 import "./index.scss";
 
-const WaterAnalysis: React.FC = () => {
-  // 视图模式：日/周/月
-  const [viewMode, setViewMode] = useState<"day" | "week" | "month">("day");
-  // 当前日期
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  
-  // 使用自定义Hook获取水分摄入数据
-  const { waterData, statistics, isLoading, refreshData } = useWaterData(viewMode, currentDate);
-  
-  // 处理视图模式切换
-  const handleViewModeChange = (index: number) => {
-    const modes: ("day" | "week" | "month")[] = ["day", "week", "month"];
-    setViewMode(modes[index]);
-  };
-  
-  // 处理日期导航
-  const handleDateNavigation = (direction: "left" | "right") => {
-    let newDate = new Date(currentDate);
-    
-    if (direction === "left") {
-      // 向左滑动，日期增加
-      if (viewMode === "day") {
-        newDate.setDate(newDate.getDate() + 1);
-      } else if (viewMode === "week") {
-        newDate.setDate(newDate.getDate() + 7);
-      } else {
-        newDate.setMonth(newDate.getMonth() + 1);
+interface WaterAnalysisProps {
+  viewMode: "day" | "week" | "month";
+  onViewModeChange: (viewMode: "day" | "week" | "month") => void;
+}
+
+const WaterAnalysis: React.FC<WaterAnalysisProps> = ({ viewMode, onViewModeChange }) => {
+  const [endDate, setEndDate] = useState(new Date());
+  const { waterData, statistics, isLoading, refreshData } = useWaterData();
+  const [timeDistribution, setTimeDistribution] = useState<WaterIntakeTimeDistributionVO | undefined>(undefined);
+  const [habitAnalysis, setHabitAnalysis] = useState<WaterIntakeHabitVO | undefined>(undefined);
+  const [isTimeDistLoading, setIsTimeDistLoading] = useState(false);
+  const [isHabitLoading, setIsHabitLoading] = useState(false);
+
+  // 初始化数据
+  useEffect(() => {
+    refreshData(viewMode, endDate);
+    fetchTimeDistribution();
+    fetchHabitAnalysis();
+  }, [viewMode, endDate, refreshData]);
+
+  // 获取时间分布数据
+  const fetchTimeDistribution = async () => {
+    setIsTimeDistLoading(true);
+    try {
+      const userId = Taro.getStorageSync("userId");
+      if (!userId) {
+        console.error("用户ID不存在");
+        setIsTimeDistLoading(false);
+        return;
       }
-    } else {
-      // 向右滑动，日期减少
-      if (viewMode === "day") {
-        newDate.setDate(newDate.getDate() - 1);
-      } else if (viewMode === "week") {
-        newDate.setDate(newDate.getDate() - 7);
+      
+      const { startDate, endDate: formattedEndDate } = getDateRange(viewMode, endDate);
+      
+      const response = await getWaterIntakeTimeDistribution(
+        userId, 
+        startDate, 
+        formattedEndDate
+      );
+      
+      if (response.isSuccess()) {
+        setTimeDistribution(response.data);
       } else {
-        newDate.setMonth(newDate.getMonth() - 1);
+        console.error("获取时间分布失败:", response.msg);
       }
-    }
-    
-    // 不允许选择未来日期
-    if (newDate > new Date()) {
-      newDate = new Date();
-    }
-    
-    setCurrentDate(newDate);
-  };
-  
-  // 获取日期显示文本
-  const getDateDisplayText = () => {
-    if (viewMode === "day") {
-      return format(currentDate, "yyyy年MM月dd日");
-    } else if (viewMode === "week") {
-      const weekStart = subDays(currentDate, 6);
-      return `${format(weekStart, "MM月dd日")} - ${format(currentDate, "MM月dd日")}`;
-    } else {
-      return format(currentDate, "yyyy年MM月");
+    } catch (error) {
+      console.error("获取时间分布出错:", error);
+    } finally {
+      setIsTimeDistLoading(false);
     }
   };
-  
-  // 图表指示器数据
-  const chartIndicators = [
-    { label: "喝水量", color: "#92A3FD" }
-  ];
-  
+
+  // 获取习惯分析数据
+  const fetchHabitAnalysis = async () => {
+    setIsHabitLoading(true);
+    try {
+      const userId = Taro.getStorageSync("userId");
+      if (!userId) {
+        console.error("用户ID不存在");
+        setIsHabitLoading(false);
+        return;
+      }
+      
+      const response = await getWaterIntakeHabitAnalysis(userId, 30); // 分析最近30天
+      
+      if (response.isSuccess()) {
+        setHabitAnalysis(response.data);
+      } else {
+        console.error("获取习惯分析失败:", response.msg);
+      }
+    } catch (error) {
+      console.error("获取习惯分析出错:", error);
+    } finally {
+      setIsHabitLoading(false);
+    }
+  };
+
+  // 计算日期范围
+  const getDateRange = (viewMode: "day" | "week" | "month", endDate: Date) => {
+    let startDate: Date;
+    
+    switch (viewMode) {
+      case "day":
+        startDate = endDate;
+        break;
+      case "week":
+        startDate = startOfWeek(endDate, { weekStartsOn: 1 }); // 周一开始
+        endDate = endOfWeek(endDate, { weekStartsOn: 1 }); // 周日结束
+        break;
+      case "month":
+        startDate = startOfMonth(endDate);
+        endDate = endOfMonth(endDate);
+        break;
+    }
+    
+    return {
+      startDate: format(startDate, "yyyy-MM-dd"),
+      endDate: format(endDate, "yyyy-MM-dd")
+    };
+  };
+
+  // 切换视图模式
+  const handleViewModeChange = (mode: "day" | "week" | "month") => {
+    onViewModeChange(mode);
+    fetchTimeDistribution();
+  };
+
+  // 切换日期
+  const handleDateChange = (newEndDate: Date) => {
+    setEndDate(newEndDate);
+    fetchTimeDistribution();
+  };
+
   return (
-    <View className="water-analysis">
-      {/* 标题 */}
-      <View className="header">
-        <Text className="title">喝水分析</Text>
+    <ScrollView className="water-analysis" scrollY>
+      <View className="section">
+        <WaterChart 
+          waterData={waterData} 
+          viewMode={viewMode}
+          endDate={endDate}
+          onViewModeChange={handleViewModeChange}
+          onDateChange={handleDateChange}
+        />
       </View>
       
-      {/* 视图模式选择器 */}
-      <AtSegmentedControl
-        values={["日", "周", "月"]}
-        onClick={handleViewModeChange}
-        current={["day", "week", "month"].indexOf(viewMode)}
-        className="view-mode-selector"
-      />
-      
-      {/* 日期导航 */}
-      <View className="date-navigation">
-        <View className="date-display">
-          <Text>{getDateDisplayText()}</Text>
-        </View>
+      <View className="section">
+        <WaterStatistics 
+          statistics={statistics} 
+          isLoading={isLoading} 
+        />
       </View>
       
-      {/* 图表 */}
-      <WaterChart
-        viewMode={viewMode}
-        waterData={waterData}
-        onSwipe={handleDateNavigation}
-        isLoading={isLoading}
-      />
+      <View className="section">
+        <WaterTimeDistribution 
+          distribution={timeDistribution} 
+          isLoading={isTimeDistLoading} 
+        />
+      </View>
       
-      {/* 图表指示器 */}
-      <ChartIndicators indicators={chartIndicators} />
-      
-      {/* 统计数据 */}
-      <WaterStatistics
-        statistics={statistics}
-        isLoading={isLoading}
-      />
-    </View>
+      <View className="section">
+        <WaterHabitAnalysis 
+          habitAnalysis={habitAnalysis} 
+          isLoading={isHabitLoading} 
+        />
+      </View>
+    </ScrollView>
   );
 };
 

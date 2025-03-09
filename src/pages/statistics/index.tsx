@@ -7,6 +7,7 @@ import BPAnalysis from "@/components/bloodPresure/analysis";
 import PdAnalysis from "@/components/pdAnalysis";
 import WeightAnalysis from "@/components/weightAnalysis";
 import UrineAnalysis from "@/components/urineAnalysis";
+import WaterAnalysis from "@/components/waterAnalysis";
 
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
@@ -14,6 +15,8 @@ const StatisticsReportPage: React.FC = () => {
   const [bpViewMode, setBpViewMode] = useState<"day" | "week" | "month">("day");
   // 体重视图模式默认为周模式
   const [weightViewMode, setWeightViewMode] = useState<"day" | "week" | "month">("week");
+  // 喝水视图模式默认为日模式
+  const [waterViewMode, setWaterViewMode] = useState<"day" | "week" | "month">("day");
 
   useDidShow(() => {
     // 检查本地存储中是否有当前tab的设置
@@ -99,7 +102,9 @@ const StatisticsReportPage: React.FC = () => {
           </AtTabsPane>
 
           <AtTabsPane current={current} index={2}>
-            {renderOtherTabContent("喝水")}
+            <View className="tab-content">
+              <WaterAnalysis initialViewMode={waterViewMode} />
+            </View>
           </AtTabsPane>
 
           <AtTabsPane current={current} index={3}>

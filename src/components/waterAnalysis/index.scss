@@ -1,39 +1,83 @@
 .water-analysis {
-  padding: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   background-color: #f8f9fa;
-  min-height: 100vh;
-  
-  // 标题
-  .header {
-    margin-bottom: 20px;
-    
-    .title {
-      font-size: 24px;
-      font-weight: 700;
-      color: #333333;
-    }
-  }
-  
-  // 视图模式选择器
-  .view-mode-selector {
+  border-radius: 12px;
+  overflow: hidden;
+  padding-bottom: 20px;
+  height: 100vh;
+
+  .section {
     margin-bottom: 16px;
   }
-  
-  // 日期导航
-  .date-navigation {
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #1d1617;
+    }
+  }
+
+  .chart-section {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 12px 0;
+    margin-bottom: 12px;
+
+    .chart-controls {
+      display: flex;
+      justify-content: flex-end;
+      padding-right: 16px;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 240px;
+      position: relative;
+    }
+  }
+
+  .loading-container, .empty-data {
+    width: 100%;
+    height: 200px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 16px;
+    color: #999999;
+  }
+
+  .at-tabs__header {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .at-tabs__item {
+    color: #666;
+    font-size: 14px;
     
-    .date-display {
-      font-size: 16px;
-      font-weight: 500;
-      color: #666666;
-      padding: 8px 16px;
-      background-color: #ffffff;
-      border-radius: 20px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    &--active {
+      color: #2563EB;
     }
+  }
+  
+  .at-tabs__item-underline {
+    background-color: #2563EB;
+    height: 3px;
+    border-radius: 3px;
+  }
+  
+  .at-tabs__body {
+    padding: 0;
+  }
+  
+  .at-tabs-pane {
+    padding: 0;
   }
 } 
