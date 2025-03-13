@@ -1,27 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { View, Text } from "@tarojs/components";
+import { View, Text, Canvas } from "@tarojs/components";
 import { WaterIntakeTimeDistributionVO } from "@/api/waterIntakeApi";
-import * as echarts from "echarts/core";
-import { LineChart } from "echarts/charts";
-import {
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent
-} from "echarts/components";
-import { CanvasRenderer } from "echarts/renderers";
 import Taro from "@tarojs/taro";
 import "./WaterTimeDistribution.scss";
 
-// 注册必须的组件
-echarts.use([
-  TitleComponent,
-  TooltipComponent,
-  GridComponent,
-  LegendComponent,
-  LineChart,
-  CanvasRenderer
-]);
+// 引入 uCharts
+import uCharts from "@qiun/ucharts";
 
 interface WaterTimeDistributionProps {
   distribution?: WaterIntakeTimeDistributionVO;
@@ -33,98 +17,190 @@ const WaterTimeDistribution: React.FC<WaterTimeDistributionProps> = ({
   isLoading = false
 }) => {
   const hourlyChartRef = useRef(null);
+  const canvasId = "hourly-distribution-chart"; // 为 Canvas 组件添加一个 id
 
-  // 初始化小时分布图表
-  useEffect(() => {
-    if (!distribution || !distribution.hourlyDistribution || !hourlyChartRef.current) {
-      return;
+  // 初始化小时分布图表 (使用 uCharts)
+  const initHourlyChart = (canvas, width, height, distributionData) => {
+    if (!canvas) {
+      console.error("Canvas 节点不存在");
+      return null;
     }
 
-    const chartDom = hourlyChartRef.current;
-    const myChart = echarts.init(chartDom);
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("无法获取 Canvas 上下文");
+      return null;
+    }
 
-    const data = distribution.hourlyDistribution.map(item => ({
-      hour: `${item.hour}时`,
-      amount: item.amount,
-      percentage: item.percentage
+    const pixelRatio = Taro.getSystemInfoSync().pixelRatio || 1;
+
+    // 设置 Canvas 尺寸
+    canvas.width = width * pixelRatio;
+    canvas.height = height * pixelRatio;
+    ctx.scale(pixelRatio, pixelRatio);
+
+    if (!distributionData || distributionData.length === 0) {
+      // 没有数据时的处理
+      return null;
+    }
+
+    // 准备 uCharts 数据
+    const categories = distributionData.map(item => `${item.hour}时`);
+    const seriesData = distributionData.map(item => ({
+      name: '饮水量',
+      data: [item.amount] // uCharts 折线图数据格式需要调整
     }));
 
-    const option = {
-      tooltip: {
-        trigger: 'axis',
-        formatter: function(params) {
-          const param = params[0];
-          return `${param.name}: ${param.value}ml (${param.data.percentage.toFixed(1)}%)`;
-        }
+    const series = [
+      {
+        name: '饮水量',
+        data: distributionData.map(item => item.amount),
+        color: "#2563EB",
+        type: "line",
+        style: "stroke",
+        pointShape: "circle",
+        pointColor: "#2563EB",
+        pointSelectedColor: "#2563EB",
+      }
+    ];
+
+
+    // uCharts 配置
+    hourlyChartRef.current = new uCharts({
+      type: "line",
+      context: ctx,
+      width,
+      height,
+      categories: categories,
+      series: series,
+      animation: true,
+      background: "#FFFFFF",
+      padding: [15, 15, 15, 15],
+      enableScroll: false,
+      legend: {
+        show: false
       },
       xAxis: {
-        type: 'category',
-        data: data.map(item => item.hour),
-        axisLabel: {
-          interval: 'auto'
+        disableGrid: true,
+        fontColor: "#999999",
+        fontSize: 12,
+        boundaryGap: "center",
+        axisLine: true,
+        calibration: true,
+        marginLeft: 5,
+        itemCount: Math.min(7, categories.length),
+        scrollShow: false,
+        labelCount: Math.min(7, categories.length),
+        formatter: (item, index) => {
+          return categories[index];
         }
       },
       yAxis: {
-        type: 'value',
-        name: '饮水量(ml)'
+        data: [
+          {
+            position: "left",
+            title: "ml",
+            titleFontColor: "#999999",
+            titleFontSize: 12,
+            titleOffsetY: -5,
+            titleOffsetX: -25,
+            min: 0,
+            format: (val) => { return val.toFixed(0) },
+            fontColor: "#999999",
+            fontSize: 12,
+            lineColor: "#EEEEEE",
+            dashLength: 4,
+            gridType: "dash",
+            splitNumber: 5,
+            showTitle: true,
+            tofix: 0
+          }
+        ]
       },
-      series: [
-        {
-          name: '饮水量',
-          type: 'line',
-          data: data.map(item => ({
-            value: item.amount,
-            percentage: item.percentage
-          })),
-          smooth: true,
-          symbol: 'circle',
-          symbolSize: 6,
-          lineStyle: {
-            color: '#2563EB',
-            width: 3
-          },
-          itemStyle: {
-            color: '#2563EB',
-            borderColor: '#fff',
-            borderWidth: 2
-          },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 0,
-              y2: 1,
-              colorStops: [
-                {
-                  offset: 0,
-                  color: 'rgba(37, 99, 235, 0.5)'
-                },
-                {
-                  offset: 1,
-                  color: 'rgba(37, 99, 235, 0.1)'
-                }
-              ]
-            }
+      extra: {
+        line: {
+          width: 3,
+          // curve: true, // 可以尝试开启曲线
+          // dotShape: 'solid', // 可以尝试实心点
+        },
+        tooltip: {
+          showBox: true,
+          showArrow: true,
+          showCategory: true,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderColor: "#000000",
+          borderOpacity: 0.7,
+          bgColor: "#000000",
+          bgOpacity: 0.7,
+          gridType: "dash",
+          dashLength: 4,
+          gridColor: "#CCCCCC",
+          fontColor: "#FFFFFF",
+          fontSize: 12,
+          lineHeight: 20,
+          padding: 10,
+          xAxisLabel: true,
+          yAxisLabel: false,
+          labelBgColor: "#000000",
+          labelBgOpacity: 0.7,
+          labelFontColor: "#FFFFFF",
+          formatter: function (item, category) { // 自定义 tooltip 内容
+            return `${category} ${item.name}: ${item.data}ml (${distributionData[item.index].percentage.toFixed(1)}%)`;
           }
         }
-      ]
-    };
+      }
+    });
 
-    myChart.setOption(option);
+    return hourlyChartRef.current;
+  };
 
-    // 处理屏幕旋转或大小变化
+
+  // 初始化图表
+  useEffect(() => {
+    if (distribution && distribution.hourlyDistribution && distribution.hourlyChartRef) {
+      const query = Taro.createSelectorQuery();
+
+      if (Taro.canIUse("SelectorQuery.selectViewport")) {
+        query.selectViewport().scrollOffset();
+      }
+
+      query
+        .select(`#${canvasId}`) // 使用 canvasId 选择器
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (res && res[0]) {
+            initHourlyChart(res[0].node, res[0].width, res[0].height, distribution.hourlyDistribution);
+          } else {
+            console.error("获取 Canvas 节点失败");
+          }
+        });
+    }
+  }, [distribution]);
+
+  // 处理屏幕旋转等导致的尺寸变化
+  useEffect(() => {
     const handleResize = () => {
-      myChart.resize();
+      if (hourlyChartRef.current) {
+        const query = Taro.createSelectorQuery();
+        query
+          .select(`#${canvasId}`) // 使用 canvasId 选择器
+          .fields({ node: true, size: true })
+          .exec((res) => {
+            if (res && res[0]) {
+              initHourlyChart(res[0].node, res[0].width, res[0].height, distribution?.hourlyDistribution || []);
+            }
+          });
+      }
     };
 
-    Taro.eventCenter.on('windowResize', handleResize);
+    Taro.onWindowResize(handleResize);
 
     return () => {
-      myChart.dispose();
-      Taro.eventCenter.off('windowResize', handleResize);
+      Taro.offWindowResize(handleResize);
     };
-  }, [distribution]);
+  }, []);
+
 
   // 如果正在加载，显示加载状态
   if (isLoading) {
@@ -162,7 +238,12 @@ const WaterTimeDistribution: React.FC<WaterTimeDistributionProps> = ({
           <Text className="card-subtitle">24小时饮水量变化</Text>
         </View>
 
-        <View className="chart-container" ref={hourlyChartRef}></View>
+        <Canvas
+          type="2d"
+          id={canvasId} // 添加 id 属性
+          className="chart-container"
+          ref={hourlyChartRef}
+        />
 
         <View className="average-interval">
           <Text className="label">平均饮水间隔:</Text>

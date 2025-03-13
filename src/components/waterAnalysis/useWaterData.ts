@@ -1,5 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import { format, addDays, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isValid } from "date-fns";
+// 优化 date-fns 引入，使用 named imports
+import format from 'date-fns/format';
+import addDays from 'date-fns/addDays';
+import subDays from 'date-fns/subDays';
+import startOfWeek from 'date-fns/startOfWeek';
+import endOfWeek from 'date-fns/endOfWeek';
+import startOfMonth from 'date-fns/startOfMonth';
+import endOfMonth from 'date-fns/endOfMonth';
+import isValid from 'date-fns/isValid'; // 显式引入 isValid
 import Taro from "@tarojs/taro";
 import { getWaterIntakeRecords, getWaterStatistics, WaterIntakeVO, WaterStatisticsVO } from "@/api/waterIntakeApi";
 

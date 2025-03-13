@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { format, subDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import format from 'date-fns/format';
+import subDays from 'date-fns/subDays';
+import startOfWeek from 'date-fns/startOfWeek';
+import endOfWeek from 'date-fns/endOfWeek';
+import startOfMonth from 'date-fns/startOfMonth';
+import endOfMonth from 'date-fns/endOfMonth';
 import WaterChart from "./WaterChart";
 import WaterStatistics from "./WaterStatistics";
 import WaterTimeDistribution from "./WaterTimeDistribution";

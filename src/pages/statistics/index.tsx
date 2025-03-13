@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, Suspense, lazy } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
 import { AtTabs, AtTabsPane } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
-import BPAnalysis from "@/components/bloodPresure/analysis";
-import PdAnalysis from "@/components/pdAnalysis";
-import WeightAnalysis from "@/components/weightAnalysis";
-import UrineAnalysis from "@/components/urineAnalysis";
-import WaterAnalysis from "@/components/waterAnalysis";
+
+const BPAnalysis = lazy(() => import("@/components/bloodPresure/analysis"));
+const PdAnalysis = lazy(() => import("@/components/pdAnalysis"));
+const WeightAnalysis = lazy(() => import("@/components/weightAnalysis"));
+const UrineAnalysis = lazy(() => import("@/components/urineAnalysis"));
+const WaterAnalysis = lazy(() => import("@/components/waterAnalysis"));
 
 // {{ Assistant:  创建通用 Tab 内容组件 }}
 interface TabContentProps {
@@ -107,23 +108,33 @@ const StatisticsReportPage: React.FC = () => {
       <ScrollView scrollY className="content-scroll">
         <View className="content-wrapper">
           <CommonTabContent current={current} index={0}>
-            <PdAnalysis />
+            <Suspense fallback={<View>加载中...</View>}>
+              <PdAnalysis />
+            </Suspense>
           </CommonTabContent>
 
           <CommonTabContent current={current} index={1}>
-            <UrineAnalysis />
+            <Suspense fallback={<View>加载中...</View>}>
+              <UrineAnalysis />
+            </Suspense>
           </CommonTabContent>
 
           <CommonTabContent current={current} index={2}>
-            <WaterAnalysis initialViewMode={waterViewMode} />
+            <Suspense fallback={<View>加载中...</View>}>
+              <WaterAnalysis initialViewMode={waterViewMode} />
+            </Suspense>
           </CommonTabContent>
 
           <CommonTabContent current={current} index={3}>
-            <WeightAnalysis initialViewMode={weightViewMode} />
+            <Suspense fallback={<View>加载中...</View>}>
+              <WeightAnalysis initialViewMode={weightViewMode} />
+            </Suspense>
           </CommonTabContent>
 
           <CommonTabContent current={current} index={4}>
-            <BPAnalysis initialViewMode={bpViewMode} />
+            <Suspense fallback={<View>加载中...</View>}>
+              <BPAnalysis initialViewMode={bpViewMode} />
+            </Suspense>
           </CommonTabContent>
         </View>
       </ScrollView>

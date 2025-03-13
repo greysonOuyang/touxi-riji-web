@@ -2,6 +2,8 @@ import { defineConfig, type UserConfigExport } from '@tarojs/cli'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import devConfig from './dev'
 import prodConfig from './prod'
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
   const baseConfig: UserConfigExport<'webpack5'> = {
@@ -32,8 +34,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
     },
     framework: 'react',
     compiler: {
-
-      type: 'webpack5', 
+      type: 'webpack5',
       prebundle: {
         enable: false
       }
@@ -58,7 +59,16 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         }
       },
       webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
+        
+        chain.plugin('bundle-analyzer') // 确保添加了插件配置
+          .use(BundleAnalyzerPlugin, [
+            {
+              analyzerMode: 'server', // 确保设置为 'server'
+              analyzerPort: 55555, // 或者你希望使用的端口，例如 8888, 9999 等
+              openAnalyzer: true, // 尝试设置为 true，强制打开浏览器
+            }
+          ])
       }
     },
     h5: {
@@ -88,7 +98,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
         }
       },
       webpackChain(chain) {
-        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin)
+        chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
       }
     },
     rn: {
