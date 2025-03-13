@@ -69,6 +69,8 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
               openAnalyzer: true, // 尝试设置为 true，强制打开浏览器
             }
           ])
+
+        chain.devtool(false); // 强制禁用 Source Map
       }
     },
     h5: {
@@ -99,6 +101,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
+        chain.devtool(false); // 强制禁用 Source Map
       }
     },
     rn: {

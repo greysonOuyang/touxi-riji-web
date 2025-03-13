@@ -1,6 +1,7 @@
 import React, { useState, Suspense, lazy } from "react";
 import { View, Text, ScrollView } from "@tarojs/components";
-import { AtTabs, AtTabsPane } from "taro-ui";
+// 移除 taro-ui AtTabs 相关组件的引入
+// import { AtTabs, AtTabsPane } from "taro-ui";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 
@@ -19,11 +20,12 @@ interface TabContentProps {
 
 const CommonTabContent: React.FC<TabContentProps> = ({ current, index, children }) => {
   return (
-    <AtTabsPane current={current} index={index}>
+    // 移除 AtTabsPane，直接使用 View 包裹 tab 内容
+    // <AtTabsPane current={current} index={index}>
       <View className="tab-content">
         {children}
       </View>
-    </AtTabsPane>
+    // </AtTabsPane>
   );
 };
 
@@ -97,12 +99,20 @@ const StatisticsReportPage: React.FC = () => {
   return (
     <View className="statistics-report-page">
       <View className="fixed-tabs">
-        <AtTabs
-          current={current}
-          tabList={tabList}
-          onClick={handleClick}
-          className="custom-tabs"
-        />
+        {/*  使用 View 和 Text 组件自定义 Tab 导航栏 */}
+        <View className="custom-tabs">
+          <View className="at-tabs__header"> {/*  保持 at-tabs__header 类名，复用部分样式 */}
+            {tabList.map((tab, index) => (
+              <View
+                key={index}
+                className={`at-tabs__item ${current === index ? 'at-tabs__item--active' : ''}`} // 保持 at-tabs__item 和 at-tabs__item--active 类名，复用部分样式
+                onClick={() => handleClick(index)}
+              >
+                <Text>{tab.title}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
       </View>
       
       <ScrollView scrollY className="content-scroll">
