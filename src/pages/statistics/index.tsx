@@ -9,6 +9,23 @@ import WeightAnalysis from "@/components/weightAnalysis";
 import UrineAnalysis from "@/components/urineAnalysis";
 import WaterAnalysis from "@/components/waterAnalysis";
 
+// {{ Assistant:  创建通用 Tab 内容组件 }}
+interface TabContentProps {
+  current: number;
+  index: number;
+  children: React.ReactNode;
+}
+
+const CommonTabContent: React.FC<TabContentProps> = ({ current, index, children }) => {
+  return (
+    <AtTabsPane current={current} index={index}>
+      <View className="tab-content">
+        {children}
+      </View>
+    </AtTabsPane>
+  );
+};
+
 const StatisticsReportPage: React.FC = () => {
   const [current, setCurrent] = useState(0);
   // 血压视图模式默认为日模式
@@ -89,35 +106,25 @@ const StatisticsReportPage: React.FC = () => {
       
       <ScrollView scrollY className="content-scroll">
         <View className="content-wrapper">
-          <AtTabsPane current={current} index={0}>
-            <View className="tab-content">
-              <PdAnalysis />
-            </View>
-          </AtTabsPane>
+          <CommonTabContent current={current} index={0}>
+            <PdAnalysis />
+          </CommonTabContent>
 
-          <AtTabsPane current={current} index={1}>
-            <View className="tab-content">
-              <UrineAnalysis />
-            </View>
-          </AtTabsPane>
+          <CommonTabContent current={current} index={1}>
+            <UrineAnalysis />
+          </CommonTabContent>
 
-          <AtTabsPane current={current} index={2}>
-            <View className="tab-content">
-              <WaterAnalysis initialViewMode={waterViewMode} />
-            </View>
-          </AtTabsPane>
+          <CommonTabContent current={current} index={2}>
+            <WaterAnalysis initialViewMode={waterViewMode} />
+          </CommonTabContent>
 
-          <AtTabsPane current={current} index={3}>
-            <View className="tab-content">
-              <WeightAnalysis initialViewMode={weightViewMode} />
-            </View>
-          </AtTabsPane>
+          <CommonTabContent current={current} index={3}>
+            <WeightAnalysis initialViewMode={weightViewMode} />
+          </CommonTabContent>
 
-          <AtTabsPane current={current} index={4}>
-            <View className="tab-content">
-              <BPAnalysis initialViewMode={bpViewMode} />
-            </View>
-          </AtTabsPane>
+          <CommonTabContent current={current} index={4}>
+            <BPAnalysis initialViewMode={bpViewMode} />
+          </CommonTabContent>
         </View>
       </ScrollView>
     </View>

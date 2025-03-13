@@ -32,11 +32,11 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
     
     switch (status) {
       case "good":
-        return "今日水分摄入控制良好，继续保持！";
+        return "控制良好";
       case "warning":
-        return "今日水分摄入接近上限，请注意控制！";
+        return "接近上限";
       case "danger":
-        return "今日水分摄入已超过建议上限，请严格控制！";
+        return "已超上限";
       default:
         return "暂无数据";
     }
@@ -72,7 +72,7 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
     );
   }
   
-  const { totalAmount, recommendedLimit, averageAmount, maxAmount, recordDays, completionRate } = statistics;
+  const { totalAmount, recommendedLimit, averageAmount, completionRate } = statistics;
   
   return (
     <View className="water-statistics">
@@ -111,18 +111,8 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
         </View>
         
         <View className="stats-item">
-          <Text className="stats-label">最高摄入量</Text>
-          <Text className="stats-value">{maxAmount}ml</Text>
-        </View>
-        
-        <View className="stats-item">
           <Text className="stats-label">建议上限</Text>
           <Text className="stats-value">{recommendedLimit}ml</Text>
-        </View>
-        
-        <View className="stats-item">
-          <Text className="stats-label">记录天数</Text>
-          <Text className="stats-value">{recordDays}天</Text>
         </View>
         
         <View className="stats-item">
@@ -138,14 +128,6 @@ const WaterStatistics: React.FC<WaterStatisticsProps> = ({
             {totalAmount <= recommendedLimit ? "达标" : "超量"}
           </Text>
         </View>
-      </View>
-      
-      {/* 健康提示 */}
-      <View className="health-tips">
-        <Text className="tips-title">健康提示</Text>
-        <Text className="tips-content">
-          腹膜透析患者需要严格控制水分摄入量，良好的水分平衡有助于减轻心脏负担和提高透析效果。建议每天饮水量不超过医生建议的上限，通常根据体重、尿量和超滤量计算得出。过量饮水可能导致水肿、高血压和心脏负担加重。
-        </Text>
       </View>
     </View>
   );

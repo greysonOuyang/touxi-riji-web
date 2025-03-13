@@ -64,7 +64,7 @@ const WaterHabitAnalysis: React.FC<WaterHabitAnalysisProps> = ({
     );
   }
 
-  const { regularity, dailyPattern, weekdayVsWeekend, suggestions } = habitAnalysis;
+  const { regularity, dailyPattern } = habitAnalysis;
   const patternInfo = getPatternInfo(dailyPattern.pattern);
 
   return (
@@ -90,7 +90,6 @@ const WaterHabitAnalysis: React.FC<WaterHabitAnalysisProps> = ({
             <Text className="level" style={{ color: getRegularityColor(regularity.level) }}>
               规律性: {regularity.level}
             </Text>
-            <Text className="analysis">{regularity.analysis}</Text>
           </View>
         </View>
       </View>
@@ -103,71 +102,9 @@ const WaterHabitAnalysis: React.FC<WaterHabitAnalysisProps> = ({
         </View>
 
         <View className="pattern-info">
-          <View className="pattern-icon" style={{ backgroundColor: patternInfo.color }}>
-            <Text>{patternInfo.icon}</Text>
-          </View>
           <View className="pattern-details">
             <Text className="pattern-name">{dailyPattern.pattern}</Text>
-            <Text className="pattern-description">{dailyPattern.description}</Text>
           </View>
-        </View>
-      </View>
-
-      {/* 工作日vs周末对比 */}
-      <View className="habit-card">
-        <View className="card-header">
-          <Text className="card-title">工作日vs周末对比</Text>
-          <Text className="card-subtitle">饮水量在不同类型日期的差异</Text>
-        </View>
-
-        <View className="comparison">
-          <View className="comparison-item">
-            <Text className="comparison-label">工作日平均</Text>
-            <Text className="comparison-value">{weekdayVsWeekend.weekdayAverage}ml</Text>
-            <View className="comparison-bar">
-              <Progress 
-                percent={weekdayVsWeekend.weekdayAverage / 10} 
-                strokeWidth={8} 
-                activeColor="#2563EB" 
-                backgroundColor="#E5E7EB" 
-              />
-            </View>
-          </View>
-
-          <View className="comparison-item">
-            <Text className="comparison-label">周末平均</Text>
-            <Text className="comparison-value">{weekdayVsWeekend.weekendAverage}ml</Text>
-            <View className="comparison-bar">
-              <Progress 
-                percent={weekdayVsWeekend.weekendAverage / 10} 
-                strokeWidth={8} 
-                activeColor="#10B981" 
-                backgroundColor="#E5E7EB" 
-              />
-            </View>
-          </View>
-
-          <View className="comparison-difference">
-            <Text className="difference-label">差异:</Text>
-            <Text className="difference-value">{weekdayVsWeekend.difference.toFixed(1)}%</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* 改进建议 */}
-      <View className="suggestions-card">
-        <View className="card-header">
-          <Text className="card-title">改进建议</Text>
-          <Text className="card-subtitle">基于您的饮水习惯分析</Text>
-        </View>
-
-        <View className="suggestions-list">
-          {suggestions.map((suggestion, index) => (
-            <View key={index} className="suggestion-item">
-              <Text className="suggestion-bullet">•</Text>
-              <Text className="suggestion-text">{suggestion}</Text>
-            </View>
-          ))}
         </View>
       </View>
     </View>

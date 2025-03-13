@@ -49,7 +49,7 @@
       margin-bottom: 16px;
     }
     
-    .best-period, .average-interval {
+    .average-interval {
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -78,25 +78,5 @@
     border-radius: 12px;
     color: #999;
     font-size: 14px;
-  }
-  
-  .health-tips {
-    background-color: #f0f7ff;
-    border-radius: 12px;
-    padding: 16px;
-    
-    .tips-title {
-      display: block;
-      font-size: 16px;
-      font-weight: bold;
-      color: #2563EB;
-      margin-bottom: 8px;
-    }
-    
-    .tips-content {
-      font-size: 14px;
-      color: #666;
-      line-height: 1.5;
-    }
   }
 } 

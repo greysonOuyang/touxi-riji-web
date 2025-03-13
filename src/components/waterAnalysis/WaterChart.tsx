@@ -29,34 +29,6 @@ const WaterChart: React.FC<WaterChartProps> = ({
 }) => {
   const chartRef = useRef<any>(null);
   const canvasId = "water-chart";
-  let startX = 0;
-
-  // 处理触摸开始事件
-  const handleTouchStart = (e) => {
-    startX = e.touches[0].x;
-  };
-
-  // 处理触摸结束事件
-  const handleTouchEnd = (e) => {
-    if (!onSwipe) return;
-    
-    const endX = e.changedTouches[0].x;
-    const diffX = endX - startX;
-    
-    // 判断滑动方向
-    if (Math.abs(diffX) > 50) {
-      if (diffX > 0) {
-        onSwipe("right"); // 右滑
-      } else {
-        onSwipe("left"); // 左滑
-      }
-    }
-  };
-
-  // 触摸移动事件处理
-  const handleTouchMove = (e) => {
-    chartRef.current?.scrollMove(e);
-  };
 
   // 处理日期导航
   const handleNavigate = (direction: "prev" | "next" | "today") => {
@@ -399,9 +371,6 @@ const WaterChart: React.FC<WaterChartProps> = ({
         type="2d"
         id={canvasId}
         className="water-chart"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
         onInit={initChart}
       />
     </View>

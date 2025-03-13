@@ -79,12 +79,6 @@
         font-weight: bold;
         margin-bottom: 4px;
       }
-      
-      .analysis {
-        font-size: 14px;
-        color: #666;
-        line-height: 1.4;
-      }
     }
   }
   
@@ -111,78 +105,6 @@
         font-weight: bold;
         color: #333;
         margin-bottom: 4px;
-      }
-      
-      .pattern-description {
-        font-size: 14px;
-        color: #666;
-        line-height: 1.4;
-      }
-    }
-  }
-  
-  .comparison {
-    .comparison-item {
-      margin-bottom: 16px;
-      
-      .comparison-label {
-        display: block;
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 4px;
-      }
-      
-      .comparison-value {
-        display: block;
-        font-size: 16px;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 8px;
-      }
-      
-      .comparison-bar {
-        width: 100%;
-      }
-    }
-    
-    .comparison-difference {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding-top: 8px;
-      border-top: 1px solid #f0f0f0;
-      
-      .difference-label {
-        font-size: 14px;
-        color: #666;
-        margin-right: 8px;
-      }
-      
-      .difference-value {
-        font-size: 16px;
-        font-weight: bold;
-        color: #2563EB;
-      }
-    }
-  }
-  
-  .suggestions-list {
-    .suggestion-item {
-      display: flex;
-      margin-bottom: 12px;
-      
-      .suggestion-bullet {
-        font-size: 16px;
-        color: #2563EB;
-        margin-right: 8px;
-        line-height: 1.4;
-      }
-      
-      .suggestion-text {
-        flex: 1;
-        font-size: 14px;
-        color: #333;
-        line-height: 1.4;
       }
     }
   }
