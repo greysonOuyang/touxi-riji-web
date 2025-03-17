@@ -60,7 +60,7 @@ export default defineConfig<'webpack5'>(async (merge, { command, mode }) => {
       },
       webpackChain(chain) {
         chain.resolve.plugin('tsconfig-paths').use(TsconfigPathsPlugin);
-        
+        chain.optimization.minimize(true).usedExports(true); // 启用 Tree Shaking; // 启用压缩
         chain.plugin('bundle-analyzer') // 确保添加了插件配置
           .use(BundleAnalyzerPlugin, [
             {
