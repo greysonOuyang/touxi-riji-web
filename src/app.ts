@@ -1,8 +1,9 @@
-// app.ts
-import { Component } from "react";
-import { autoLogin } from "@/utils/auth";
-import Taro from "@tarojs/taro";
-import "taro-ui/dist/style/index.scss";
+import { Component } from 'react';
+import Taro from '@tarojs/taro';
+import UCharts from '@qiun/ucharts';
+import './app.scss';
+
+global.UCharts = UCharts; // 全局注册 uCharts
 
 interface IProps {
   children: React.ReactNode;
@@ -15,12 +16,14 @@ class App extends Component<IProps> {
 
   async checkLoginStatus() {
     try {
-      const token = Taro.getStorageSync("token");
+      const token = Taro.getStorageSync('token');
       if (!token) {
+        // 假设 autoLogin 已优化为异步导入或精简
+        const { autoLogin } = await import('@/utils/auth');
         await autoLogin();
       }
     } catch (error) {
-      console.error("登录状态检查失败:", error);
+      console.error('登录状态检查失败:', error);
     }
   }
 
