@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, Image } from "@tarojs/components";
-import { AtIcon, AtActivityIndicator } from "taro-ui";
+import Icon from "@/components/common/Icon";
 import Taro, { usePageScroll, useDidShow } from "@tarojs/taro";
 import {
   format,
@@ -43,8 +43,6 @@ const HistoricalDataMore: React.FC = () => {
   const [detailedData, setDetailedData] = useState<PdRecordData[]>([]);
   const [todayRecord, setTodayRecord] = useState<PdRecordVO | null>(null);
   const [latestRecord, setLatestRecord] = useState<LatestPdRecordDTO>(defaultLatestRecord);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [scrollTop, setScrollTop] = useState(0);
   const [monthOffset, setMonthOffset] = useState(0);
   const calendarRef = useRef<any>(null);
@@ -112,7 +110,6 @@ const HistoricalDataMore: React.FC = () => {
 
   // 获取月度数据
   const fetchMonthData = async (date: Date) => {
-    setIsLoading(true);
     try {
       const userId = Taro.getStorageSync("userId");
       if (!userId) return;
@@ -140,14 +137,11 @@ const HistoricalDataMore: React.FC = () => {
     } catch (err) {
       console.error("获取月度数据失败:", err);
       Taro.showToast({ title: "获取数据失败", icon: "none" });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   // 获取日详情
   const fetchDayDetails = async (dateStr: string) => {
-    setIsDetailLoading(true);
     try {
       const userId = Taro.getStorageSync("userId");
       if (!userId) return;
@@ -158,8 +152,6 @@ const HistoricalDataMore: React.FC = () => {
       }
     } catch (err) {
       console.error("获取日详情失败:", err);
-    } finally {
-      setIsDetailLoading(false);
     }
   };
 
@@ -334,7 +326,7 @@ const HistoricalDataMore: React.FC = () => {
 
         {isNegativeUltrafiltration && (
           <View className="warning-message">
-            <AtIcon value="alert-circle" size="16" color="#FF6B6B" />
+            <Icon value="alert-circle" size={16} color="#FF6B6B" />
             <Text>当前超滤量为负值，请及时关注，必要时咨询医生</Text>
           </View>
         )}
@@ -346,11 +338,7 @@ const HistoricalDataMore: React.FC = () => {
             <Text className="record-count">共 {detailedData.length} 条记录</Text>
           </View>
           
-          {isDetailLoading ? (
-            <View className="loading-container">
-              <AtActivityIndicator size={32} color="#92A3FD" />
-            </View>
-          ) : detailedData.length > 0 ? (
+          {detailedData.length > 0 ? (
             <View className="records-list">
               {detailedData.map((record, index) => (
                 <View key={index} className="record-item">
@@ -388,7 +376,7 @@ const HistoricalDataMore: React.FC = () => {
             </View>
           ) : (
             <View className="empty-records">
-              <AtIcon value="calendar" size="48" color="#E0E0E0" />
+              <Icon value="calendar" size={48} color="#E0E0E0" />
               <Text className="empty-text">暂无记录</Text>
             </View>
           )}
@@ -410,31 +398,25 @@ const HistoricalDataMore: React.FC = () => {
           <View className="calendar-header">
             <View className="month-navigator">
               <View className="nav-button" onClick={() => handleMonthChange("prev")}>
-                <AtIcon value="chevron-left" size="20" color="#666666" />
+                <Icon value="chevron-left" size={20} color="#666666" />
               </View>
               <Text className="current-month">{format(currentDate, "yyyy年MM月")}</Text>
               <View className="nav-button" onClick={() => handleMonthChange("next")}>
-                <AtIcon value="chevron-right" size="20" color="#666666" />
+                <Icon value="chevron-right" size={20} color="#666666" />
               </View>
             </View>
             
             {!isSameDay(currentDate, new Date()) && (
               <View className="today-button" onClick={goToToday}>
-                <AtIcon value="clock" size="14" color="#666666" />
+                <Icon value="clock" size={14} color="#666666" />
                 <Text>返回今日</Text>
               </View>
             )}
           </View>
           
-          {isLoading ? (
-            <View className="loading-container">
-              <AtActivityIndicator size={32} color="#92A3FD" />
-            </View>
-          ) : (
-            <ScrollView className="calendar-container" scrollY>
-              {renderCalendarGrid()}
-            </ScrollView>
-          )}
+          <ScrollView className="calendar-container" scrollY>
+            {renderCalendarGrid()}
+          </ScrollView>
         </View>
         
         {/* 选中日期的记录 */}
@@ -447,11 +429,7 @@ const HistoricalDataMore: React.FC = () => {
             <Text className="record-count">共 {detailedData.length} 条记录</Text>
           </View>
 
-          {isDetailLoading ? (
-            <View className="loading-container">
-              <AtActivityIndicator size={32} color="#92A3FD" />
-            </View>
-          ) : detailedData.length > 0 ? (
+          {detailedData.length > 0 ? (
             <View className="records-list">
               {detailedData.map((record, index) => (
                 <View key={index} className="record-item">
@@ -489,7 +467,7 @@ const HistoricalDataMore: React.FC = () => {
             </View>
           ) : (
             <View className="empty-records">
-              <AtIcon value="calendar" size="48" color="#E0E0E0" />
+              <Icon value="calendar" size={48} color="#E0E0E0" />
               <Text className="empty-text">暂无记录</Text>
               {!isSelectedToday && (
                 <View className="go-today-button" onClick={() => {
@@ -521,7 +499,7 @@ const HistoricalDataMore: React.FC = () => {
             }
           }}
         >
-          <AtIcon value="home" size="12" color={activeSection === "today" ? "#92A3FD" : "#666"} />
+          <Icon value="home" size={12} color={activeSection === "today" ? "#92A3FD" : "#666"} />
           <Text className="nav-text">今日指标</Text>
         </View>
         <View 
@@ -534,7 +512,7 @@ const HistoricalDataMore: React.FC = () => {
           className={`nav-item ${activeSection === "history" ? "active" : ""}`}
           onClick={() => setActiveSection("history")}
         >
-          <AtIcon value="calendar" size="12" color={activeSection === "history" ? "#92A3FD" : "#666"} />
+          <Icon value="calendar" size={12} color={activeSection === "history" ? "#92A3FD" : "#666"} />
           <Text className="nav-text">历史数据</Text>
         </View>
       </View>

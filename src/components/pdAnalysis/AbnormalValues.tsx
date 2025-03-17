@@ -124,11 +124,7 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({
     return (
       <View className="abnormal-values normal">
         <View className="normal-icon">
-          <Image 
-            className="icon" 
-            src="/assets/icons/success.png" 
-            mode="aspectFit" 
-          />
+          {/*  */}
         </View>
         <Text className="normal-text">未检测到异常值</Text>
         <Text className="normal-hint">您的腹透数据正常，请继续保持</Text>
@@ -155,11 +151,7 @@ const AbnormalValues: React.FC<AbnormalValuesProps> = ({
               className={`abnormal-item ${severity}`}
             >
               <View className="abnormal-icon">
-                <Image 
-                  className="icon" 
-                  src="/assets/icons/warning.png" 
-                  mode="aspectFit" 
-                />
+                {/*  */}
               </View>
               <View className="abnormal-content">
                 <Text className="abnormal-description">

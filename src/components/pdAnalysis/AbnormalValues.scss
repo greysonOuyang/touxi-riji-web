@@ -425,4 +425,30 @@
       padding-top: 12px;
     }
   }
+}
+
+.abnormal-values.normal .normal-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #52c41a; /* 绿色圆环边框 */
+  background-color: transparent; /* 透明背景 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.abnormal-values .abnormal-item .abnormal-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #faad14; /* 黄色圆环边框 */
+  background-color: transparent; /* 透明背景 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.abnormal-values .abnormal-item.high .abnormal-icon {
+  border-color: #f5222d; /* 红色圆环边框，如果 severity 为 high */
 } 
