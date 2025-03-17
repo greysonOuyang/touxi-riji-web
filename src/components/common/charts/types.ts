@@ -1,142 +1,88 @@
 export interface BaseChartConfig {
-  categories?: string[];
-  series: {
-    name: string;
-    data: number[];
-    color?: string;
-    type?: string;
-    pointShape?: string;
-    pointSize?: number;
-    lineWidth?: number;
-    format?: (val: number) => string;
-  }[];
-  width: number;
-  height: number;
-  animation?: boolean;
-  background?: string;
-  padding?: number[];
-  enableScroll?: boolean;
-  dataLabel?: boolean;
-  legend?: {
-    show?: boolean;
-    position?: 'top' | 'bottom' | 'left' | 'right';
-    float?: 'left' | 'right' | 'center';
-    padding?: number;
-    margin?: number;
-    backgroundColor?: string;
-    fontSize?: number;
-    lineHeight?: number;
-    itemGap?: number;
-    itemWidth?: number;
-    itemHeight?: number;
-    formatter?: (name: string) => string;
+  animation: boolean;
+  background: string;
+  padding: number[];
+  enableScroll: boolean;
+  dataLabel: boolean;
+  legend: {
+    show: boolean;
+    position: string;
+    float: string;
+    padding: number;
+    margin: number;
+    backgroundColor: string;
+    fontSize: number;
+    lineHeight: number;
+    itemGap: number;
+    itemWidth: number;
+    itemHeight: number;
   };
-  xAxis?: {
-    labelCount?: number;
-    scrollShow?: boolean;
-    itemCount?: number;
-    scrollAlign?: 'left' | 'right' | 'center';
-    formatter?: (item: string) => string;
-    calibration?: boolean;
-    marginLeft?: number;
+  xAxis: {
+    labelCount: number;
+    scrollShow: boolean;
+    itemCount: number;
+    scrollAlign: string;
+    calibration: boolean;
+    marginLeft: number;
+    formatter: (item: string) => string;
   };
-  yAxis?: {
+  yAxis: {
     data: {
-      min?: number;
-      max?: number;
-      format?: (val: number) => string;
-      title?: string;
-      titleFontColor?: string;
-      titleFontSize?: number;
-      titleOffsetY?: number;
-      titleOffsetX?: number;
-      splitNumber?: number;
-      showTitle?: boolean;
+      min: number;
+      splitNumber: number;
+      showTitle: boolean;
+      format: (val: number) => string;
     }[];
   };
-  extra?: {
-    line?: {
-      type?: 'straight' | 'curve' | 'dash';
-      width?: number;
-      activeType?: string;
-      linearType?: string;
-      activeLine?: boolean;
-      activeLineWidth?: number;
-      activeLineColor?: string;
-      activeAreaOpacity?: number;
-      point?: {
-        size?: number;
-        activeSize?: number;
-        activeColor?: string;
-        activeBorderWidth?: number;
-        borderWidth?: number;
-        borderColor?: string;
-        fillColor?: string;
-        strokeWidth?: number;
+  extra: {
+    line: {
+      type: string;
+      width: number;
+      activeType: string;
+      linearType: string;
+      activeLine: boolean;
+      activeLineWidth: number;
+      activeLineColor: string;
+      activeAreaOpacity: number;
+      point: {
+        size: number;
+        activeSize: number;
+        activeColor: string;
+        activeBorderWidth: number;
+        borderWidth: number;
+        borderColor: string;
+        fillColor: string;
+        strokeWidth: number;
       };
     };
-    pie?: {
-      activeRadius?: number;
-      offsetAngle?: number;
-      labelWidth?: number;
-      border?: boolean;
-      borderWidth?: number;
-      borderColor?: string;
-      linearType?: 'custom';
-      customColor?: string[];
-      ringWidth?: number;
-      centerColor?: string;
-      radius?: number;
-      pieChartLinePadding?: number;
-      activeOpacity?: number;
-      borderOpacity?: number;
-      labelAlign?: 'center' | 'left' | 'right';
-      labelFontSize?: number;
-      labelFontColor?: string;
-      format?: (val: number, series: any, opts: any) => string;
-    };
-    tooltip?: {
-      showBox?: boolean;
-      showArrow?: boolean;
-      showCategory?: boolean;
-      borderWidth?: number;
-      borderRadius?: number;
-      borderColor?: string;
-      borderOpacity?: number;
-      bgColor?: string;
-      bgOpacity?: number;
-      gridType?: 'dash';
-      dashLength?: number;
-      gridColor?: string;
-      fontColor?: string;
-      fontSize?: number;
-      lineHeight?: number;
-      padding?: number;
-      horizentalLine?: boolean;
-      xAxisLabel?: boolean;
-      yAxisLabel?: boolean;
-      labelBgColor?: string;
-      labelBgOpacity?: number;
-      labelFontColor?: string;
-    };
-    markLine?: {
-      type?: 'dash';
-      dashLength?: number;
-      data?: {
-        value: number;
-        lineColor: string;
-        showLabel?: boolean;
-        labelText?: string;
-        labelPosition?: 'left' | 'right' | 'top' | 'bottom';
-        labelAlign?: 'top' | 'bottom' | 'left' | 'right';
-        labelOffsetX?: number;
-        labelOffsetY?: number;
-        labelFontSize?: number;
-        labelBgColor?: string;
-        labelBgOpacity?: number;
-        labelFontColor?: string;
-      }[];
+    tooltip: {
+      showBox: boolean;
+      showArrow: boolean;
+      showCategory: boolean;
+      borderWidth: number;
+      borderRadius: number;
+      borderColor: string;
+      borderOpacity: number;
+      bgColor: string;
+      bgOpacity: number;
+      gridType: string;
+      dashLength: number;
+      gridColor: string;
+      fontColor: string;
+      fontSize: number;
+      lineHeight: number;
+      padding: number;
+      horizentalLine: boolean;
+      xAxisLabel: boolean;
+      yAxisLabel: boolean;
+      labelBgColor: string;
+      labelBgOpacity: number;
+      labelFontColor: string;
     };
   };
-  context?: Taro.CanvasContext;
-} 
+  categories: string[];
+  series: { name: string; data: number[]; color?: string; type?: string; pointShape?: string; pointSize?: number; lineWidth?: number; format?: (val: number) => string }[];
+  width: number;
+  height: number;
+  context: Taro.CanvasContext;
+}

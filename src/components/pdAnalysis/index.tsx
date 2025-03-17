@@ -11,20 +11,15 @@ import AbnormalValues from "./AbnormalValues";
 import "./index.scss";
 
 const PdAnalysis: React.FC = () => {
-  // 视图模式状态
   const [viewMode, setViewMode] = useState<"day" | "week" | "month">("day");
   
-  // 使用公共的日期导航钩子
+  // 使用 currentDate 替换 currentEndDate
   const { 
-    currentEndDate,
+    currentDate = new Date(), // 默认值
     handleDateChange,
     resetToCurrentDate
-  } = useDateNavigation(viewMode, (date) => {
-    // 日期变化时的回调，这里不需要主动调用refreshData
-    // 因为useEffect会监听currentEndDate的变化
-  });
-  
-  // 使用自定义钩子获取腹透数据
+  } = useDateNavigation(viewMode, () => {});
+
   const { 
     pdData, 
     metadata, 
@@ -33,27 +28,23 @@ const PdAnalysis: React.FC = () => {
     error 
   } = usePdData();
 
-  // 处理视图模式变化
   const handleViewModeChange = (mode: "day" | "week" | "month") => {
     setViewMode(mode);
-    // 切换视图模式时重置为当天
     resetToCurrentDate();
-    // 不需要在这里调用refreshData，因为视图模式和日期变化会触发useEffect
   };
 
-  // 当视图模式或日期变化时刷新数据
   useEffect(() => {
-    refreshData(viewMode, currentEndDate);
-  }, [viewMode, currentEndDate, refreshData]);
+    if (currentDate && !isNaN(new Date(currentDate).getTime())) {
+      refreshData(viewMode, currentDate);
+    } else {
+      console.error("Invalid currentDate:", currentDate);
+    }
+  }, [viewMode, currentDate, refreshData]);
 
-  // 设置页面标题
   useEffect(() => {
-    Taro.setNavigationBarTitle({
-      title: "腹透分析"
-    });
+    Taro.setNavigationBarTitle({ title: "腹透分析" });
   }, []);
 
-  // 如果发生错误，显示错误信息
   if (error) {
     return (
       <View className="pd-analysis error">
@@ -61,7 +52,7 @@ const PdAnalysis: React.FC = () => {
         <Text className="error-message">{error}</Text>
         <View 
           className="retry-button"
-          onClick={() => refreshData(viewMode, currentEndDate)}
+          onClick={() => refreshData(viewMode, currentDate)}
         >
           <Text className="retry-text">重试</Text>
         </View>
@@ -69,9 +60,16 @@ const PdAnalysis: React.FC = () => {
     );
   }
 
+  if (isLoading || !currentDate) {
+    return (
+      <View className="pd-analysis">
+        <Text>加载中...</Text>
+      </View>
+    );
+  }
+
   return (
     <View className="pd-analysis">
-      {/* 头部容器 - 与血压分析保持一致 */}
       <View className="header-container">
         <Text className="chart-title">腹透趋势</Text>
         <ViewModeSelector 
@@ -80,33 +78,23 @@ const PdAnalysis: React.FC = () => {
         />
       </View>
       
-      {/* 日期导航器 */}
       <DateNavigator 
         mode={viewMode}
-        currentDate={currentEndDate}
+        currentDate={currentDate} // 使用 currentDate
         onNavigate={handleDateChange}
         onReset={resetToCurrentDate}
       />
       
-      {/* 图表区域 */}
       <View className="chart-section">
         <View className="chart-container">
-          {isLoading && (
-            <View className="loading-container">
-              <Text>加载中...</Text>
-            </View>
-          )}
-          
-          {!isLoading && pdData && pdData.length > 0 && (
+          {pdData && pdData.length > 0 ? (
             <PdChart 
-              key={`chart-${viewMode}`} // 添加key确保组件在视图模式变化时重新渲染
+              key={`chart-${viewMode}`} 
               viewMode={viewMode} 
               pdData={pdData} 
               isLoading={false}
             />
-          )}
-          
-          {!isLoading && (!pdData || pdData.length === 0) && (
+          ) : (
             <View className="empty-container">
               <Text>暂无数据</Text>
             </View>
@@ -114,8 +102,7 @@ const PdAnalysis: React.FC = () => {
         </View>
       </View>
       
-      {/* 异常值分析 - 仅在日视图模式下显示 */}
-      {!isLoading && pdData && Array.isArray(pdData) && pdData.length > 0 && viewMode === "day" && (
+      {pdData && Array.isArray(pdData) && pdData.length > 0 && viewMode === "day" && (
         <AbnormalValues 
           pdData={pdData} 
           viewMode={viewMode}
@@ -123,10 +110,9 @@ const PdAnalysis: React.FC = () => {
         />
       )}
       
-      {/* 腹透统计分析 */}
-      {!isLoading && pdData && Array.isArray(pdData) && pdData.length > 0 && (
+      {pdData && Array.isArray(pdData) && pdData.length > 0 && (
         <PdStatistics 
-          key={`stats-${viewMode}`} // 添加key确保组件在视图模式变化时重新渲染
+          key={`stats-${viewMode}`} 
           pdData={pdData} 
           metadata={metadata} 
           viewMode={viewMode}

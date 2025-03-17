@@ -18,6 +18,11 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
 }) => {
   // 获取日期显示文本
   const getDateDisplayText = () => {
+    // 检查 currentDate 是否有效
+    if (!(currentDate instanceof Date) || isNaN(currentDate.getTime())) {
+      return "无效日期";
+    }
+
     if (mode === "day") {
       return format(currentDate, "yyyy年MM月dd日");
     } else if (mode === "week") {
@@ -26,18 +31,20 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
       return format(currentDate, "yyyy年MM月");
     }
   };
-  
+
   return (
     <View className="date-navigator">
       <View className="navigator-arrow" onClick={() => onNavigate("prev")}>
         <View className="arrow-icon left"></View>
       </View>
-      
+
       <View className="date-display">
         <Text className="date-value">{getDateDisplayText()}</Text>
-        <Text className="date-reset" onClick={onReset}>返回今天</Text>
+        <Text className="date-reset" onClick={onReset}>
+          返回今天
+        </Text>
       </View>
-      
+
       <View className="navigator-arrow" onClick={() => onNavigate("next")}>
         <View className="arrow-icon right"></View>
       </View>
@@ -45,4 +52,4 @@ const DateNavigator: React.FC<DateNavigatorProps> = ({
   );
 };
 
-export default DateNavigator; 
+export default DateNavigator;

@@ -1,11 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import UCharts from "@qiun/ucharts";
 import { BaseChartConfig } from './types';
 import Taro from '@tarojs/taro';
-import { View } from '@tarojs/components';
+import { View, Canvas } from '@tarojs/components';
 
-// 基础图表配置
-const baseConfig: BaseChartConfig = {
+const baseConfig: Partial<BaseChartConfig> = {
   animation: true,
   background: "#FFFFFF",
   padding: [15, 15, 15, 15],
@@ -89,44 +88,20 @@ const baseConfig: BaseChartConfig = {
   }
 };
 
-// 图表组件接口
 interface ChartProps {
   categories: string[];
-  series: {
-    name: string;
-    data: number[];
-    color?: string;
-    type?: string;
-    pointShape?: string;
-    pointSize?: number;
-    lineWidth?: number;
-    format?: (val: number) => string;
-  }[];
+  series: { name: string; data: number[]; color?: string; type?: string; pointShape?: string; pointSize?: number; lineWidth?: number; format?: (val: number) => string }[];
   width: number;
   height: number;
   config?: Partial<BaseChartConfig>;
 }
 
-// 基础图表组件
-const Chart: React.FC<ChartProps> = ({
-  categories,
-  series,
-  width,
-  height,
-  config = {}
-}) => {
-  const chartId = useRef(Math.random().toString(36).substring(2, 15)).current; // 生成随机 canvasId
-  const chartRef = useRef< Taro.CanvasContext | null>(null); // 创建 ref 用于存储 canvas context
-  const [chartContext, setChartContext] = useState< Taro.CanvasContext | null>(null); // 使用 useState 存储 context
+const Chart: React.FC<ChartProps> = ({ categories, series, width, height, config = {} }) => {
+  const chartId = useRef(`chart-${Math.random().toString(36).substring(2, 15)}`).current;
 
   useEffect(() => {
-    const ctx = Taro.createCanvasContext(chartId); // 使用 Taro.createCanvasContext 获取 context
-    chartRef.current = ctx; // 将 context 存储到 ref
-    setChartContext(ctx); // 更新 state，触发重新渲染
-  }, [chartId]); // 依赖 chartId，确保每次 chartId 变化都重新获取 context
-
-  useEffect(() => {
-    if (chartContext) { // 确保 context 获取成功后才初始化 uCharts
+    if (width > 0 && height > 0) {
+      const ctx = Taro.createCanvasContext(chartId);
       const chartConfig: BaseChartConfig = {
         ...baseConfig,
         ...config,
@@ -134,21 +109,25 @@ const Chart: React.FC<ChartProps> = ({
         series,
         width,
         height,
-        context: chartContext, // 使用 context 属性传递 context
-        // canvasId: chartId, // 移除 canvasId 属性
-      };
-      new UCharts(chartConfig); // 初始化 uCharts
+        context: ctx,
+      } as BaseChartConfig;
+      try {
+        console.log("Initializing uCharts with config:", chartConfig);
+        new UCharts(chartConfig);
+        console.log("uCharts initialized successfully");
+      } catch (error) {
+        console.error("uCharts initialization failed:", error);
+      }
     }
-  }, [chartContext, categories, series, width, height, config]); // 依赖 context 和其他配置项
+  }, [categories, series, width, height, config]);
 
   return (
-    <View ref={chartRef}> {/* 使用 View 包裹 canvas，并设置 ref */}
-      <canvas canvasId={chartId} style={{ width: `${width}px`, height: `${height}px` }} />
+    <View>
+      <Canvas canvasId={chartId} style={{ width: `${width}px`, height: `${height}px` }} />
     </View>
   );
 };
 
-// 折线图组件
 export const LineChart: React.FC<ChartProps> = (props) => {
   const config = {
     ...props,
@@ -163,26 +142,18 @@ export const LineChart: React.FC<ChartProps> = (props) => {
   return <Chart {...config} />;
 };
 
-// 柱状图组件
 export const ColumnChart: React.FC<ChartProps> = (props) => {
   const config = {
     ...props,
-    series: props.series.map(item => ({
-      ...item,
-      type: 'column'
-    }))
+    series: props.series.map(item => ({ ...item, type: 'column' }))
   };
   return <Chart {...config} />;
 };
 
-// 饼图组件
 export const PieChart: React.FC<ChartProps> = (props) => {
   const config = {
     ...props,
-    series: props.series.map(item => ({
-      ...item,
-      type: 'pie'
-    }))
+    series: props.series.map(item => ({ ...item, type: 'pie' }))
   };
   return <Chart {...config} />;
-}; 
+};

@@ -1,15 +1,30 @@
 import { useState, useCallback } from "react";
-import { format, subDays, addDays, subMonths, addMonths } from "date-fns";
+import {
+  format,
+  subDays,
+  addDays,
+  subMonths,
+  addMonths,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  isSameDay,
+  subWeeks,
+  addWeeks,
+} from "date-fns";
 
 type ViewMode = "day" | "week" | "month";
 
 interface DateNavigationHook {
-  currentEndDate: Date;
+  currentDate: Date;
+  dateRange: { start: Date; end: Date };
   handleDateChange: (direction: 'prev' | 'next') => void;
   handleTouchStart: (e: any) => void;
   handleTouchEnd: (e: any) => void;
   formatDateRange: () => string;
   resetToCurrentDate: () => void;
+  isToday: () => boolean;
 }
 
 // 使用命名导出
@@ -17,37 +32,54 @@ export default function useDateNavigation(
   viewMode: ViewMode,
   onDateChange?: (date: Date) => void
 ): DateNavigationHook {
-  const [currentEndDate, setCurrentEndDate] = useState<Date>(new Date());
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [dateRange, setDateRange] = useState<{ start: Date; end: Date }>({
+    start: new Date(),
+    end: new Date(),
+  });
+
+  // 更新日期范围
+  const updateDateRange = useCallback((date: Date) => {
+    let start: Date;
+    let end: Date;
+
+    if (viewMode === "day") {
+      start = date;
+      end = date;
+    } else if (viewMode === "week") {
+      start = startOfWeek(date, { weekStartsOn: 1 });
+      end = endOfWeek(date, { weekStartsOn: 1 });
+    } else {
+      start = startOfMonth(date);
+      end = endOfMonth(date);
+    }
+
+    setDateRange({ start, end });
+  }, [viewMode]);
 
   // 处理日期变更
   const handleDateChange = useCallback((direction: 'prev' | 'next') => {
-    let newDate = new Date(currentEndDate);
+    let newDate = new Date(currentDate);
     
     if (viewMode === "day") {
-      // 日视图，前后移动一天
       newDate = direction === 'prev' ? subDays(newDate, 1) : addDays(newDate, 1);
       
-      // 限制不能超过今天
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       if (direction === 'next' && newDate > today) {
-        newDate = today; // 设置为今天，而不是直接返回
+        newDate = today;
       }
     } else if (viewMode === "week") {
-      // 周视图，前后移动一周
-      newDate = direction === 'prev' ? subDays(newDate, 7) : addDays(newDate, 7);
+      newDate = direction === 'prev' ? subWeeks(currentDate, 1) : addWeeks(currentDate, 1);
       
-      // 限制不能超过今天
       const today = new Date();
       if (direction === 'next' && newDate > today) {
-        newDate = new Date(); // 设置为今天
+        newDate = new Date();
       }
     } else {
-      // 月视图，前后移动一个月
-      newDate = direction === 'prev' ? subMonths(newDate, 1) : addMonths(newDate, 1);
+      newDate = direction === 'prev' ? subMonths(currentDate, 1) : addMonths(currentDate, 1);
       
-      // 限制不能超过当前月
       const today = new Date();
       const currentMonth = today.getMonth();
       const currentYear = today.getFullYear();
@@ -56,15 +88,16 @@ export default function useDateNavigation(
           (newDate.getFullYear() > currentYear || 
           (newDate.getFullYear() === currentYear && newDate.getMonth() > currentMonth))) {
         newDate = new Date();
-        newDate.setDate(1); // 设置为当月第一天
+        newDate.setDate(1);
       }
     }
     
-    setCurrentEndDate(newDate);
+    setCurrentDate(newDate);
+    updateDateRange(newDate);
     if (onDateChange) {
       onDateChange(newDate);
     }
-  }, [currentEndDate, viewMode, onDateChange]);
+  }, [currentDate, viewMode, onDateChange, updateDateRange]);
 
   // 处理触摸开始
   const handleTouchStart = useCallback((e) => {
@@ -78,7 +111,6 @@ export default function useDateNavigation(
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchEndX - touchStartX;
     
-    // 如果滑动距离超过50px，则切换日期
     if (Math.abs(diff) > 50) {
       handleDateChange(diff > 0 ? 'prev' : 'next');
     }
@@ -89,31 +121,37 @@ export default function useDateNavigation(
   // 格式化日期范围
   const formatDateRange = useCallback(() => {
     if (viewMode === "day") {
-      return format(currentEndDate, 'yyyy年MM月dd日');
+      return currentDate.toString();
     } else if (viewMode === "week") {
-      const endDate = new Date(currentEndDate);
-      const startDate = new Date(endDate);
-      startDate.setDate(endDate.getDate() - 6);
-      return `${format(startDate, 'MM/dd')} - ${format(endDate, 'MM/dd')}`;
+      return `${dateRange.start.toString()} - ${dateRange.end.toString()}`;
     } else {
-      return format(currentEndDate, 'yyyy年MM月');
+      return currentDate.toString();
     }
-  }, [currentEndDate, viewMode]);
+  }, [currentDate, viewMode, dateRange]);
 
   // 重置日期为当前日期
   const resetToCurrentDate = useCallback(() => {
-    setCurrentEndDate(new Date());
+    const today = new Date();
+    setCurrentDate(today);
+    updateDateRange(today);
     if (onDateChange) {
-      onDateChange(new Date());
+      onDateChange(today);
     }
-  }, [onDateChange]);
+  }, [onDateChange, updateDateRange]);
+
+  // 检查是否是今天
+  const isToday = useCallback(() => {
+    return isSameDay(currentDate, new Date());
+  }, [currentDate]);
 
   return {
-    currentEndDate,
+    currentDate,
+    dateRange,
     handleDateChange,
     handleTouchStart,
     handleTouchEnd,
     formatDateRange,
-    resetToCurrentDate
+    resetToCurrentDate,
+    isToday,
   };
 } 

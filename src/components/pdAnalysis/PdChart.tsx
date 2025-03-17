@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text } from "@tarojs/components";
 import { LineChart } from '@/components/common/charts';
-import { format, parseISO, getDay } from "date-fns";
-import { zhCN } from "date-fns/locale";
-import { PdDataPoint } from "./usePdData";
-import "./PdChart.scss";
+import { getDay } from "date-fns";
 import Taro from '@tarojs/taro';
+import "./PdChart.scss";
+import { PdDataPoint } from "./usePdData";
+import { BaseChartConfig } from '@/components/common/charts/types';
 
 interface PdChartProps {
   viewMode: "day" | "week" | "month";
@@ -13,114 +13,71 @@ interface PdChartProps {
   isLoading?: boolean;
 }
 
-// 星期几的中文表示
 const weekDayNames = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 
-const PdChart: React.FC<PdChartProps> = ({
-  viewMode,
-  pdData,
-  isLoading = false
-}) => {
+const PdChart: React.FC<PdChartProps> = ({ viewMode, pdData, isLoading = false }) => {
   const [chartWidth, setChartWidth] = useState(0);
   const [chartHeight, setChartHeight] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
   const [dataView, setDataView] = useState<"ultrafiltration" | "drainage">("ultrafiltration");
-  const chartId = useRef<number>(Math.random());
-  
+  const chartId = useRef(`pd-chart-${Math.random().toString(36).substring(2, 15)}`);
+
   useEffect(() => {
-    if (containerRef.current) {
-      // 使用 Taro.createSelectorQuery 获取元素尺寸
-      Taro.createSelectorQuery()
-        .select(`#pd-chart-container-${chartId.current}`) // 使用 id 选择器
-        .boundingClientRect()
-        .exec(res => {
-          if (res && res[0]) {
-            const { width, height } = res[0];
-            setChartWidth(width);
-            setChartHeight(height);
-          }
-        });
-    }
+    const query = Taro.createSelectorQuery();
+    query
+      .select(`#pd-chart-container-${chartId.current}`)
+      .boundingClientRect((rect) => {
+        if (rect && 'width' in rect) {
+          setChartWidth(rect.width);
+          setChartHeight(rect.height || 300);
+          console.log("Chart dimensions:", rect.width, rect.height || 300);
+        } else {
+          console.error("Failed to get chart dimensions", rect);
+        }
+      })
+      .exec();
   }, []);
-  
-  // 切换数据视图
+
   const toggleDataView = () => {
-    setDataView(prev => prev === "ultrafiltration" ? "drainage" : "ultrafiltration");
+    setDataView(prev => (prev === "ultrafiltration" ? "drainage" : "ultrafiltration"));
   };
 
   const getCategories = () => {
     if (viewMode === "day") {
-      // 日视图：按时间排序
       const sortedData = [...pdData].sort((a, b) => {
         const timeA = a.timestamp ? new Date(a.timestamp).getTime() : new Date(`${a.date}T${a.recordTime}`).getTime();
         const timeB = b.timestamp ? new Date(b.timestamp).getTime() : new Date(`${b.date}T${b.recordTime}`).getTime();
         return timeA - timeB;
       });
-      
-      return sortedData.map(item => item.recordTime);
+      const times = sortedData.map(item => item.recordTime);
+      return times.length > 1 ? times : ["00:00", times[0]]; // 添加默认起点
     } else if (viewMode === "week") {
-      // 周视图：按周几分组
-      const weekDayMap = new Map<number, {
-        ultrafiltration: number[],
-        drainage: number[],
-        count: number,
-        dayOfWeek: number
-      }>();
-      
+      const weekDayMap = new Map<number, { ultrafiltration: number[], drainage: number[], count: number, dayOfWeek: number }>();
       pdData.forEach(item => {
         const date = new Date(item.date);
         const dayOfWeek = getDay(date);
-        
         if (!weekDayMap.has(dayOfWeek)) {
-          weekDayMap.set(dayOfWeek, {
-            ultrafiltration: [],
-            drainage: [],
-            count: 0,
-            dayOfWeek
-          });
+          weekDayMap.set(dayOfWeek, { ultrafiltration: [], drainage: [], count: 0, dayOfWeek });
         }
-        
         const dayData = weekDayMap.get(dayOfWeek)!;
         dayData.ultrafiltration.push(item.ultrafiltration);
         dayData.drainage.push(item.drainageVolume);
         dayData.count++;
       });
-      
-      const sortedDays = Array.from(weekDayMap.keys()).sort((a, b) => {
-        const orderA = a === 0 ? 7 : a;
-        const orderB = b === 0 ? 7 : b;
-        return orderA - orderB;
-      });
-      
+      const sortedDays = Array.from(weekDayMap.keys()).sort((a, b) => (a === 0 ? 7 : a) - (b === 0 ? 7 : b));
       return sortedDays.map(dayOfWeek => weekDayNames[dayOfWeek]);
     } else {
-      // 月视图：按周分组
-      const weekMap = new Map<number, {
-        ultrafiltration: number[],
-        drainage: number[],
-        count: number,
-        weekNumber: number
-      }>();
-      
+      const weekMap = new Map<number, { ultrafiltration: number[], drainage: number[], count: number, weekNumber: number }>();
       pdData.forEach(item => {
         const date = new Date(item.date);
         const weekNumber = Math.ceil(date.getDate() / 7);
-        
         if (!weekMap.has(weekNumber)) {
-          weekMap.set(weekNumber, {
-            ultrafiltration: [],
-            drainage: [],
-            count: 0,
-            weekNumber
-          });
+          weekMap.set(weekNumber, { ultrafiltration: [], drainage: [], count: 0, weekNumber });
         }
-        
         const weekData = weekMap.get(weekNumber)!;
         weekData.ultrafiltration.push(item.ultrafiltration);
         weekData.drainage.push(item.drainageVolume);
         weekData.count++;
       });
-      
       const sortedWeeks = Array.from(weekMap.keys()).sort((a, b) => a - b);
       return sortedWeeks.map(weekNumber => `第${weekNumber}周`);
     }
@@ -144,12 +101,7 @@ const PdChart: React.FC<PdChartProps> = ({
             return false;
         }
       });
-
-      if (dataView === "ultrafiltration") {
-        return matchingData ? matchingData.ultrafiltration : 0;
-      } else {
-        return matchingData ? matchingData.drainageVolume : 0;
-      }
+      return matchingData ? (dataView === "ultrafiltration" ? matchingData.ultrafiltration : matchingData.drainageVolume) : 0;
     });
 
     return [{
@@ -160,66 +112,66 @@ const PdChart: React.FC<PdChartProps> = ({
     }];
   };
 
-  const getChartConfig = () => {
-    const maxValue = dataView === "ultrafiltration" 
+  const getChartConfig = (): Partial<BaseChartConfig> => {
+    const maxValue = dataView === "ultrafiltration"
       ? Math.max(...pdData.map(item => item.ultrafiltration)) * 1.2 || 500
       : Math.max(...pdData.map(item => item.drainageVolume)) * 1.2 || 3000;
 
     return {
       xAxis: {
         labelCount: 5,
+        scrollShow: true,
+        itemCount: 5,
+        scrollAlign: 'right',
+        calibration: true,
+        marginLeft: 5,
         formatter: (item: string) => item
       },
       yAxis: {
         data: [{
           min: dataView === "ultrafiltration" ? -maxValue : 0,
           max: maxValue,
+          splitNumber: 5,
+          showTitle: true,
           format: (val: number) => `${val}mL`
         }]
       }
     };
   };
 
-  if (isLoading) {
-    return (
-      <View className="pd-chart loading">
-        <Text className="loading-text">加载中...</Text>
-      </View>
-    );
-  }
-  
-  if (!pdData || pdData.length === 0) {
-    return (
-      <View className="pd-chart empty">
-        <Text className="empty-text">暂无数据</Text>
-        <Text className="empty-hint">请先记录腹透数据</Text>
-      </View>
-    );
-  }
-  
+  useEffect(() => {
+    const categories = getCategories();
+    const series = getSeries();
+    console.log("PdChart - pdData:", pdData);
+    console.log("PdChart - Categories:", categories);
+    console.log("PdChart - Series:", series);
+    console.log("Rendering LineChart with:", { width: chartWidth, height: chartHeight });
+  }, [pdData, viewMode, dataView, chartWidth, chartHeight]);
+
+  if (isLoading) return <View className="pd-chart loading"><Text>加载中...</Text></View>;
+  if (!pdData || pdData.length === 0) return <View className="pd-chart empty"><Text>暂无数据</Text><Text>请先记录腹透数据</Text></View>;
+
   return (
-    <View className="pd-chart" ref={containerRef} id={`pd-chart-container-${chartId.current}`}>
+    <View className="pd-chart" id={`pd-chart-container-${chartId.current}`}>
       <View className="chart-header">
-        <Text className="chart-title">
-          {dataView === "ultrafiltration" ? "超滤量趋势" : "引流量趋势"}
-        </Text>
+        <Text>{dataView === "ultrafiltration" ? "超滤量趋势" : "引流量趋势"}</Text>
         <View className="view-toggle" onClick={toggleDataView}>
           <Text>查看{dataView === "ultrafiltration" ? "引流量" : "超滤量"}</Text>
         </View>
       </View>
-      
-      <View className="chart-unit">
-        <Text>单位: mL</Text>
-      </View>
-      
+      <View className="chart-unit"><Text>单位: mL</Text></View>
       <View className="chart-canvas">
-        <LineChart
-          categories={getCategories()}
-          series={getSeries()}
-          width={chartWidth}
-          height={chartHeight}
-          config={getChartConfig()}
-        />
+        {chartWidth > 0 && chartHeight > 0 ? (
+          <LineChart
+            categories={getCategories()}
+            series={getSeries()}
+            width={chartWidth}
+            height={chartHeight}
+            config={getChartConfig()}
+          />
+        ) : (
+          <Text>图表尺寸加载中...</Text>
+        )}
       </View>
     </View>
   );
