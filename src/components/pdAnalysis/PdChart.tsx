@@ -112,7 +112,7 @@ const PdChart: React.FC<PdChartProps> = ({ viewMode, pdData, isLoading = false }
     }];
   };
 
-  const getChartConfig = (): Partial<BaseChartConfig> => {
+  const getChartConfig = (categories: string[]): Partial<BaseChartConfig> => {
     const maxValue = dataView === "ultrafiltration"
       ? Math.max(...pdData.map(item => item.ultrafiltration)) * 1.2 || 500
       : Math.max(...pdData.map(item => item.drainageVolume)) * 1.2 || 3000;
@@ -120,8 +120,8 @@ const PdChart: React.FC<PdChartProps> = ({ viewMode, pdData, isLoading = false }
     return {
       xAxis: {
         labelCount: 5,
-        scrollShow: true,
-        itemCount: 5,
+        scrollShow: categories.length > 5, // 根据数据量动态调整
+        itemCount: categories.length,
         scrollAlign: 'right',
         calibration: true,
         marginLeft: 5,
@@ -151,6 +151,8 @@ const PdChart: React.FC<PdChartProps> = ({ viewMode, pdData, isLoading = false }
   if (isLoading) return <View className="pd-chart loading"><Text>加载中...</Text></View>;
   if (!pdData || pdData.length === 0) return <View className="pd-chart empty"><Text>暂无数据</Text><Text>请先记录腹透数据</Text></View>;
 
+  const categories = getCategories(); // 在渲染时计算一次，避免重复调用
+
   return (
     <View className="pd-chart" id={`pd-chart-container-${chartId.current}`}>
       <View className="chart-header">
@@ -163,11 +165,11 @@ const PdChart: React.FC<PdChartProps> = ({ viewMode, pdData, isLoading = false }
       <View className="chart-canvas">
         {chartWidth > 0 && chartHeight > 0 ? (
           <LineChart
-            categories={getCategories()}
+            categories={categories}
             series={getSeries()}
             width={chartWidth}
             height={chartHeight}
-            config={getChartConfig()}
+            config={getChartConfig(categories)}
           />
         ) : (
           <Text>图表尺寸加载中...</Text>
