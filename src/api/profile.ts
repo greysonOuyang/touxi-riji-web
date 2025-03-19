@@ -6,6 +6,7 @@ export interface UserProfileVO {
   userId: number;
   userName: string;
   avatarUrl: string;
+  avatarBase64: string;
   name: string;
   gender: string;
   age: number;

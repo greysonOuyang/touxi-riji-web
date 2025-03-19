@@ -4,11 +4,12 @@ import { getUserProfile, updateUserProfile } from "@/api/profile";
 import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 
-const DEFAULT_AVATAR = "../../assets/images/face.png";
+// const DEFAULT_AVATAR = "../../assets/images/face.png"; // 删除 DEFAULT_AVATAR 常量
 
 const EditProfile = () => {
   const [profile, setProfile] = useState({
-    avatarUrl: DEFAULT_AVATAR,
+    // avatarUrl: "", // 移除 avatarUrl 字段
+    avatarBase64: "",
     userName: "",
     name: "",
     gender: "",
@@ -32,7 +33,8 @@ const EditProfile = () => {
           const response = await getUserProfile(userId);
           if (response.data) {
             setProfile({
-              avatarUrl: response.data.avatarUrl || DEFAULT_AVATAR,
+              // avatarUrl: response.data.avatarBase64 || "", // 不再设置 avatarUrl
+              avatarBase64: response.data.avatarBase64 || "", // 使用 avatarBase64
               userName: response.data.userName || "",
               name: response.data.name || "",
               gender: response.data.gender || "",
@@ -67,9 +69,24 @@ const EditProfile = () => {
       sourceType: ["album", "camera"],
       success: function (res) {
         const tempFilePaths = res.tempFilePaths;
-        setProfile((prev) => ({ ...prev, avatarUrl: tempFilePaths[0] }));
-        // Here you would typically upload the image to your server
-        // and update the user's profile with the new avatar URL
+        const filePath = tempFilePaths[0];
+        Taro.getFileSystemManager().readFile({ // 使用 Taro.getFileSystemManager().readFile 读取文件
+          filePath,
+          encoding: 'base64', // 指定编码为 base64
+          success: ({ data }) => {
+            const base64Data = `data:image/png;base64,${data}`; //  拼接 Base64 数据格式
+            setProfile((prev) => ({ ...prev, avatarBase64: base64Data })); //  只更新 avatarBase64
+            handleUpdate("avatarBase64", base64Data); //  更新 avatarBase64 字段
+          },
+          fail: (error) => {
+            console.error("Failed to read image as base64:", error);
+            Taro.showToast({
+              title: "图片读取失败",
+              icon: "error",
+              duration: 2000,
+            });
+          }
+        });
       },
     });
   };
@@ -95,7 +112,7 @@ const EditProfile = () => {
     const userId = Taro.getStorageSync("userId");
     if (userId) {
       try {
-        await updateUserProfile(userId, { [field]: value });
+        await updateUserProfile(userId, { [field]: value }); //  确保 updateUserProfile 接口可以接收 avatarBase64 字段
         Taro.showToast({ title: "更新成功", icon: "success", duration: 1500 });
       } catch (error) {
         console.error("Failed to update profile:", error);
@@ -112,7 +129,14 @@ const EditProfile = () => {
     <View className="edit-profile-container">
       <View className="edit-profile-content">
         <View className="avatar-section" onClick={handleAvatarChange}>
-          <Image className="profile-avatar" src={profile.avatarUrl} />
+          <Image
+            className="profile-avatar"
+            src={profile.avatarBase64} //  直接使用 avatarBase64 作为 src
+            style={{
+              backgroundImage: profile.avatarBase64 ? `none` : `url(../../assets/images/face.png)`,
+              backgroundColor: profile.avatarBase64 ? 'transparent' : '#eee',
+            }}
+          />
           <View className="avatar-edit-overlay">
             <Text className="edit-text">编辑</Text>
           </View>

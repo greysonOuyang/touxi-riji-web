@@ -5,7 +5,6 @@ import Taro, { useDidShow } from "@tarojs/taro";
 import "./index.scss";
 import ArrowRight from "@/components/common/ArrowRight";
 
-const DEFAULT_AVATAR = "../../assets/images/face.png";
 const ICON_PROFILE = "../../assets/icons/icon-profile.png";
 
 const calculatePdDays = (startDate: string | null): number => {
@@ -19,7 +18,7 @@ const calculatePdDays = (startDate: string | null): number => {
 const Profile = () => {
   const [profile, setProfile] = useState({
     username: "",
-    avatarUrl: DEFAULT_AVATAR,
+    avatarBase64: "",
     name: "",
     height: 0,
     weight: 0,
@@ -37,7 +36,7 @@ const Profile = () => {
           const apiData = response.data;
           setProfile({
             username: apiData.userName || "",
-            avatarUrl: apiData.avatarUrl || DEFAULT_AVATAR,
+            avatarBase64: apiData.avatarBase64 || "",
             name: apiData.name || "",
             height: apiData.height || 0,
             weight: apiData.weight || 0,
@@ -80,7 +79,14 @@ const Profile = () => {
     <View className="profile-container">
       {/* 个人信息 */}
       <View className="profile-header" onClick={handleEditProfile}>
-        <Image className="profile-avatar" src={profile.avatarUrl} />
+        <Image
+          className="profile-avatar"
+          src={profile.avatarBase64}
+          style={{
+            backgroundImage: profile.avatarBase64 ? `none` : `url(../../assets/images/face.png)`,
+            backgroundColor: profile.avatarBase64 ? 'transparent' : '#eee',
+          }}
+        />
         <View className="profile-info">
           <Text className="profile-name">{profile.username}</Text>
           <Text className="profile-details">
