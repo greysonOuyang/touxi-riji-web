@@ -24,8 +24,8 @@ export default {
       {
         pagePath: "pages/health/index",
         text: "首页",
-        iconPath: "assets/icons/home.png",
-        selectedIconPath: "assets/icons/home_selected.png",
+        iconPath: "assets/icons/home_unselected.png",
+        selectedIconPath: "assets/icons/home_selected copy.png",
       },
       // {
       //   pagePath: 'pages/record/index',
@@ -36,16 +36,14 @@ export default {
       {
         pagePath: "pages/statistics/index",
         text: "统计",
-        // iconPath: 'assets/icons/statistics.png',
-        // selectedIconPath: 'assets/icons/statistics_selected.png'
-        iconPath: "assets/icons/home.png",
-        selectedIconPath: "assets/icons/home_selected.png",
+        iconPath: "assets/icons/statics_unselected.png",
+        selectedIconPath: "assets/icons/statics_selected.png",
       },
       {
         pagePath: "pages/profile/index",
         text: "个人",
-        iconPath: "assets/icons/personal.png",
-        selectedIconPath: "assets/icons/personal_a.png",
+        iconPath: "assets/icons/personal_unselected.png",
+        selectedIconPath: "assets/icons/personal_selected.png",
       },
     ],
     color: "#999999",
