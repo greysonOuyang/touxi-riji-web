@@ -3,980 +3,481 @@
     min-height: 100vh;
     background-color: #f8f9fa;
     padding-bottom: 30px;
-
-    .content-area {
-        height: 100vh;
-        padding-top: 16px;
-        padding-bottom: 65px;
+  
+    .page-content {
+      height: 100vh;
+      padding-top: 16px;
+      padding-bottom: 65px;
     }
-
-    .section-container {
-        padding: 0 16px;
+  
+    .content-container {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
     }
-
-    // 加载状态样式
-    .loading-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 40px 0;
-        background-color: #fff;
-        border-radius: 16px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-    }
-
-    // 今日指标部分样式
-    .today-section {
-        .today-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-
-            .today-title {
-                font-size: 18px;
-                font-weight: 600;
-                color: #333;
-            }
-
-            .today-date {
-                font-size: 14px;
-                color: #666;
-            }
-        }
-
-        .metrics-card {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-
-            .ultrafiltration-display {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                margin-bottom: 20px;
-
-                .ultrafiltration-circle {
-                    width: 120px;
-                    height: 120px;
-                    border-radius: 60px;
-                    background: linear-gradient(135deg, #92A3FD, #9DCEFF);
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: center;
-                    align-items: center;
-                    margin-bottom: 10px;
-                    box-shadow: 0 4px 15px rgba(146, 163, 253, 0.15);
-                    
-                    &.zero {
-                        background: linear-gradient(135deg, #9DCEFF, #92A3FD);
-                        opacity: 0.5;
-                        box-shadow: 0 4px 15px rgba(146, 163, 253, 0.1);
-                    }
-                    
-                    &.negative {
-                        background: linear-gradient(135deg, #FF6B6B, #FFB6B6);
-                    }
-
-                    .ultrafiltration-value {
-                        font-size: 28px;
-                        font-weight: 700;
-                        color: #fff;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-
-                        &.negative {
-                            color: #FFE2E2;
-                        }
-                        
-                        .ultrafiltration-unit {
-                            font-size: 16px;
-                            color: #fff;
-                            opacity: 0.9;
-                            margin-left: 4px;
-                            font-weight: 600;
-                        }
-                    }
-                }
-
-                .ultrafiltration-label {
-                    font-size: 16px;
-                    color: #666;
-                }
-            }
-
-            .metrics-details {
-                .metric-item {
-                    display: flex;
-                    justify-content: space-between;
-                    margin-bottom: 12px;
-
-                    .metric-label {
-                        font-size: 14px;
-                        color: #666;
-                    }
-
-                    .metric-value {
-                        font-size: 14px;
-                        font-weight: 500;
-                        color: #333;
-                    }
-                }
-
-                .progress-bar {
-                    height: 8px;
-                    background-color: #F0F0F0;
-                    border-radius: 4px;
-                    margin-bottom: 16px;
-                    overflow: hidden;
-
-                    .progress-fill {
-                        height: 100%;
-                        background: linear-gradient(90deg, #92A3FD, #9DCEFF);
-                        border-radius: 4px;
-                        transition: width 0.3s ease;
-
-                        &.negative {
-                            background: linear-gradient(90deg, #FF6B6B, #FFB6B6);
-                        }
-                    }
-                }
-            }
-        }
-
-        .warning-message {
-            display: flex;
-            align-items: center;
-            background-color: #FFF5F5;
-            padding: 12px 16px;
-            border-radius: 12px;
-            margin-bottom: 16px;
-
-            .at-icon {
-                margin-right: 8px;
-            }
-
-            text {
-                font-size: 14px;
-                color: #FF6B6B;
-            }
-        }
-
-        .quick-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            background-color: #fff;
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.03);
-
-            .action-button {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 8px 0;
-                flex: 1;
-                position: relative;
-
-                &:not(:last-child)::after {
-                    content: '';
-                    position: absolute;
-                    right: 0;
-                    top: 20%;
-                    height: 60%;
-                    width: 1px;
-                    background-color: #f0f0f0;
-                }
-
-                .at-icon {
-                    margin-bottom: 4px;
-                }
-
-                text {
-                    font-size: 12px;
-                    color: #666;
-                }
-            }
-        }
-
-        // 今日详细记录
-        .today-records {
-            margin-top: 20px;
-            
-            .records-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 16px;
-                
-                .records-title {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #333;
-                }
-                
-                .record-count {
-                    font-size: 14px;
-                    color: #666;
-                }
-            }
-            
-            .records-list {
-                background-color: #fff;
-                border-radius: 16px;
-                padding: 20px;
-                box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-
-                .record-item {
-                    display: flex;
-                    margin-bottom: 24px;
-
-                    &:last-child {
-                        margin-bottom: 0;
-
-                        .record-time-container .time-line {
-                            display: none;
-                        }
-                    }
-
-                    .record-time-container {
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        width: 60px;
-                        position: relative;
-
-                        .time-dot {
-                            width: 14px;
-                            height: 14px;
-                            border-radius: 50%;
-                            background-color: #92A3FD;
-                            margin-bottom: 4px;
-                            z-index: 1;
-                            box-shadow: 0 0 0 4px rgba(146, 163, 253, 0.15);
-                            
-                            &.morning { background-color: #FFD166; }
-                            &.afternoon { background-color: #92A3FD; }
-                            &.evening { background-color: #6B66FF; }
-                        }
-
-                        .time-line {
-                            position: absolute;
-                            top: 14px;
-                            width: 2px;
-                            height: calc(100% + 12px);
-                            background-color: #E0E0E0;
-                        }
-
-                        .record-time {
-                            font-size: 14px;
-                            color: #666;
-                            font-weight: 500;
-                        }
-                    }
-
-                    .record-details {
-                        flex: 1;
-                        background-color: #F8F9FA;
-                        border-radius: 16px;
-                        padding: 18px;
-                        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
-                        border: 1px solid rgba(0, 0, 0, 0.03);
-
-                        .record-main-info {
-                            display: flex;
-                            justify-content: space-between;
-                            margin-bottom: 14px;
-                            padding-bottom: 14px;
-                            border-bottom: 1px solid rgba(224, 224, 224, 0.5);
-
-                            .record-label {
-                                font-size: 15px;
-                                color: #666;
-                            }
-
-                            .record-value {
-                                font-size: 18px;
-                                font-weight: 600;
-                                color: #333;
-
-                                &.negative {
-                                    color: #FF6B6B;
-                                    position: relative;
-                                    
-                                    &::before {
-                                        content: '↓';
-                                        margin-right: 2px;
-                                        font-size: 16px;
-                                    }
-                                }
-                                
-                                &:not(.negative) {
-                                    position: relative;
-                                    
-                                    &::before {
-                                        content: '↑';
-                                        margin-right: 2px;
-                                        color: #4CAF50;
-                                        font-size: 16px;
-                                    }
-                                }
-                            }
-                        }
-
-                        .record-secondary-info {
-                            display: flex;
-                            flex-wrap: wrap;
-                            gap: 12px;
-
-                            .info-item {
-                                flex: 1;
-                                min-width: calc(33% - 8px);
-                                background-color: rgba(255, 255, 255, 0.6);
-                                padding: 8px;
-                                border-radius: 8px;
-
-                                .info-label {
-                                    font-size: 12px;
-                                    color: #999;
-                                    margin-bottom: 4px;
-                                    display: block;
-                                }
-
-                                .info-value {
-                                    font-size: 14px;
-                                    color: #333;
-                                    font-weight: 500;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            .empty-records {
-                background-color: #fff;
-                border-radius: 16px;
-                padding: 40px 20px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-
-                .at-icon {
-                    margin-bottom: 16px;
-                }
-
-                .empty-text {
-                    font-size: 16px;
-                    color: #999;
-                }
-            }
-        }
-    }
-
-    // 历史记录部分样式
-    .history-section {
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 16px;
-
-            .history-title-container {
-                display: flex;
-                flex-direction: column;
-
-                .history-title {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #333;
-                    display: flex;
-                    align-items: center;
-                    margin-bottom: 4px;
-
-                    .today-tag {
-                        font-size: 12px;
-                        color: #fff;
-                        background-color: #92A3FD;
-                        padding: 2px 6px;
-                        border-radius: 4px;
-                        margin-left: 8px;
-                    }
-                }
-
-                .date-actions {
-                    display: flex;
-                    align-items: center;
-                    
-                    .today-link {
-                        display: flex;
-                        align-items: center;
-                        font-size: 12px;
-                        color: #92A3FD;
-                        
-                        .at-icon {
-                            margin-right: 4px;
-                        }
-                    }
-                }
-            }
-
-            .record-count {
-                font-size: 14px;
-                color: #666;
-            }
-        }
-
-        .records-list {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-
-            .record-item {
-                display: flex;
-                margin-bottom: 24px;
-
-                &:last-child {
-                    margin-bottom: 0;
-
-                    .record-time-container .time-line {
-                        display: none;
-                    }
-                }
-
-                .record-time-container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    width: 60px;
-                    position: relative;
-
-                    .time-dot {
-                        width: 14px;
-                        height: 14px;
-                        border-radius: 50%;
-                        background-color: #92A3FD;
-                        margin-bottom: 4px;
-                        z-index: 1;
-                        box-shadow: 0 0 0 4px rgba(146, 163, 253, 0.15);
-                        
-                        &.morning { background-color: #FFD166; }
-                        &.afternoon { background-color: #92A3FD; }
-                        &.evening { background-color: #6B66FF; }
-                    }
-
-                    .time-line {
-                        position: absolute;
-                        top: 14px;
-                        width: 2px;
-                        height: calc(100% + 12px);
-                        background-color: #E0E0E0;
-                    }
-
-                    .record-time {
-                        font-size: 14px;
-                        color: #666;
-                        font-weight: 500;
-                    }
-                }
-
-                .record-details {
-                    flex: 1;
-                    background-color: #F8F9FA;
-                    border-radius: 16px;
-                    padding: 18px;
-                    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
-                    border: 1px solid rgba(0, 0, 0, 0.03);
-
-                    .record-main-info {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 14px;
-                        padding-bottom: 14px;
-                        border-bottom: 1px solid rgba(224, 224, 224, 0.5);
-
-                        .record-label {
-                            font-size: 15px;
-                            color: #666;
-                        }
-
-                        .record-value {
-                            font-size: 18px;
-                            font-weight: 600;
-                            color: #333;
-
-                            &.negative {
-                                color: #FF6B6B;
-                                position: relative;
-                                
-                                &::before {
-                                    content: '↓';
-                                    margin-right: 2px;
-                                    font-size: 16px;
-                                }
-                            }
-                            
-                            &:not(.negative) {
-                                position: relative;
-                                
-                                &::before {
-                                    content: '↑';
-                                    margin-right: 2px;
-                                    color: #4CAF50;
-                                    font-size: 16px;
-                                }
-                            }
-                        }
-                    }
-
-                    .record-secondary-info {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 12px;
-
-                        .info-item {
-                            flex: 1;
-                            min-width: calc(33% - 8px);
-                            background-color: rgba(255, 255, 255, 0.6);
-                            padding: 8px;
-                            border-radius: 8px;
-
-                            .info-label {
-                                font-size: 12px;
-                                color: #999;
-                                margin-bottom: 4px;
-                                display: block;
-                            }
-
-                            .info-value {
-                                font-size: 14px;
-                                color: #333;
-                                font-weight: 500;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        .empty-records {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-
-            .at-icon {
-                margin-bottom: 16px;
-            }
-
-            .empty-text {
-                font-size: 16px;
-                color: #999;
-                margin-bottom: 16px;
-            }
-
-            .go-today-button {
-                padding: 8px 16px;
-                background-color: #F0F0F0;
-                border-radius: 20px;
-                
-                text {
-                    font-size: 14px;
-                    color: #666;
-                }
-
-                &:active {
-                    background-color: #E0E0E0;
-                }
-            }
-        }
-
-        .calendar-section {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-            margin-bottom: 20px;
-            
-            .calendar-container {
-                max-height: 280px;
-            }
-        }
-        
-        .selected-date-records {
-            background-color: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-            margin-bottom: 20px;
-        }
-    }
-
-    // 日历部分样式
+  
     .calendar-section {
-        background-color: #fff;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
-        margin-bottom: 24px;
-
-        .calendar-header {
-            margin-bottom: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .month-navigator {
-                display: flex;
-                align-items: center;
-
-                .nav-button {
-                    width: 36px;
-                    height: 36px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 50%;
-                    background-color: #F0F0F0;
-                    transition: background-color 0.2s;
-                    
-                    &:active {
-                        background-color: #E5E5E5;
-                    }
-                }
-
-                .current-month {
-                    font-size: 18px;
-                    font-weight: 600;
-                    color: #333;
-                    margin: 0 16px;
-                    min-width: 120px;
-                    text-align: center;
-                }
-            }
-
-            .today-button {
-                display: flex;
-                align-items: center;
-                padding: 6px 12px;
-                background-color: #F0F0F0;
-                border-radius: 16px;
-                transition: background-color 0.2s;
-                
-                &:active {
-                    background-color: #E5E5E5;
-                }
-                
-                .at-icon {
-                    margin-right: 4px;
-                }
-                
-                text {
-                    font-size: 14px;
-                    color: #666;
-                }
-            }
-        }
-
-        .calendar-container {
-            max-height: 320px;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
-
-            .calendar-weekday {
-                text-align: center;
-                padding: 8px 0;
-                font-size: 14px;
-                color: #999;
-            }
-
-            .calendar-day {
-                aspect-ratio: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                position: relative;
-                
-                &.empty {
-                    background-color: transparent;
-                }
-
-                &.has-record {
-                    background-color: #F8F9FA;
-                    cursor: pointer;
-                    
-                    &:active {
-                        background-color: #EAEAEA;
-                    }
-                }
-
-                &.selected {
-                    background-color: #92A3FD;
-                    
-                    .day-number {
-                        color: #fff;
-                    }
-                }
-
-                &.today {
-                    border: 2px solid #92A3FD;
-                    
-                    &:not(.selected) .day-number {
-                        color: #92A3FD;
-                        font-weight: 600;
-                    }
-                }
-
-                .day-number {
-                    font-size: 14px;
-                    color: #333;
-                }
-
-                .record-indicator {
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    margin-top: 4px;
-
-                    &.positive {
-                        background-color: #4CAF50;
-                    }
-
-                    &.negative {
-                        background-color: #FF6B6B;
-                    }
-                }
-            }
-        }
-
-        .calendar-legend {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid #F0F0F0;
-
-            .legend-item {
-                display: flex;
-                align-items: center;
-
-                .legend-indicator {
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    margin-right: 6px;
-
-                    &.positive {
-                        background-color: #4CAF50;
-                    }
-
-                    &.negative {
-                        background-color: #FF6B6B;
-                    }
-
-                    &.selected {
-                        background-color: #92A3FD;
-                    }
-                }
-
-                .legend-text {
-                    font-size: 12px;
-                    color: #666;
-                }
-            }
-        }
-    }
-
-    // 底部空白区域
-    .bottom-space {
-        height: 65px;
-    }
-
-    // 底部导航样式
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        display: flex;
-        background-color: #f8f9fa;
-        box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.02);
-        padding: 4px 0 6px;
-        z-index: 100;
-        border-top: 1px solid rgba(0, 0, 0, 0.03);
-
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 3px 0;
-            position: relative;
-            transition: opacity 0.2s ease;
-
-            &:active {
-                opacity: 0.7;
-            }
-
-            &.active {
-                .nav-text {
-                    color: #92A3FD;
-                    font-weight: 500;
-                }
-            }
-
-            &.add-button {
-                margin-top: -16px;
-                
-                .add-text {
-                    background: linear-gradient(135deg, #92A3FD, #9DCEFF);
-                    color: #FFFFFF;
-                    font-size: 14px;
-                    font-weight: 500;
-                    padding: 8px 20px;
-                    border-radius: 20px;
-                    box-shadow: 0 4px 10px rgba(146, 163, 253, 0.2);
-                    position: relative;
-                    z-index: 2;
-                    transition: transform 0.2s ease;
-                    
-                    &:active {
-                        transform: scale(0.95);
-                    }
-                }
-
-                &::before {
-                    content: '';
-                    position: absolute;
-                    top: -4px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    width: 100px;
-                    height: 40px;
-                    background-color: #f8f9fa;
-                    border-radius: 20px;
-                    z-index: 1;
-                    box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.01);
-                }
-
-                .nav-text {
-                    display: none;
-                }
-            }
-
-            .at-icon {
-                font-size: 12px;
-            }
-
-            .nav-text {
-                font-size: 10px;
-                color: #666;
-                margin-top: 2px;
-            }
-        }
-    }
-}
-
-.popup-content-wrapper {
-    min-height: 300px;
-    padding: 15px;
-}
-
-.popup-content-scroll {
-    max-height: 60vh;
-}
-
-.detail-records {
-    .detail-header {
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
+      margin-bottom: 24px;
+  
+      .calendar-header {
+        margin-bottom: 16px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #f0f0f0;
-
-        .detail-date {
+  
+        .month-navigator {
+          display: flex;
+          align-items: center;
+  
+          .nav-button {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            transition: background-color 0.2s;
+  
+            &:active {
+              background-color: #e5e5e5;
+            }
+  
+            .chevron-left {
+              width: 12px;
+              height: 12px;
+              border-left: 2px solid #666666;
+              border-bottom: 2px solid #666666;
+              transform: rotate(45deg);
+            }
+  
+            .chevron-right {
+              width: 12px;
+              height: 12px;
+              border-right: 2px solid #666666;
+              border-top: 2px solid #666666;
+              transform: rotate(45deg);
+            }
+          }
+  
+          .current-month {
             font-size: 18px;
             font-weight: 600;
             color: #333;
+            margin: 0 16px;
+            min-width: 120px;
+            text-align: center;
+          }
         }
-
-        .detail-count {
+  
+        .today-button {
+          display: flex;
+          align-items: center;
+          padding: 6px 12px;
+          background-color: #f0f0f0;
+          border-radius: 16px;
+          transition: background-color 0.2s;
+  
+          &:active {
+            background-color: #e5e5e5;
+          }
+  
+          .clock-icon {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #666666;
+            border-radius: 50%;
+            position: relative;
+            margin-right: 4px;
+  
+            &::before {
+              content: "";
+              position: absolute;
+              width: 6px;
+              height: 2px;
+              background: #666666;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%) rotate(90deg);
+            }
+  
+            &::after {
+              content: "";
+              position: absolute;
+              width: 4px;
+              height: 2px;
+              background: #666666;
+              top: 25%;
+              left: 50%;
+              transform: translateX(-50%);
+            }
+          }
+  
+          text {
             font-size: 14px;
-            color: #999;
+            color: #666;
+          }
         }
+      }
+  
+      .calendar-container {
+        max-height: 320px;
+      }
+  
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 8px;
+  
+        .calendar-weekday {
+          text-align: center;
+          padding: 8px 0;
+          font-size: 14px;
+          color: #999;
+        }
+  
+        .calendar-day {
+          aspect-ratio: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+          position: relative;
+  
+          &.empty {
+            background-color: transparent;
+          }
+  
+          &.has-record {
+            background-color: #f8f9fa;
+            cursor: pointer;
+  
+            &:active {
+              background-color: #eaeaea;
+            }
+          }
+  
+          &.selected {
+            background-color: #92a3fd;
+  
+            .day-number {
+              color: #fff;
+            }
+          }
+  
+          &.today {
+            border: 2px solid #92a3fd;
+  
+            &:not(.selected) .day-number {
+              color: #92a3fd;
+              font-weight: 600;
+            }
+          }
+  
+          .day-number {
+            font-size: 14px;
+            color: #333;
+          }
+  
+          .record-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            margin-top: 4px;
+  
+            &.positive {
+              background-color: #4caf50;
+            }
+  
+            &.negative {
+              background-color: #ff6b6b;
+            }
+          }
+        }
+      }
     }
-
-    .detail-item {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #f0f0f0;
-
-        &:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
+  
+    .records-section {
+      background-color: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 8px rgba(0, 0, 0, 0.03);
+  
+      .records-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+  
+        .records-title {
+          font-size: 18px;
+          font-weight: 600;
+          color: #333;
+  
+          .today-tag {
+            font-size: 12px;
+            color: #fff;
+            background-color: #92a3fd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+          }
         }
-
-        .detail-time {
+  
+        .header-actions {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+  
+          .record-count {
+            font-size: 14px;
+            color: #666;
+          }
+  
+          .add-button {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-
-            .time-text {
-                font-size: 16px;
-                font-weight: 500;
+            align-items: center;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #92a3fd, #9dceff);
+            border-radius: 20px;
+            color: #fff;
+  
+            .plus-icon {
+              width: 14px;
+              height: 14px;
+              position: relative;
+              margin-right: 4px;
+  
+              &::before {
+                content: "";
+                position: absolute;
+                width: 100%;
+                height: 2px;
+                background: #fff;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
+              }
+  
+              &::after {
+                content: "";
+                position: absolute;
+                width: 2px;
+                height: 100%;
+                background: #fff;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+              }
+            }
+  
+            text {
+              font-size: 14px;
+              color: #fff;
+            }
+          }
+        }
+      }
+  
+      .records-list {
+        .record-item {
+          display: flex;
+          margin-bottom: 24px;
+  
+          &:last-child {
+            margin-bottom: 0;
+  
+            .record-time-container .time-line {
+              display: none;
+            }
+          }
+  
+          .record-time-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 60px;
+            position: relative;
+  
+            .time-dot {
+              width: 14px;
+              height: 14px;
+              border-radius: 50%;
+              background-color: #92a3fd;
+              margin-bottom: 4px;
+              z-index: 1;
+              box-shadow: 0 0 0 4px rgba(146, 163, 253, 0.15);
+  
+              &.morning {
+                background-color: #ffd166;
+              }
+  
+              &.afternoon {
+                background-color: #92a3fd;
+              }
+  
+              &.evening {
+                background-color: #6b66ff;
+              }
+            }
+  
+            .time-line {
+              position: absolute;
+              top: 14px;
+              width: 2px;
+              height: calc(100% + 12px);
+              background-color: #e0e0e0;
+            }
+  
+            .record-time {
+              font-size: 14px;
+              color: #666;
+              font-weight: 500;
+            }
+          }
+  
+          .record-details {
+            flex: 1;
+            background-color: #f8f9fa;
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+  
+            .record-main-info {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 14px;
+              padding-bottom: 14px;
+              border-bottom: 1px solid rgba(224, 224, 224, 0.5);
+  
+              .record-label {
+                font-size: 15px;
+                color: #666;
+              }
+  
+              .record-value {
+                font-size: 18px;
+                font-weight: 600;
                 color: #333;
-            }
-
-            .sequence-text {
-                font-size: 14px;
-                color: #92A3FD;
-            }
-        }
-
-        .detail-values {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-
-            .value-item {
-                .value-label {
-                    font-size: 12px;
-                    color: #999;
-                    margin-bottom: 4px;
-                    display: block;
-                }
-
-                .value-text {
+  
+                &.negative {
+                  color: #ff6b6b;
+                  position: relative;
+  
+                  &::before {
+                    content: "↓";
+                    margin-right: 2px;
                     font-size: 16px;
-                    color: #333;
-
-                    &.negative {
-                        color: #F44336;
-                    }
+                  }
                 }
+  
+                &:not(.negative) {
+                  position: relative;
+  
+                  &::before {
+                    content: "↑";
+                    margin-right: 2px;
+                    color: #4caf50;
+                    font-size: 16px;
+                  }
+                }
+              }
             }
+  
+            .record-secondary-info {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 12px;
+  
+              .info-item {
+                flex: 1;
+                min-width: calc(33% - 8px);
+                background-color: rgba(255, 255, 255, 0.6);
+                padding: 8px;
+                border-radius: 8px;
+  
+                .info-label {
+                  font-size: 12px;
+                  color: #999;
+                  margin-bottom: 4px;
+                  display: block;
+                }
+  
+                .info-value {
+                  font-size: 14px;
+                  color: #333;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
         }
+      }
+  
+      .empty-records {
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+  
+        .calendar-icon {
+          width: 48px;
+          height: 48px;
+          position: relative;
+          border: 2px solid #e0e0e0;
+          border-radius: 8px;
+          margin-bottom: 16px;
+  
+          &::before {
+            content: "";
+            position: absolute;
+            width: 80%;
+            height: 2px;
+            background: #e0e0e0;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+          }
+  
+          &::after {
+            content: "";
+            position: absolute;
+            width: 2px;
+            height: 80%;
+            background: #e0e0e0;
+            top: 50%;
+            left: 20%;
+            transform: translateY(-50%);
+          }
+        }
+  
+        .empty-text {
+          font-size: 16px;
+          color: #999;
+          margin-bottom: 16px;
+        }
+  
+        .go-today-button {
+          padding: 8px 16px;
+          background-color: #f0f0f0;
+          border-radius: 20px;
+  
+          text {
+            font-size: 14px;
+            color: #666;
+          }
+  
+          &:active {
+            background-color: #e0e0e0;
+          }
+        }
+      }
     }
-}
+  }
