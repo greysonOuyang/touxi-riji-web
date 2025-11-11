@@ -16,6 +16,14 @@
 
 ---
 
+## 🖼️ 截图
+
+| Dashboard | Data Visualization |
+|------------|--------------------|
+| ![Dashboard](./resources/dashboard.jpg) | ![DataShow](./resources/dataShow.jpg) |
+
+---
+
 ## ⚙️ 核心功能
 
 | 模块 | 功能说明 |

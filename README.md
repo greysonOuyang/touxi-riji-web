@@ -16,6 +16,14 @@ It provides data recording, reminder settings, and trend visualization through a
 
 ---
 
+## 🖼️ Screenshots
+
+| Dashboard | Data Visualization |
+|------------|--------------------|
+| ![Dashboard](./resources/dashboard.jpg) | ![DataShow](./resources/dataShow.jpg) |
+
+---
+
 ## ⚙️ Core Features
 
 | Module | Description |
